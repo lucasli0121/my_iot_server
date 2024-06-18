@@ -1,0 +1,2497 @@
+definitions:
+  api.InsertUserFriendReq:
+    properties:
+      phone:
+        description: |-
+          required: true
+          example: 1
+        type: string
+      user_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  api.RemoveUserDeviceReq:
+    properties:
+      device_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+      user_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mdb.AskEd713RealDataReq:
+    properties:
+      freq:
+        description: |-
+          发送频率
+          required: false
+        type: integer
+      keep_push:
+        description: |-
+          是否保持推送
+          required: true
+          enum: 0,1
+        type: integer
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+    type: object
+  mdb.AskX1RealDataReq:
+    properties:
+      freq:
+        description: |-
+          发送频率
+          required: false
+        type: integer
+      keep_push:
+        description: |-
+          是否保持推送
+          required: true
+          enum: 0,1
+        type: integer
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+    type: object
+  mdb.CleanX1EventReq:
+    properties:
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+    type: object
+  mdb.ControlLampReq:
+    properties:
+      brightness:
+        type: integer
+      color_temp:
+        type: integer
+      ctrl_mode:
+        type: integer
+      end_time:
+        type: string
+      mac:
+        type: string
+      select:
+        type: integer
+      start_time:
+        type: string
+      switch:
+        type: integer
+    type: object
+  mdb.CreateStudyRoomReq:
+    properties:
+      create_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+      flag:
+        description: |-
+          required: true
+          example: 0,  1--auto invite create
+        type: integer
+      name:
+        description: |-
+          required: true
+          example: study room
+        type: string
+    type: object
+  mdb.DeleteUserReq:
+    properties:
+      id:
+        description: |-
+          required: false
+          example: 1
+        type: integer
+    type: object
+  mdb.DeviceBindResp:
+    properties:
+      bind:
+        description: 'required: true'
+        type: boolean
+      mac:
+        description: 'required: true'
+        type: string
+    type: object
+  mdb.ImproveDisturbedReq:
+    properties:
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+      switch:
+        description: |-
+          开关状态
+          required: true
+          enum: 0,1
+        type: integer
+    type: object
+  mdb.LampRealDataReq:
+    properties:
+      mac:
+        type: string
+      req:
+        $ref: '#/definitions/mysql.RealDataReq'
+    type: object
+  mdb.LoginReq:
+    properties:
+      account:
+        description: |-
+          required: true
+          example: 1
+        type: string
+      login_type:
+        description: |-
+          required: false
+          example: 1
+        type: integer
+      passwd:
+        description: |-
+          required: true
+          example: 1
+        type: string
+    type: object
+  mdb.LoginoutReq:
+    properties:
+      id:
+        description: |-
+          required: false
+          example: 1
+        type: integer
+    type: object
+  mdb.ModifyFriendReq:
+    properties:
+      face:
+        type: string
+      friend_id:
+        type: integer
+      nick_name:
+        type: string
+      user_id:
+        description: 'required: true'
+        type: integer
+    type: object
+  mdb.ModifyStudyRoomReq:
+    properties:
+      name:
+        description: |-
+          required: true
+          example: "study room name"
+        type: string
+      room_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mdb.NewDeviceReq:
+    properties:
+      flag:
+        description: |-
+          required: false
+          flag 0:自己创建 1:共享
+        type: integer
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+      name:
+        description: |-
+          required: true
+          设备名称
+        type: string
+      type:
+        description: |-
+          设备类型
+          required: false
+          enum: heart_rate,fall_check,lamp_type
+        type: string
+      user_id:
+        type: integer
+    type: object
+  mdb.NewEmail:
+    properties:
+      email:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  mdb.NewPasswd:
+    properties:
+      password:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  mdb.NewPhone:
+    properties:
+      phone:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  mdb.NickNameReq:
+    properties:
+      nick_name:
+        type: string
+      user_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mdb.QueryDateListResp:
+    properties:
+      days:
+        items:
+          type: string
+        type: array
+      mac:
+        description: 'required: true'
+        type: string
+    type: object
+  mdb.ReleaseStudyRoomReq:
+    properties:
+      create_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+      room_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mdb.RemoveFriendReq:
+    properties:
+      friend_id:
+        description: 'required: true'
+        type: integer
+      user_id:
+        description: 'required: true'
+        type: integer
+    type: object
+  mdb.ShareDeviceReq:
+    properties:
+      flag:
+        description: |-
+          required: true
+          flag 0:自己创建 1:共享
+        type: integer
+      id:
+        description: |-
+          required: true
+          设备ID
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  mdb.SleepX1SwitchReq:
+    properties:
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+      switch:
+        description: |-
+          开关状态
+          required: true
+          enum: 0,1
+        type: integer
+    type: object
+  mdb.StatsHeartRate:
+    properties:
+      breath_rate:
+        type: integer
+      breath_rate_range:
+        items:
+          type: integer
+        type: array
+      heart_rate:
+        description: 'required: true'
+        type: integer
+      heart_rate_range:
+        items:
+          type: integer
+        type: array
+      physical:
+        type: integer
+      physical_range:
+        items:
+          type: integer
+        type: array
+      stats_item:
+        items:
+          $ref: '#/definitions/mdb.StatsHeartRateItem'
+        type: array
+    type: object
+  mdb.StatsHeartRateItem:
+    properties:
+      high_breath_rate:
+        type: integer
+      high_heart_rate:
+        type: integer
+      high_physical:
+        type: integer
+      low_breath_rate:
+        type: integer
+      low_heart_rate:
+        type: integer
+      low_physical:
+        type: integer
+    type: object
+  mdb.UpdateDeviceReq:
+    properties:
+      id:
+        type: integer
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+      name:
+        type: string
+      remark:
+        description: |-
+          required: false
+          设备备注
+        type: string
+      type:
+        description: |-
+          设备类型
+          required: false
+          enum: heart_rate,fall_check,lamp_type
+        type: string
+    type: object
+  mdb.UserEnterStudyReq:
+    properties:
+      room_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+      user_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mdb.UserFacePicReq:
+    properties:
+      face:
+        type: string
+      user_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mdb.UserStudyData:
+    properties:
+      day_data:
+        items:
+          $ref: '#/definitions/mysql.UserStudyDataByDay'
+        type: array
+      total_data:
+        items:
+          $ref: '#/definitions/mysql.UserStudyRoomData'
+        type: array
+    type: object
+  mdb.UserToStudyRoomReq:
+    properties:
+      create_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+      room_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+      sn:
+        description: |-
+          required: false
+          example: 1
+        type: integer
+      user_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mysql.Device:
+    properties:
+      create_time:
+        type: string
+      id:
+        description: |-
+          设备ID
+          required: true
+        type: integer
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+      name:
+        type: string
+      online:
+        description: |-
+          是否在线
+          required: false
+          enum: 0,1
+        type: integer
+      online_time:
+        type: string
+      remark:
+        type: string
+      room_num:
+        type: string
+      type:
+        description: |-
+          设备类型
+          required: false
+          enum: heart_rate,fall_check,lamp_type
+        type: string
+    type: object
+  mysql.EventReportSql:
+    properties:
+      create_time:
+        type: string
+      eventTs:
+        type: integer
+      eventType:
+        type: integer
+      id:
+        type: integer
+      mac:
+        type: string
+    type: object
+  mysql.FallAlarm:
+    properties:
+      alarm_event:
+        type: integer
+      create_time:
+        type: string
+      id:
+        type: integer
+      mac:
+        type: string
+    required:
+    - mac
+    type: object
+  mysql.FallCheck:
+    properties:
+      active_state:
+        type: integer
+      create_time:
+        type: string
+      fall_state:
+        type: integer
+      id:
+        type: integer
+      mac:
+        type: string
+      person_state:
+        type: integer
+      type:
+        type: integer
+    required:
+    - mac
+    type: object
+  mysql.FallParams:
+    properties:
+      back_dist:
+        type: integer
+      beeper:
+        type: integer
+      create_time:
+        type: string
+      device_id:
+        type: integer
+      front_dist:
+        type: integer
+      id:
+        type: integer
+      install_flag:
+        type: integer
+      install_height:
+        type: integer
+      left_dist:
+        type: integer
+      right_dist:
+        type: integer
+      sensitive:
+        type: integer
+      state_delay:
+        type: integer
+    required:
+    - device_id
+    type: object
+  mysql.HeartRate:
+    properties:
+      active_status:
+        type: integer
+      breathe_rate:
+        type: integer
+      create_time:
+        type: string
+      heart_rate:
+        type: integer
+      id:
+        type: integer
+      mac:
+        type: string
+      person_num:
+        type: integer
+      person_pos:
+        type: integer
+      person_status:
+        type: integer
+      physical_rate:
+        type: integer
+      sleep_features:
+        type: integer
+      stages_status:
+        type: integer
+    required:
+    - mac
+    type: object
+  mysql.LampControlSql:
+    properties:
+      brightness:
+        type: integer
+      color_temp:
+        type: integer
+      create_time:
+        type: string
+      ctrl_mode:
+        type: integer
+      end_time:
+        type: string
+      id:
+        type: integer
+      mac:
+        type: string
+      select:
+        type: integer
+      start_time:
+        type: string
+      switch:
+        type: integer
+    type: object
+  mysql.LampReportStatus:
+    properties:
+      concentration:
+        type: integer
+      concentration_time_len:
+        type: integer
+      efficiency:
+        type: integer
+      efficiency_time_len:
+        type: integer
+      evaluation:
+        type: integer
+      evaluation_time_len:
+        type: integer
+      mac:
+        type: string
+    type: object
+  mysql.LampUserWithStudyRoom:
+    properties:
+      nick_name:
+        type: string
+      phone:
+        type: string
+      room_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  mysql.NotifySetting:
+    properties:
+      high_value:
+        type: integer
+      id:
+        type: integer
+      interval_time:
+        type: integer
+      last_notify_time:
+        type: string
+      last_status:
+        type: integer
+      low_value:
+        type: integer
+      mac:
+        type: string
+      switch:
+        type: integer
+      type:
+        description: |-
+          通知类型
+          required: true
+          PeopleType         = 1
+          BreathType         = 2
+          BreathAbnormalType = 3
+          HeartRateType      = 4
+          NurseModeType      = 5
+          BeeperType         = 6
+          LightType          = 7
+        type: integer
+    type: object
+  mysql.RealDataReq:
+    properties:
+      deadline:
+        type: integer
+      frequency:
+        type: integer
+      keep_push:
+        type: integer
+    type: object
+  mysql.RealDataSql:
+    properties:
+      activity_freq:
+        type: integer
+      body_angle:
+        type: integer
+      body_movement:
+        type: integer
+      body_pos:
+        type: integer
+      body_status:
+        type: integer
+      create_time:
+        type: string
+      flow_state:
+        type: integer
+      hand_angle:
+        type: integer
+      hand_pos:
+        type: integer
+      head_angle:
+        type: integer
+      head_pos:
+        type: integer
+      heart_rate:
+        type: integer
+      id:
+        type: integer
+      mac:
+        type: string
+      posture_state:
+        type: integer
+      remark:
+        type: string
+      respiratory:
+        type: integer
+    type: object
+  mysql.SleepReport:
+    properties:
+      awake_long:
+        type: integer
+      end_time:
+        type: string
+      leave_bed_num:
+        type: integer
+      leave_bed_time:
+        items:
+          type: string
+        type: array
+      on_bed_time:
+        type: string
+      sleep_deep:
+        type: integer
+      sleep_light:
+        type: integer
+      sleep_long:
+        type: integer
+      sleep_num:
+        type: integer
+      sleep_time:
+        items:
+          $ref: '#/definitions/mysql.SleepTime'
+        type: array
+      stages_sleep_time:
+        items:
+          $ref: '#/definitions/mysql.StagesSleepTime'
+        type: array
+      start_time:
+        type: string
+      turn_over:
+        type: integer
+    type: object
+  mysql.SleepTime:
+    properties:
+      begin_sleep_time:
+        type: string
+      end_sleep_time:
+        type: string
+    type: object
+  mysql.StagesSleepTime:
+    properties:
+      begin_sleep_time:
+        type: string
+      end_sleep_time:
+        type: string
+      stages_status:
+        description: '0: awake, 1: light sleep, 2: deep sleep'
+        type: integer
+    type: object
+  mysql.StudyRoom:
+    properties:
+      capacity:
+        type: integer
+      close_time:
+        type: string
+      create_id:
+        type: integer
+      create_time:
+        type: string
+      current_num:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: integer
+    type: object
+  mysql.StudyRoomRanking:
+    properties:
+      nick_name:
+        description: 用户昵称
+        type: string
+      phone:
+        description: 用户手机号
+        type: string
+      room_id:
+        description: 房间id
+        type: integer
+      room_name:
+        description: 房间名称
+        type: string
+      today_days:
+        description: 总天数
+        type: integer
+      total_seconds:
+        description: 总时长 秒
+        type: integer
+      user_id:
+        description: 用户id
+        type: integer
+    type: object
+  mysql.StudyRoomUser:
+    properties:
+      create_time:
+        type: string
+      id:
+        type: integer
+      room_id:
+        type: integer
+      sn:
+        type: integer
+      status:
+        description: 1:邀请 0:移除
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  mysql.StudyRoomUserDetail:
+    properties:
+      capacity:
+        type: integer
+      create_id:
+        type: integer
+      create_time:
+        type: string
+      current_num:
+        type: integer
+      id:
+        type: integer
+      nick_name:
+        type: string
+      room_id:
+        type: integer
+      room_name:
+        type: string
+      sn:
+        type: integer
+      user_id:
+        type: integer
+      user_phone:
+        type: string
+    type: object
+  mysql.User:
+    properties:
+      account:
+        type: string
+      address:
+        type: string
+      create_time:
+        type: string
+      email:
+        type: string
+      emergent_phone:
+        type: string
+      face:
+        type: string
+      id:
+        type: integer
+      is_login:
+        type: integer
+      login_time:
+        type: string
+      login_type:
+        description: 0:phone 1:email
+        type: integer
+      nick_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      room_num:
+        type: string
+    type: object
+  mysql.UserDevice:
+    properties:
+      create_time:
+        type: string
+      flag:
+        description: |-
+          required: false
+          flag 0:自己创建 1:共享
+        type: integer
+      id:
+        description: |-
+          设备ID
+          required: true
+        type: integer
+      mac:
+        description: |-
+          设备mac地址
+          required: true
+        type: string
+      name:
+        type: string
+      online:
+        description: |-
+          是否在线
+          required: false
+          enum: 0,1
+        type: integer
+      online_time:
+        type: string
+      remark:
+        type: string
+      room_num:
+        type: string
+      type:
+        description: |-
+          设备类型
+          required: false
+          enum: heart_rate,fall_check,lamp_type
+        type: string
+      user_id:
+        description: |-
+          required: true
+          user id
+        type: integer
+    type: object
+  mysql.UserFriend:
+    properties:
+      create_time:
+        type: string
+      email:
+        type: string
+      face:
+        type: string
+      friend_id:
+        type: integer
+      group_name:
+        type: string
+      id:
+        type: integer
+      nick_name:
+        type: string
+      phone:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - user_id
+    type: object
+  mysql.UserStudyDataByDay:
+    properties:
+      day_seconds:
+        type: integer
+      enter_day:
+        type: string
+    type: object
+  mysql.UserStudyRecord:
+    properties:
+      enter_time:
+        type: string
+      id:
+        type: integer
+      leave_time:
+        type: string
+      room_id:
+        type: integer
+      sn:
+        type: integer
+      status:
+        description: 1:进入 0:离开
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  mysql.UserStudyRoomData:
+    properties:
+      avg_seconds:
+        description: 平均时长
+        type: integer
+      max_seconds:
+        description: 最大时长
+        type: integer
+      room_id:
+        description: 房间id
+        type: integer
+      total_days:
+        description: 总天数
+        type: integer
+      total_seconds:
+        description: 总时长
+        type: integer
+      user_id:
+        description: 用户id
+        type: integer
+    type: object
+  mysql.UserStudyTime:
+    properties:
+      enter_time:
+        description: 'required: true'
+        type: string
+      leave_time:
+        type: string
+      user_id:
+        description: 'required: true'
+        type: integer
+    type: object
+  mysql.X1DayReportOrigin:
+    properties:
+      create_time:
+        type: string
+      id:
+        type: integer
+      mac:
+        type: string
+      value:
+        type: string
+    required:
+    - id
+    - mac
+    type: object
+  mysql.X1RealDataOrigin:
+    properties:
+      create_time:
+        type: string
+      id:
+        type: integer
+      mac:
+        type: string
+      value:
+        type: string
+    required:
+    - id
+    - mac
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/device/askEd713RealData:
+    post:
+      description: ask Ed713 device to send real data
+      parameters:
+      - description: ack Ed713 info
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.AskEd713RealDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: askEd713RealData
+      tags:
+      - ED713 device
+  /v1/device/askX1RealData:
+    post:
+      description: ask X1 device to send real data
+      parameters:
+      - description: ack X1 info
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.AskX1RealDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: askX1RealData
+      tags:
+      - X1 device
+  /v1/device/cleanX1Event:
+    post:
+      description: clean event from X1 device
+      parameters:
+      - description: clean X1 event
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.CleanX1EventReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: cleanX1Event
+      tags:
+      - X1 device
+  /v1/device/controlLamp:
+    post:
+      description: control lamp status
+      parameters:
+      - description: control lamp
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ControlLampReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: controlLamp
+      tags:
+      - lamp device
+  /v1/device/createStudyRoom:
+    post:
+      description: create study room
+      parameters:
+      - description: room information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.CreateStudyRoomReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.StudyRoom'
+      summary: createStudyRoom
+      tags:
+      - room
+  /v1/device/improveDisturbed:
+    post:
+      description: import x1 device disturbed data
+      parameters:
+      - description: X1 distrube switch
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ImproveDisturbedReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: improveDisturbed
+      tags:
+      - X1 device
+  /v1/device/insert:
+    post:
+      description: insert user device
+      parameters:
+      - description: user device information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.NewDeviceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserDevice'
+      summary: insertDevice
+      tags:
+      - device
+  /v1/device/insertFallParams:
+    post:
+      description: query fall check device install params
+      parameters:
+      - description: fall check device params
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mysql.FallParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.FallParams'
+      summary: insertFallParams
+      tags:
+      - fall check device
+  /v1/device/modifyStudyRoom:
+    post:
+      description: 修改自习室信息
+      parameters:
+      - description: room information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ModifyStudyRoomReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 修改成功"}
+          schema:
+            type: string
+      summary: modifyStudyRoom
+      tags:
+      - room
+  /v1/device/openLampRealData:
+    post:
+      description: query fall check device install params
+      parameters:
+      - description: lamp real data
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.LampRealDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: openLampRealData
+      tags:
+      - lamp device
+  /v1/device/queryAlarmRecord:
+    get:
+      description: query alarm record report from fall check device
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day, format yyyy-MM-dd
+        in: query
+        name: begin_day
+        type: string
+      - description: end day, format yyyy-MM-dd
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.FallAlarm'
+      summary: queryAlarmRecord
+      tags:
+      - fall check device
+  /v1/device/queryBindByMac:
+    get:
+      description: query device has bind by mac
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.DeviceBindResp'
+      summary: queryBindByMac
+      tags:
+      - device
+  /v1/device/queryById:
+    get:
+      description: query device infomaion
+      parameters:
+      - description: device id
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.Device'
+      summary: queryById
+      tags:
+      - device
+  /v1/device/queryByUser:
+    get:
+      description: query device infomaion by user id
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: flag
+        in: query
+        name: flag
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.Device'
+      summary: queryByUser
+      tags:
+      - device
+  /v1/device/queryDateListInReport:
+    get:
+      description: 查詢报表中含有数据的日期列表
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day, format yyyy-MM-dd
+        in: query
+        name: begin_day
+        type: string
+      - description: end day, format yyyy-MM-dd
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.QueryDateListResp'
+      summary: queryDateListInReport
+      tags:
+      - device
+  /v1/device/queryFallCheckStatus:
+    get:
+      description: query fall check data
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.FallCheck'
+      summary: queryFallCheckStatus
+      tags:
+      - fall check device
+  /v1/device/queryFallExistRecord:
+    get:
+      description: query fall check data if has person exist
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day, format yyyy-MM-dd
+        in: query
+        name: begin_day
+        type: string
+      - description: end day, format yyyy-MM-dd
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.FallCheck'
+      summary: queryFallExistRecord
+      tags:
+      - fall check device
+  /v1/device/queryFallParams:
+    get:
+      description: query fall check device install params
+      parameters:
+      - description: device id
+        in: query
+        name: device_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.FallParams'
+      summary: queryFallParams
+      tags:
+      - fall check device
+  /v1/device/queryHeartRate:
+    get:
+      description: query heart data from heart rate table
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day, format yyyy-MM-dd
+        in: query
+        name: begin_day
+        type: string
+      - description: end day, format yyyy-MM-dd
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.HeartRate'
+      summary: queryHeartRate
+      tags:
+      - sleep device
+  /v1/device/queryInviteStudyRoom:
+    get:
+      description: query invited study room by create user
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.StudyRoomUserDetail'
+      summary: queryInviteStudyRoom
+      tags:
+      - room
+  /v1/device/queryLampControl:
+    get:
+      description: query lamp control data by mac
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.LampControlSql'
+      summary: queryLampControl
+      tags:
+      - lamp device
+  /v1/device/queryLampEvent:
+    get:
+      description: query lamp device real-data by mac and time
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day
+        in: query
+        name: begin_day
+        type: string
+      - description: end day
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.EventReportSql'
+      summary: queryLampEvent
+      tags:
+      - lamp device
+  /v1/device/queryLampRealData:
+    get:
+      description: query lamp device real-data by mac and time
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day
+        in: query
+        name: begin_day
+        type: string
+      - description: end day
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.RealDataSql'
+      summary: queryLampRealData
+      tags:
+      - lamp device
+  /v1/device/queryLampReportStatus:
+    get:
+      description: query lamp device report by mac and date
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day
+        in: query
+        name: begin_day
+        type: string
+      - description: end day
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.LampReportStatus'
+      summary: queryLampReportStatus
+      tags:
+      - lamp device
+  /v1/device/queryRankingByStudyRoom:
+    get:
+      description: 查询自习室排行数据，查询条件自习室id
+      parameters:
+      - description: room id
+        in: query
+        name: room_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.StudyRoomRanking'
+      summary: queryRankingByStudyRoom
+      tags:
+      - room
+  /v1/device/querySleepReport:
+    get:
+      description: query sleep report data
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day, format yyyy-MM-dd
+        in: query
+        name: begin_day
+        type: string
+      - description: end day, format yyyy-MM-dd
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.SleepReport'
+      summary: querySleepReport
+      tags:
+      - sleep device
+  /v1/device/queryStudyRoom:
+    get:
+      description: query study room by create user id
+      parameters:
+      - description: user id in study room
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.StudyRoom'
+      summary: queryStudyRoom
+      tags:
+      - room
+  /v1/device/queryX1RealDataJson:
+    get:
+      description: query X1 real data in json format
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: create date
+        in: query
+        name: create_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.X1RealDataOrigin'
+      summary: queryX1RealDataJson
+      tags:
+      - X1 device
+  /v1/device/queryX1SleepReportJson:
+    get:
+      description: query X1 sleep report in json format
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: create date
+        in: query
+        name: create_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.X1DayReportOrigin'
+      summary: queryX1SleepReportJson
+      tags:
+      - X1 device
+  /v1/device/releaseStudyRoom:
+    post:
+      description: release study room
+      parameters:
+      - description: release room
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ReleaseStudyRoomReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: release study room success"}
+          schema:
+            type: string
+      summary: releaseStudyRoom
+      tags:
+      - room
+  /v1/device/share:
+    post:
+      description: update user device
+      parameters:
+      - description: user device information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ShareDeviceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserDevice'
+      summary: shareDevice
+      tags:
+      - device
+  /v1/device/sleepX1Switch:
+    post:
+      description: change sleep switch of X1 device
+      parameters:
+      - description: X1 switch
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.SleepX1SwitchReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: sleepX1Switch
+      tags:
+      - X1 device
+  /v1/device/statsHeartRateByMinute:
+    get:
+      description: stats heart data per half of hour from heart rate table
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: begin day, format yyyy-MM-dd
+        in: query
+        name: begin_day
+        type: string
+      - description: end day, format yyyy-MM-dd
+        in: query
+        name: end_day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.StatsHeartRate'
+      summary: statsHeartRateByMinute
+      tags:
+      - sleep device
+  /v1/device/statsLampFlowData:
+    get:
+      description: 统计台灯的心流数据，根据日期返回心流的比率数据
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: start time
+        in: query
+        name: start_time
+        required: true
+        type: string
+      - description: end time
+        in: query
+        name: end_time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: statsLampFlowData
+      tags:
+      - lamp device
+  /v1/device/update:
+    post:
+      description: update user device
+      parameters:
+      - description: user device information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UpdateDeviceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.Device'
+      summary: updateDevice
+      tags:
+      - device
+  /v1/notify/notifySetting:
+    post:
+      description: set params for notify
+      parameters:
+      - description: people notify setting
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mysql.NotifySetting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: notifySetting
+      tags:
+      - Notify
+  /v1/notify/queryAllNotifySetting:
+    get:
+      description: query params for notify setting
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.NotifySetting'
+      summary: queryAllNotifySetting
+      tags:
+      - Notify
+  /v1/notify/queryNotifySettingByType:
+    get:
+      description: query params for notify setting
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: notify type
+        in: query
+        name: type
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.NotifySetting'
+      summary: queryNotifySetting
+      tags:
+      - Notify
+  /v1/user/addUserToStudyRoom:
+    post:
+      description: add user id to study room
+      parameters:
+      - description: add user to study room
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UserToStudyRoomReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.StudyRoomUser'
+      summary: addUserToStudyRoom
+      tags:
+      - room
+  /v1/user/deleteUser:
+    post:
+      description: delete user from server
+      parameters:
+      - description: user id
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.DeleteUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: delete user ok""}
+          schema:
+            type: string
+      summary: deleteUser
+      tags:
+      - user
+  /v1/user/enterStudyRoom:
+    post:
+      description: 用户进入已邀请的自习室
+      parameters:
+      - description: study info
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UserEnterStudyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserStudyRecord'
+      summary: enterStudyRoom
+      tags:
+      - room
+  /v1/user/insertUserFriend:
+    post:
+      description: insert user's friend
+      parameters:
+      - description: friend info
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/api.InsertUserFriendReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserFriend'
+      summary: insertUserFriend
+      tags:
+      - user
+  /v1/user/leaveStudyRoom:
+    post:
+      description: 用户离开已邀请的自习室
+      parameters:
+      - description: study info
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UserEnterStudyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: leave room success"}
+          schema:
+            type: string
+      summary: leaveStudyRoom
+      tags:
+      - room
+  /v1/user/loginout:
+    post:
+      description: login out from server
+      parameters:
+      - description: user id
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.LoginoutReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: loginout
+      tags:
+      - user
+  /v1/user/modifyEmail:
+    post:
+      description: modify user email
+      parameters:
+      - description: user email
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.NewEmail'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: modifyEmail
+      tags:
+      - user
+  /v1/user/modifyEmergentPhone:
+    post:
+      description: modify user emergent phone
+      parameters:
+      - description: user information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.NewPhone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: modifyEmergentPhone
+      tags:
+      - user
+  /v1/user/modifyPasswd:
+    post:
+      description: modify user passwd
+      parameters:
+      - description: user new passwd
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.NewPasswd'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: modifyPasswd
+      tags:
+      - user
+  /v1/user/modifyPhone:
+    post:
+      description: modify user phone
+      parameters:
+      - description: user information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.NewPhone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: modifyPhone
+      tags:
+      - user
+  /v1/user/modifyUserFriend:
+    post:
+      description: modify user's friend
+      parameters:
+      - description: modify friend request
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ModifyFriendReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: modify user friend ok""}
+          schema:
+            type: string
+      summary: modifyUserFriend
+      tags:
+      - user
+  /v1/user/offline:
+    post:
+      description: set user offline
+      parameters:
+      - description: user id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: offline
+      tags:
+      - user
+  /v1/user/online:
+    post:
+      description: set user online
+      parameters:
+      - description: user id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: online
+      tags:
+      - user
+  /v1/user/queryById:
+    get:
+      description: query user by id
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: queryById
+      tags:
+      - user
+  /v1/user/queryFriendsByUser:
+    get:
+      description: query user's friend
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserFriend'
+      summary: queryFriendsByUser
+      tags:
+      - user
+  /v1/user/queryLampUserInFriend:
+    get:
+      description: 查询好友中绑定灯的好友
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.LampUserWithStudyRoom'
+      summary: queryLampUserInFriend
+      tags:
+      - room
+  /v1/user/queryLampUsersByRoom:
+    get:
+      description: 查询拥有灯的用户，条件自习室ID,id=0 时拥有灯控的所有用户
+      parameters:
+      - description: room id
+        in: query
+        name: room_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.LampUserWithStudyRoom'
+      summary: queryLampUsersByRoom
+      tags:
+      - room
+  /v1/user/queryStudyRoomUser:
+    get:
+      description: query user list from study room
+      parameters:
+      - description: create user id
+        in: query
+        name: create_id
+        required: true
+        type: integer
+      - description: room id
+        in: query
+        name: room_id
+        required: true
+        type: integer
+      - description: flag 0:all 1:study user
+        in: query
+        name: flag
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.StudyRoomUserDetail'
+      summary: queryStudyRoomUser
+      tags:
+      - room
+  /v1/user/queryUserByEmail:
+    get:
+      description: query user by email
+      parameters:
+      - description: user email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: queryUserByEmail
+      tags:
+      - user
+  /v1/user/queryUserByPhone:
+    get:
+      description: query user by phone
+      parameters:
+      - description: user phone
+        in: query
+        name: phone
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: queryUserByPhone
+      tags:
+      - user
+  /v1/user/queryUserStudyData:
+    get:
+      description: 查询用户自习的数据,包括自习时长，自习天数，平均时长，最长时间, 以及根据日期进行分组统计每天的自习时长
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: room id
+        in: query
+        name: room_id
+        required: true
+        type: integer
+      - description: start time
+        in: query
+        name: start_time
+        required: true
+        type: string
+      - description: end time
+        in: query
+        name: end_time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.UserStudyData'
+      summary: queryUserStudyData
+      tags:
+      - room
+  /v1/user/queryUserStudyTimeByDay:
+    get:
+      description: 查询用户学习时间段，根据指定日期查询
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: room id
+        in: query
+        name: room_id
+        required: true
+        type: integer
+      - description: query date
+        in: query
+        name: query_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserStudyTime'
+      summary: queryUserStudyTimeByDay
+      tags:
+      - room
+  /v1/user/removeUserDevice:
+    post:
+      description: remove user device
+      parameters:
+      - description: user device
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/api.RemoveUserDeviceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: remove user device ok"}
+          schema:
+            type: string
+      summary: removeUserDevice
+      tags:
+      - user
+  /v1/user/removeUserFriend:
+    post:
+      description: remove user's friend
+      parameters:
+      - description: remove friend request
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.RemoveFriendReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: remove user friend ok""}
+          schema:
+            type: string
+      summary: removeUserFriend
+      tags:
+      - user
+  /v1/user/removeUserFromStudyRoom:
+    post:
+      description: remove user id from study room
+      parameters:
+      - description: remove user from study room
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UserToStudyRoomReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: removeUserFromStudyRoom
+      tags:
+      - room
+  /v1/user/update:
+    post:
+      description: update user
+      parameters:
+      - description: user information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mysql.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: update
+      tags:
+      - user
+  /v1/user/updateHeadPic:
+    post:
+      description: update user face picture
+      parameters:
+      - description: user picture information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UserFacePicReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: updateHeadPic
+      tags:
+      - user
+  /v1/user/updateNickName:
+    post:
+      description: update user nickname
+      parameters:
+      - description: user information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.NickNameReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: updateNickName
+      tags:
+      - user
+  /v1/user/userLogin:
+    post:
+      description: login in
+      parameters:
+      - description: user info
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: userLogin
+      tags:
+      - user
+  /v1/user/userRegister:
+    post:
+      description: user register
+      parameters:
+      - description: user info
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mysql.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: userRegister
+      tags:
+      - user
+swagger: "2.0"

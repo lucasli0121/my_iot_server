@@ -1,0 +1,71 @@
+server:
+  host: 0.0.0.0:8082
+  out_url: https://8.217.217.243:8082/
+  location: zh-hk  # zh-hk  zh-cn  en-us
+database:
+  #url: mongodb://dening-tech.net:27017
+  #url: mongodb://120.79.139.90:27017
+  #url: tcp(120.79.139.90:9306)
+  url: tcp(8.217.217.243:9306)
+  username: hjy
+  password: hjy123
+  dbname: hjy
+mq:
+  host: 8.217.217.243
+  port: 1883
+  client_id: hjyserver_mqtt_client_2
+  username: hjy
+  password: hjy123
+log:
+  level: debug
+  file: ./log/hjyserver.log
+  maxsize: 100
+  maxage: 7
+  maxbackups: 10
+  console: true
+  format: text
+  
+alarm_msg:
+  pull_rope_alarm_msg_cn: "紧急拉绳报警"
+  pull_rope_alarm_msg_hk: "緊急拉繩報警"
+  pull_rope_alarm_msg_en: "Emergency Pull Rope Alarm"
+  disarmed_pull_rope_alarm_msg_cn: "解除紧急拉绳报警"
+  disarmed_pull_rope_alarm_msg_hk: "解除緊急拉繩報警"
+  disarmed_pull_rope_alarm_msg_en: "Disarmed Emergency Pull Rope Alarm"
+  apnea_alarm_msg_cn: "呼吸暂停报警"
+  apnea_alarm_msg_hk: "呼吸暫停報警"
+  apnea_alarm_msg_en: "Apnea Alarm"
+  leave_bed_alarm_msg_cn: "离床报警"
+  leave_bed_alarm_msg_hk: "離床報警"
+  leave_bed_alarm_msg_en: "Leave Bed Alarm"
+  in_bed_alarm_msg_cn: "在床报警"
+  in_bed_alarm_msg_hk: "在床報警"
+  in_bed_alarm_msg_en: "In Bed Alarm"
+  breathing_abnormal_alarm_msg_cn: "呼吸异常报警"
+  breathing_abnormal_alarm_msg_hk: "呼吸異常報警"
+  breathing_abnormal_alarm_msg_en: "Breathing Abnormal Alarm"
+  heart_rate_abnormal_alarm_msg_cn: "心率异常报警"
+  heart_rate_abnormal_alarm_msg_hk: "心率異常報警"
+  heart_rate_abnormal_alarm_msg_en: "Heart Rate Abnormal Alarm"
+  check_person_activity_msg_cn: "护眠仪检测到人员活动"
+  check_person_activity_msg_hk: "護眠儀檢測到人員活動"
+  check_person_activity_msg_en: "The sleep monitor detects personnel activity"
+  check_person_no_activity_msg_cn: "护眠仪检测到无人员活动"
+  check_person_no_activity_msg_hk: "護眠儀檢測到無人員活動"
+  check_person_no_activity_msg_en: "The sleep monitor detects no personnel activity"
+  check_person_breath_high_msg_cn: "护眠仪检测到呼吸频率过高"
+  check_person_breath_high_msg_hk: "護眠儀檢測到呼吸頻率過高"
+  check_person_breath_high_msg_en: "The sleep monitor detects a high respiratory rate"
+  check_person_breath_low_msg_cn: "护眠仪检测到呼吸频率过低"
+  check_person_breath_low_msg_hk: "護眠儀檢測到呼吸頻率過低"
+  check_person_breath_low_msg_en: "The sleep monitor detects a low respiratory rate"
+  check_person_heart_high_msg_cn: "护眠仪检测到心率过高"
+  check_person_heart_high_msg_hk: "護眠儀檢測到心率過高"
+  check_person_heart_high_msg_en: "The sleep monitor detects a high heart rate"
+  check_person_heart_low_msg_cn: "护眠仪检测到心率过低"
+  check_person_heart_low_msg_hk: "護眠儀檢測到心率過低"
+  check_person_heart_low_msg_en: "The sleep monitor detects a low heart rate"
+
+certFile: ./cert/cert.pem
+keyFile: ./cert/key.pem
+staticPath: ./public
