@@ -352,7 +352,7 @@ func handleDeviceSyncCmd(lampMqttMsg *LampMqttMsg) {
 ********************************************************************************/
 func handleKeepAlive(lampMqttMsg *LampMqttMsg) {
 	mylog.Log.Infoln("handleKeepAlive:", lampMqttMsg.Cmd)
-	SetDeviceOnline(lampMqttMsg.Mac, 1)
+	SetDeviceOnline(lampMqttMsg.Mac, 1, 0)
 }
 
 type RealDataReq struct {
@@ -772,17 +772,21 @@ func handleRealDataSetRsp(lampMqttMsg *LampMqttMsg) {
 	realDataSql.HeadAngle = realDataJson.HeadAngle[len(realDataJson.HeadAngle)-1]
 	realDataSql.HandPos = realDataJson.HandPos[len(realDataJson.HandPos)-1]
 	realDataSql.HandAngle = realDataJson.HandAngle[len(realDataJson.HandAngle)-1]
-	taskPool.Put(&gopool.Task{
-		Params: []interface{}{realDataSql},
-		Do: func(params ...interface{}) {
-			var obj = params[0].(*RealDataSql)
-			obj.Insert()
-		},
-	})
-	//publish RealDataSql to APP
-	mq.PublishData(common.MakeHl77RealDataTopic(lampMqttMsg.Mac), realDataSql)
-	// send a read mq message to lamp control status
-	readLampControlStatus(lampMqttMsg.Mac)
+
+	if CheckDiffBetweenTwoLampDeviceRecords(LampType, lampMqttMsg.Mac, realDataSql) {
+		//publish RealDataSql to APP
+		mq.PublishData(common.MakeHl77RealDataTopic(lampMqttMsg.Mac), realDataSql)
+		// send a read mq message to lamp control status
+		readLampControlStatus(lampMqttMsg.Mac)
+		// save to database
+		taskPool.Put(&gopool.Task{
+			Params: []interface{}{realDataSql},
+			Do: func(params ...interface{}) {
+				var obj = params[0].(*RealDataSql)
+				obj.Insert()
+			},
+		})
+	}
 }
 
 func QueryHl77RealDataToHeartRateByCond(filter interface{}, page *common.PageDao, sort interface{}, limited int, results *[]HeartRate) bool {

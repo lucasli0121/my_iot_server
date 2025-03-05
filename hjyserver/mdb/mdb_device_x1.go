@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-11-20 11:58:18
  * LastEditors: liguoqiang
- * LastEditTime: 2024-06-02 19:28:47
+ * LastEditTime: 2024-07-11 17:09:49
  * Description:
 ********************************************************************************/
 package mdb
@@ -136,4 +136,33 @@ func QueryX1SleepReportJson(c *gin.Context) (int, interface{}) {
 	var glist []mysql.X1DayReportOrigin
 	mysql.QueryX1DayReportJson(mac, createDate, &glist)
 	return common.Success, glist
+}
+
+/******************************************************************************
+ * function:RecoverX1SleepReport
+ * description: recover x1 sleep report from json table
+ * param {*gin.Context} c
+ * return {*}
+********************************************************************************/
+
+// swagger:model RecoverX1SleepReportReq
+type RecoverX1SleepReportReq struct {
+	// 设备mac地址
+	Mac string `json:"mac"`
+	// 报告日期
+	ReportDate string `json:"report_date"`
+}
+
+func RecoverX1SleepReport(c *gin.Context) (int, interface{}) {
+	var req *RecoverX1SleepReportReq = &RecoverX1SleepReportReq{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		exception.Throw(http.StatusAccepted, err.Error())
+	}
+	mac := req.Mac
+	reportDate := req.ReportDate
+	if reportDate == "" {
+		return http.StatusBadRequest, "report date required"
+	}
+	mysql.RecoverX1DayReport(mac, reportDate)
+	return common.Success, nil
 }

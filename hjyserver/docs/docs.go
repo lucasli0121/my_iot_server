@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/device/askEd713RealData": {
+        "/device/askEd713RealData": {
             "post": {
                 "description": "ask Ed713 device to send real data",
                 "produces": [
@@ -26,6 +26,12 @@ const docTemplate = `{
                 ],
                 "summary": "askEd713RealData",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "ack Ed713 info",
                         "name": "in",
@@ -46,7 +52,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/askX1RealData": {
+        "/device/askX1RealData": {
             "post": {
                 "description": "ask X1 device to send real data",
                 "produces": [
@@ -57,6 +63,12 @@ const docTemplate = `{
                 ],
                 "summary": "askX1RealData",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "ack X1 info",
                         "name": "in",
@@ -77,7 +89,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/cleanX1Event": {
+        "/device/cleanX1Event": {
             "post": {
                 "description": "clean event from X1 device",
                 "produces": [
@@ -88,6 +100,12 @@ const docTemplate = `{
                 ],
                 "summary": "cleanX1Event",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "clean X1 event",
                         "name": "in",
@@ -108,7 +126,81 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/controlLamp": {
+        "/device/confirmSharedDevice": {
+            "post": {
+                "description": "confirm shared device",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "confirmSharedDevice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "confirm shared device request",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.ConfirmSharedReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Confirmed successfully\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/confirmTransferDevice": {
+            "post": {
+                "description": "confirmed transfer device to other user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "confirmTransferDevice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "confirmed transfer device",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.ConfirmTransferReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Confirmed successfully\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/controlLamp": {
             "post": {
                 "description": "control lamp status",
                 "produces": [
@@ -119,6 +211,12 @@ const docTemplate = `{
                 ],
                 "summary": "controlLamp",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "control lamp",
                         "name": "in",
@@ -139,7 +237,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/createStudyRoom": {
+        "/device/createStudyRoom": {
             "post": {
                 "description": "create study room",
                 "produces": [
@@ -150,6 +248,12 @@ const docTemplate = `{
                 ],
                 "summary": "createStudyRoom",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "room information",
                         "name": "in",
@@ -170,7 +274,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/improveDisturbed": {
+        "/device/improveDisturbed": {
             "post": {
                 "description": "import x1 device disturbed data",
                 "produces": [
@@ -181,6 +285,12 @@ const docTemplate = `{
                 ],
                 "summary": "improveDisturbed",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "X1 distrube switch",
                         "name": "in",
@@ -201,7 +311,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/insert": {
+        "/device/insert": {
             "post": {
                 "description": "insert user device",
                 "produces": [
@@ -212,6 +322,12 @@ const docTemplate = `{
                 ],
                 "summary": "insertDevice",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user device information",
                         "name": "in",
@@ -232,7 +348,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/insertFallParams": {
+        "/device/insertFallParams": {
             "post": {
                 "description": "query fall check device install params",
                 "produces": [
@@ -243,6 +359,12 @@ const docTemplate = `{
                 ],
                 "summary": "insertFallParams",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "fall check device params",
                         "name": "in",
@@ -263,7 +385,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/modifyStudyRoom": {
+        "/device/modifySharedDeviceRemark": {
+            "post": {
+                "description": "modify shared device remark",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "modifySharedDeviceRemark",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "modify share device remark",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.ModifySharedDeviceRemarkReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.UserShareDevice"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/modifyStudyRoom": {
             "post": {
                 "description": "修改自习室信息",
                 "produces": [
@@ -274,6 +433,12 @@ const docTemplate = `{
                 ],
                 "summary": "modifyStudyRoom",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "room information",
                         "name": "in",
@@ -294,7 +459,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/openLampRealData": {
+        "/device/openLampRealData": {
             "post": {
                 "description": "query fall check device install params",
                 "produces": [
@@ -305,6 +470,12 @@ const docTemplate = `{
                 ],
                 "summary": "openLampRealData",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "lamp real data",
                         "name": "in",
@@ -325,7 +496,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryAlarmRecord": {
+        "/device/queryAlarmRecord": {
             "get": {
                 "description": "query alarm record report from fall check device",
                 "produces": [
@@ -366,7 +537,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryBindByMac": {
+        "/device/queryBindByMac": {
             "get": {
                 "description": "query device has bind by mac",
                 "produces": [
@@ -402,7 +573,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryById": {
+        "/device/queryById": {
             "get": {
                 "description": "query device infomaion",
                 "produces": [
@@ -431,7 +602,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryByUser": {
+        "/device/queryByUser": {
             "get": {
                 "description": "query device infomaion by user id",
                 "produces": [
@@ -467,7 +638,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryDateListInReport": {
+        "/device/queryDateListInReport": {
             "get": {
                 "description": "查詢报表中含有数据的日期列表",
                 "produces": [
@@ -508,7 +679,36 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryFallCheckStatus": {
+        "/device/queryDeviceOverview": {
+            "get": {
+                "description": "查询设备的概览数据",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "queryDeviceOverview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.DeviceOverview"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/queryFallCheckStatus": {
             "get": {
                 "description": "query fall check data",
                 "produces": [
@@ -537,7 +737,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryFallExistRecord": {
+        "/device/queryFallExistRecord": {
             "get": {
                 "description": "query fall check data if has person exist",
                 "produces": [
@@ -578,7 +778,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryFallParams": {
+        "/device/queryFallParams": {
             "get": {
                 "description": "query fall check device install params",
                 "produces": [
@@ -607,7 +807,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryHeartRate": {
+        "/device/queryHeartRate": {
             "get": {
                 "description": "query heart data from heart rate table",
                 "produces": [
@@ -648,7 +848,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryInviteStudyRoom": {
+        "/device/queryInviteStudyRoom": {
             "get": {
                 "description": "query invited study room by create user",
                 "produces": [
@@ -677,7 +877,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryLampControl": {
+        "/device/queryLampControl": {
             "get": {
                 "description": "query lamp control data by mac",
                 "produces": [
@@ -706,7 +906,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryLampEvent": {
+        "/device/queryLampEvent": {
             "get": {
                 "description": "query lamp device real-data by mac and time",
                 "produces": [
@@ -747,7 +947,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryLampRealData": {
+        "/device/queryLampRealData": {
             "get": {
                 "description": "query lamp device real-data by mac and time",
                 "produces": [
@@ -788,7 +988,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryLampReportStatus": {
+        "/device/queryLampReportStatus": {
             "get": {
                 "description": "query lamp device report by mac and date",
                 "produces": [
@@ -829,7 +1029,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryRankingByStudyRoom": {
+        "/device/queryRankingByStudyRoom": {
             "get": {
                 "description": "查询自习室排行数据，查询条件自习室id",
                 "produces": [
@@ -858,7 +1058,43 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/querySleepReport": {
+        "/device/queryShareUsers": {
+            "get": {
+                "description": "query users to which device shared",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "queryShareUsers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "login user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.UserShareDeviceDetail"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/querySleepReport": {
             "get": {
                 "description": "query sleep report data",
                 "produces": [
@@ -899,7 +1135,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryStudyRoom": {
+        "/device/queryStudyRoom": {
             "get": {
                 "description": "query study room by create user id",
                 "produces": [
@@ -928,7 +1164,113 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryX1RealDataJson": {
+        "/device/queryTransferUsers": {
+            "get": {
+                "description": "query users to which device transfered",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "queryTransferUsers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "login user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.UserTransferDeviceDetail"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/queryUnconfirmedShareDevices": {
+            "get": {
+                "description": "query unconfirmed share devices",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "queryUnconfirmedShareDevices",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "login user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "设备mac地址",
+                        "name": "mac",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.UserShareDeviceDetail"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/queryUnconfirmedTransferDevices": {
+            "get": {
+                "description": "query unconfirmed transfered devices",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "queryUnconfirmedTransferDevices",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "login user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.UserTransferDeviceDetail"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/queryX1RealDataJson": {
             "get": {
                 "description": "query X1 real data in json format",
                 "produces": [
@@ -963,7 +1305,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/queryX1SleepReportJson": {
+        "/device/queryX1SleepReportJson": {
             "get": {
                 "description": "query X1 sleep report in json format",
                 "produces": [
@@ -998,7 +1340,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/releaseStudyRoom": {
+        "/device/recoverX1SleepReport": {
+            "post": {
+                "description": "recover x1 device sleep report from json table",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "X1 device"
+                ],
+                "summary": "recoverX1SleepReport",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "X1 sleep report",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.RecoverX1SleepReportReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/releaseStudyRoom": {
             "post": {
                 "description": "release study room",
                 "produces": [
@@ -1009,6 +1388,12 @@ const docTemplate = `{
                 ],
                 "summary": "releaseStudyRoom",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "release room",
                         "name": "in",
@@ -1029,7 +1414,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/share": {
+        "/device/removeSharedDevice": {
+            "post": {
+                "description": "delete shared device",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "removeSharedDevice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "delete share device",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.RemoveSharedDeviceReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "delete shared device successfully\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/share": {
             "post": {
                 "description": "update user device",
                 "produces": [
@@ -1040,6 +1462,12 @@ const docTemplate = `{
                 ],
                 "summary": "shareDevice",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user device information",
                         "name": "in",
@@ -1060,7 +1488,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/sleepX1Switch": {
+        "/device/shareDeviceToPhoneWithMac": {
+            "post": {
+                "description": "share device to other user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "shareDeviceToPhoneWithMac",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "user device information",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.ShareDeviceWithMacReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.UserShareDevice"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/sleepX1Switch": {
             "post": {
                 "description": "change sleep switch of X1 device",
                 "produces": [
@@ -1071,6 +1536,12 @@ const docTemplate = `{
                 ],
                 "summary": "sleepX1Switch",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "X1 switch",
                         "name": "in",
@@ -1091,7 +1562,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/statsHeartRateByMinute": {
+        "/device/statsHeartRateByMinute": {
             "get": {
                 "description": "stats heart data per half of hour from heart rate table",
                 "produces": [
@@ -1132,7 +1603,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/statsLampFlowData": {
+        "/device/statsLampFlowData": {
             "get": {
                 "description": "统计台灯的心流数据，根据日期返回心流的比率数据",
                 "produces": [
@@ -1175,7 +1646,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/device/update": {
+        "/device/transferDeviceToPhoneWithMac": {
+            "post": {
+                "description": "transfer device to other user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "transferDeviceToPhoneWithMac",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "user device information",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.TransferDeviceWithMacReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.UserDevice"
+                        }
+                    }
+                }
+            }
+        },
+        "/device/update": {
             "post": {
                 "description": "update user device",
                 "produces": [
@@ -1186,6 +1694,12 @@ const docTemplate = `{
                 ],
                 "summary": "updateDevice",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user device information",
                         "name": "in",
@@ -1206,7 +1720,515 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/notify/notifySetting": {
+        "/device/updateDeviceOverview": {
+            "post": {
+                "description": "更新设备概况",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "updateDeviceOverview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "概况数据",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.DeviceOverviewReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.DeviceOverview"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/askH03Reboot": {
+            "post": {
+                "description": "ask H03 device to reboot",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "askH03Reboot",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "reboot information",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03RebootReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/askH03SyncVersion": {
+            "post": {
+                "description": "ask H03 device to sync version",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "askH03SyncVersion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03CurDayFocusStatus": {
+            "get": {
+                "description": "查询H03当天的专注状态",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03CurDayFocusStatus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03CurDayFocusStatus"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03CurrentDayStudyTimeDetail": {
+            "get": {
+                "description": "查询H03当天学习时长的详情数据",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03CurrentDayStudyTimeDetail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03CurrentDayStudyTimeDetail"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03LatestAttrs": {
+            "get": {
+                "description": "查询H03属性",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03LatestAttrs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.H03AttrData"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03LatestStudyStatus": {
+            "get": {
+                "description": "查询H03学习状态",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03LatestStudyStatus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.H03Event"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03ReportSwitch": {
+            "get": {
+                "description": "根据mac查报告开关设置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03ReportSwitch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.H03ReportSwitchSetting"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03StudyReport": {
+            "get": {
+                "description": "根据日期查询H03学习报告",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03StudyReport",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "start_day",
+                        "name": "start_day",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "end_day",
+                        "name": "end_day",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03StudyReportResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03Version": {
+            "get": {
+                "description": "查询H03版本",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03Version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03VersionResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03WarningEventStatDaily": {
+            "get": {
+                "description": "根据mac以及日期查询一周七天每天的告警事件统计次数",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03WarningEventStatDaily",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询的日期",
+                        "name": "daily_date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.H03WarningEventNotifyDailyStat"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03WarningEventStatWeekly": {
+            "get": {
+                "description": "根据mac以及日期查询一周告警事件统计次数",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03WarningEventStatWeekly",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "周报日期",
+                        "name": "week_date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.H03WarningEventNotifyWeekStat"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/queryH03WeekReport": {
+            "get": {
+                "description": "根据mac以及日期查询周报告",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "queryH03WeekReport",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "周报日期",
+                        "name": "week_date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03WeekReportResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/setH03Param": {
+            "post": {
+                "description": "set H03 control params",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "setH03Param",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "params settting",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03SettingReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/h03/setH03ReportSwitch": {
+            "post": {
+                "description": "set H03 report setting",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "H03"
+                ],
+                "summary": "setH03ReportSwitch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "params settting",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.H03SwitchSettingReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/notify/notifySetting": {
             "post": {
                 "description": "set params for notify",
                 "produces": [
@@ -1217,6 +2239,12 @@ const docTemplate = `{
                 ],
                 "summary": "notifySetting",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "people notify setting",
                         "name": "in",
@@ -1237,7 +2265,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/notify/queryAllNotifySetting": {
+        "/notify/queryAllNotifySetting": {
             "get": {
                 "description": "query params for notify setting",
                 "produces": [
@@ -1266,7 +2294,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/notify/queryNotifySettingByType": {
+        "/notify/queryNotifySettingByType": {
             "get": {
                 "description": "query params for notify setting",
                 "produces": [
@@ -1302,7 +2330,99 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/addUserToStudyRoom": {
+        "/setting/insertBanner": {
+            "post": {
+                "description": "insert banner picture into database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "insertBanner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "banner settting",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mysql.BannerSetting"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/setting/queryBanner": {
+            "get": {
+                "description": "查询banner图片",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "queryBanner",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.BannerSetting"
+                        }
+                    }
+                }
+            }
+        },
+        "/upload/picture": {
+            "post": {
+                "description": "上传图片接口",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "uploader"
+                ],
+                "summary": "uploadPicFun",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "type": "file",
+                        "description": "file to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/addUserToStudyRoom": {
             "post": {
                 "description": "add user id to study room",
                 "produces": [
@@ -1333,7 +2453,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/deleteUser": {
+        "/user/deleteUser": {
             "post": {
                 "description": "delete user from server",
                 "produces": [
@@ -1344,6 +2464,12 @@ const docTemplate = `{
                 ],
                 "summary": "deleteUser",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user id",
                         "name": "in",
@@ -1364,7 +2490,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/enterStudyRoom": {
+        "/user/enterStudyRoom": {
             "post": {
                 "description": "用户进入已邀请的自习室",
                 "produces": [
@@ -1395,7 +2521,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/insertUserFriend": {
+        "/user/insertUserFriend": {
             "post": {
                 "description": "insert user's friend",
                 "produces": [
@@ -1406,6 +2532,12 @@ const docTemplate = `{
                 ],
                 "summary": "insertUserFriend",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "friend info",
                         "name": "in",
@@ -1426,7 +2558,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/leaveStudyRoom": {
+        "/user/leaveStudyRoom": {
             "post": {
                 "description": "用户离开已邀请的自习室",
                 "produces": [
@@ -1457,7 +2589,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/loginout": {
+        "/user/loginout": {
             "post": {
                 "description": "login out from server",
                 "produces": [
@@ -1468,6 +2600,12 @@ const docTemplate = `{
                 ],
                 "summary": "loginout",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user id",
                         "name": "in",
@@ -1488,7 +2626,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/modifyEmail": {
+        "/user/modifyEmail": {
             "post": {
                 "description": "modify user email",
                 "produces": [
@@ -1499,6 +2637,12 @@ const docTemplate = `{
                 ],
                 "summary": "modifyEmail",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user email",
                         "name": "in",
@@ -1519,7 +2663,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/modifyEmergentPhone": {
+        "/user/modifyEmergentPhone": {
             "post": {
                 "description": "modify user emergent phone",
                 "produces": [
@@ -1530,6 +2674,12 @@ const docTemplate = `{
                 ],
                 "summary": "modifyEmergentPhone",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user information",
                         "name": "in",
@@ -1550,7 +2700,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/modifyPasswd": {
+        "/user/modifyPasswd": {
             "post": {
                 "description": "modify user passwd",
                 "produces": [
@@ -1561,6 +2711,12 @@ const docTemplate = `{
                 ],
                 "summary": "modifyPasswd",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user new passwd",
                         "name": "in",
@@ -1581,7 +2737,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/modifyPhone": {
+        "/user/modifyPhone": {
             "post": {
                 "description": "modify user phone",
                 "produces": [
@@ -1592,6 +2748,12 @@ const docTemplate = `{
                 ],
                 "summary": "modifyPhone",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user information",
                         "name": "in",
@@ -1612,7 +2774,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/modifyUserFriend": {
+        "/user/modifyUserFriend": {
             "post": {
                 "description": "modify user's friend",
                 "produces": [
@@ -1623,6 +2785,12 @@ const docTemplate = `{
                 ],
                 "summary": "modifyUserFriend",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "modify friend request",
                         "name": "in",
@@ -1643,7 +2811,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/offline": {
+        "/user/offline": {
             "post": {
                 "description": "set user offline",
                 "produces": [
@@ -1655,36 +2823,11 @@ const docTemplate = `{
                 "summary": "offline",
                 "parameters": [
                     {
-                        "description": "user id",
-                        "name": "id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/mysql.User"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/user/online": {
-            "post": {
-                "description": "set user online",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "online",
-                "parameters": [
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user id",
                         "name": "id",
@@ -1705,7 +2848,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryById": {
+        "/user/online": {
+            "post": {
+                "description": "set user online",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "online",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "user id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.User"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/queryById": {
             "get": {
                 "description": "query user by id",
                 "produces": [
@@ -1734,7 +2914,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryFriendsByUser": {
+        "/user/queryFriendsByUser": {
             "get": {
                 "description": "query user's friend",
                 "produces": [
@@ -1763,7 +2943,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryLampUserInFriend": {
+        "/user/queryLampUserInFriend": {
             "get": {
                 "description": "查询好友中绑定灯的好友",
                 "produces": [
@@ -1792,7 +2972,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryLampUsersByRoom": {
+        "/user/queryLampUsersByRoom": {
             "get": {
                 "description": "查询拥有灯的用户，条件自习室ID,id=0 时拥有灯控的所有用户",
                 "produces": [
@@ -1821,7 +3001,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryStudyRoomUser": {
+        "/user/queryStudyRoomUser": {
             "get": {
                 "description": "query user list from study room",
                 "produces": [
@@ -1864,7 +3044,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryUserByEmail": {
+        "/user/queryUserByEmail": {
             "get": {
                 "description": "query user by email",
                 "produces": [
@@ -1893,7 +3073,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryUserByPhone": {
+        "/user/queryUserByPhone": {
             "get": {
                 "description": "query user by phone",
                 "produces": [
@@ -1922,7 +3102,36 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryUserStudyData": {
+        "/user/queryUserOverview": {
+            "get": {
+                "description": "查询用户概况数据",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "queryUserOverview",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mdb.UserOverview"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/queryUserStudyData": {
             "get": {
                 "description": "查询用户自习的数据,包括自习时长，自习天数，平均时长，最长时间, 以及根据日期进行分组统计每天的自习时长",
                 "produces": [
@@ -1972,7 +3181,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/queryUserStudyTimeByDay": {
+        "/user/queryUserStudyTimeByDay": {
             "get": {
                 "description": "查询用户学习时间段，根据指定日期查询",
                 "produces": [
@@ -2015,7 +3224,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/removeUserDevice": {
+        "/user/removeUserDevice": {
             "post": {
                 "description": "remove user device",
                 "produces": [
@@ -2026,6 +3235,12 @@ const docTemplate = `{
                 ],
                 "summary": "removeUserDevice",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user device",
                         "name": "in",
@@ -2046,7 +3261,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/removeUserFriend": {
+        "/user/removeUserFriend": {
             "post": {
                 "description": "remove user's friend",
                 "produces": [
@@ -2057,6 +3272,12 @@ const docTemplate = `{
                 ],
                 "summary": "removeUserFriend",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "remove friend request",
                         "name": "in",
@@ -2077,7 +3298,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/removeUserFromStudyRoom": {
+        "/user/removeUserFromStudyRoom": {
             "post": {
                 "description": "remove user id from study room",
                 "produces": [
@@ -2108,7 +3329,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/update": {
+        "/user/update": {
             "post": {
                 "description": "update user",
                 "produces": [
@@ -2119,6 +3340,12 @@ const docTemplate = `{
                 ],
                 "summary": "update",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user information",
                         "name": "in",
@@ -2139,7 +3366,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/updateHeadPic": {
+        "/user/updateGender": {
+            "post": {
+                "description": "update user gender",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "updateGender",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "user gender",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.UserGenderReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.User"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/updateHeadPic": {
             "post": {
                 "description": "update user face picture",
                 "produces": [
@@ -2150,6 +3414,12 @@ const docTemplate = `{
                 ],
                 "summary": "updateHeadPic",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user picture information",
                         "name": "in",
@@ -2170,7 +3440,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/updateNickName": {
+        "/user/updateNickName": {
             "post": {
                 "description": "update user nickname",
                 "produces": [
@@ -2181,6 +3451,12 @@ const docTemplate = `{
                 ],
                 "summary": "updateNickName",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
                     {
                         "description": "user information",
                         "name": "in",
@@ -2201,7 +3477,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/userLogin": {
+        "/user/updateUserOverview": {
+            "post": {
+                "description": "更新用户概况数据",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "updateUserOverview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "用户概况数据",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.UserOverview"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "update success\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/userLogin": {
             "post": {
                 "description": "login in",
                 "produces": [
@@ -2232,7 +3545,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/userRegister": {
+        "/user/userRegister": {
             "post": {
                 "description": "user register",
                 "produces": [
@@ -2258,6 +3571,240 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/mysql.User"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/verifyUserToken": {
+            "get": {
+                "description": "验证用户token是否过期",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "verifyUserToken",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mdb.VerifyTokenResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/askMiniUrl": {
+            "post": {
+                "description": "获取url",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "askMiniUrl",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdbwx.WxMiniUrlReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/queryMiniAccessToken": {
+            "get": {
+                "description": "获取小程序的access_token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "queryMiniAccessToken",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/wxMiniProgramLogin": {
+            "post": {
+                "description": "winxin mini program login api",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "wxMiniProgramLogin",
+                "parameters": [
+                    {
+                        "description": "wx mini program login request",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdbwx.WxMiniLoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mysql.User"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/wxPublicSubmit": {
+            "post": {
+                "description": "公众号推送的服务器地址",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "wxPublicSubmit",
+                "parameters": [
+                    {
+                        "description": "xml字符串",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/x1s/askX1sSyncVersion": {
+            "post": {
+                "description": "ask X1s device to sync version",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "X1s"
+                ],
+                "summary": "askX1sSyncVersion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "device mac address",
+                        "name": "mac",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
+                        }
+                    }
+                }
+            }
+        },
+        "/x1s/insertX1sWhiteList": {
+            "post": {
+                "description": "insert X1s White list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "X1s"
+                ],
+                "summary": "insertX1sWhiteList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "description": "mac",
+                        "name": "in",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mdb.X1sWhiteListReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/x1s/queryX1sWhiteList": {
+            "get": {
+                "description": "query X1s White list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "X1s"
+                ],
+                "summary": "queryX1sWhiteList",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "none"
                         }
                     }
                 }
@@ -2334,6 +3881,36 @@ const docTemplate = `{
                 }
             }
         },
+        "mdb.ConfirmSharedReq": {
+            "type": "object",
+            "properties": {
+                "confirm": {
+                    "description": "required: true\n是否确认共享设备, true:确认共享设备, false:拒绝共享设备",
+                    "type": "boolean"
+                },
+                "device_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "mdb.ConfirmTransferReq": {
+            "type": "object",
+            "properties": {
+                "confirm": {
+                    "description": "required: true\n是否确认共享设备, true:确认共享设备, false:拒绝共享设备",
+                    "type": "boolean"
+                },
+                "device_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "mdb.ControlLampReq": {
             "type": "object",
             "properties": {
@@ -2399,6 +3976,408 @@ const docTemplate = `{
                 "mac": {
                     "description": "required: true",
                     "type": "string"
+                }
+            }
+        },
+        "mdb.DeviceOverviewReq": {
+            "type": "object",
+            "properties": {
+                "born_date": {
+                    "description": "出生日期",
+                    "type": "string"
+                },
+                "gender": {
+                    "description": "0 未知 1 男 2 女",
+                    "type": "integer"
+                },
+                "grade": {
+                    "description": "年级",
+                    "type": "string"
+                },
+                "mac": {
+                    "description": "required: true",
+                    "type": "string"
+                }
+            }
+        },
+        "mdb.H03CurDayFocusStatus": {
+            "type": "object",
+            "properties": {
+                "deep_study_time": {
+                    "description": "学习状态时长 深度学习时长 单位分钟",
+                    "type": "integer"
+                },
+                "low_study_time": {
+                    "description": "学习状态时长, 低度时长 单位分钟",
+                    "type": "integer"
+                },
+                "mac": {
+                    "description": "设备mac地址",
+                    "type": "string"
+                },
+                "mid_study_time": {
+                    "description": "学习状态时长, 中度时长 单位分钟",
+                    "type": "integer"
+                },
+                "total_time": {
+                    "description": "当天学习的总时间，单位分钟",
+                    "type": "integer"
+                }
+            }
+        },
+        "mdb.H03CurrentDayStudyTimeDetail": {
+            "type": "object",
+            "properties": {
+                "end_time": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "study_time_len": {
+                    "description": "学习时长，单位分钟",
+                    "type": "number"
+                }
+            }
+        },
+        "mdb.H03RebootReq": {
+            "type": "object",
+            "properties": {
+                "delay_tm": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                }
+            }
+        },
+        "mdb.H03ReportDetail": {
+            "type": "object",
+            "properties": {
+                "start_time": {
+                    "description": "状态开始时间",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "状态 0:无人 1:低度 2:深度 3:离开 4:中度",
+                    "type": "integer"
+                }
+            }
+        },
+        "mdb.H03ReportItem": {
+            "type": "object",
+            "properties": {
+                "detail_list": {
+                    "description": "状态详情列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mdb.H03ReportDetail"
+                    }
+                },
+                "end_time": {
+                    "description": "学习结束时间",
+                    "type": "string"
+                },
+                "focus": {
+                    "description": "专注度",
+                    "type": "integer"
+                },
+                "learning_continuity": {
+                    "description": "学习效率",
+                    "type": "integer"
+                },
+                "posture": {
+                    "description": "坐姿管理",
+                    "type": "integer"
+                },
+                "score": {
+                    "description": "学习评分",
+                    "type": "integer"
+                },
+                "start_time": {
+                    "description": "学习开始时间",
+                    "type": "string"
+                },
+                "study_eff": {
+                    "description": "学习时长",
+                    "type": "integer"
+                }
+            }
+        },
+        "mdb.H03SettingReq": {
+            "type": "object",
+            "properties": {
+                "mac": {
+                    "description": "设备mac地址",
+                    "type": "string"
+                },
+                "set_brightness_val": {
+                    "description": "设置亮度",
+                    "type": "integer"
+                },
+                "set_color_temp": {
+                    "description": "required: true\n设置色温",
+                    "type": "integer"
+                },
+                "set_control_mode": {
+                    "description": "required: true\n设置控制模式",
+                    "type": "integer"
+                },
+                "set_delay_time": {
+                    "description": "required: true\n设置延时时间",
+                    "type": "integer"
+                },
+                "set_gesture_mode": {
+                    "description": "required: true\n设置手势模式\"",
+                    "type": "integer"
+                },
+                "set_onoff_status": {
+                    "description": "required: true\n设置开关状态",
+                    "type": "integer"
+                }
+            }
+        },
+        "mdb.H03StudyReportResp": {
+            "type": "object",
+            "properties": {
+                "avg_focus": {
+                    "description": "平均专注度",
+                    "type": "integer"
+                },
+                "avg_learning": {
+                    "description": "平均学习效率",
+                    "type": "integer"
+                },
+                "avg_posture": {
+                    "description": "平均坐姿管理",
+                    "type": "integer"
+                },
+                "avg_score": {
+                    "description": "学习评分（平均值）",
+                    "type": "integer"
+                },
+                "avg_study_eff": {
+                    "description": "平均学习时长",
+                    "type": "integer"
+                },
+                "beat_users": {
+                    "description": "打败用户数",
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "report_list": {
+                    "description": "学习记录列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mdb.H03ReportItem"
+                    }
+                },
+                "total_time": {
+                    "description": "总学习时间",
+                    "type": "integer"
+                }
+            }
+        },
+        "mdb.H03SwitchSettingReq": {
+            "type": "object",
+            "properties": {
+                "concentration_high_notify_switch": {
+                    "description": "专注度高通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "concentration_low_notify_switch": {
+                    "description": "专注度低通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "day_report_push_set_time": {
+                    "description": "required: true\n日报告推送设定时间 格式: 00:00:00",
+                    "type": "string"
+                },
+                "day_report_switch": {
+                    "description": "required: true\n日报告开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "every_time_report_switch": {
+                    "description": "required: true\n次报告开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "leave_notify_switch": {
+                    "description": "反复离开通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "posture_notify_switch": {
+                    "description": "坐姿提醒通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "seat_notify_switch": {
+                    "description": "落座通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "study_timeout_notify_switch": {
+                    "description": "学习超时通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "temp_id_list": {
+                    "description": "required: false\n小程序订阅消息模板ID，后台返回给小程序端",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "mdb.H03VersionResp": {
+            "type": "object",
+            "properties": {
+                "coreVersion": {
+                    "type": "string"
+                },
+                "create_time": {
+                    "type": "string"
+                },
+                "deviceType": {
+                    "type": "string"
+                },
+                "hardwareVersion": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_update": {
+                    "type": "boolean"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "softwareVersion": {
+                    "type": "string"
+                }
+            }
+        },
+        "mdb.H03WeekReportResp": {
+            "type": "object",
+            "properties": {
+                "avg_concentration": {
+                    "description": "required: true\n一周平均专注度分数",
+                    "type": "number"
+                },
+                "avg_day_study_time": {
+                    "description": "required: true\n平均每天学习时长,单位分钟",
+                    "type": "number"
+                },
+                "avg_study_evaluation": {
+                    "description": "required: true\n平均学习评分",
+                    "type": "number"
+                },
+                "bronze_award_nums": {
+                    "description": "required: true\n铜奖数量",
+                    "type": "integer"
+                },
+                "create_time": {
+                    "description": "required: true\n创建时间",
+                    "type": "string"
+                },
+                "gold_award_nums": {
+                    "description": "required: true\n金奖数量",
+                    "type": "integer"
+                },
+                "gold_award_week_day": {
+                    "description": "required: true\n周几奖励金奖",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "required: true\nID",
+                    "type": "integer"
+                },
+                "last_end_report_time": {
+                    "description": "required: true\n最近一次学习报告结束时间",
+                    "type": "string"
+                },
+                "mac": {
+                    "description": "required: true\nmac地址",
+                    "type": "string"
+                },
+                "max_concentration": {
+                    "description": "required: true\n最高专注度分数",
+                    "type": "number"
+                },
+                "max_concentration_week_day": {
+                    "description": "required: true\n周几最高专注度",
+                    "type": "integer"
+                },
+                "max_study_evaluation": {
+                    "description": "required: true\n最大学习评分",
+                    "type": "number"
+                },
+                "max_study_evaluation_week_day": {
+                    "description": "required: true\n最大学习评分周几",
+                    "type": "integer"
+                },
+                "max_study_time": {
+                    "description": "required: true\n最长学习时长,单位分钟",
+                    "type": "number"
+                },
+                "max_study_time_week_day": {
+                    "description": "required: true\n最长学习时长周几",
+                    "type": "integer"
+                },
+                "report_week": {
+                    "description": "required: true\n报告周数",
+                    "type": "integer"
+                },
+                "report_year": {
+                    "description": "required: true\n报告年份",
+                    "type": "integer"
+                },
+                "sliver_award_nums": {
+                    "description": "required: true\n银奖数量",
+                    "type": "integer"
+                },
+                "study_day_nums": {
+                    "description": "required: true\n一周学习天数",
+                    "type": "integer"
+                },
+                "than_last_concentration": {
+                    "description": "required: true\n比上周最高专注度",
+                    "type": "number"
+                },
+                "than_last_max_study_time": {
+                    "description": "required: true\n比上周最长学习时长",
+                    "type": "number"
+                },
+                "than_last_study_day_nums": {
+                    "description": "required: true\n比上周学习天数",
+                    "type": "integer"
+                },
+                "than_last_study_time": {
+                    "description": "required: true\n比上周学习时长,单位分钟",
+                    "type": "number"
+                },
+                "total_concentration": {
+                    "description": "required: true\n总专注度分数",
+                    "type": "number"
+                },
+                "total_study_time": {
+                    "description": "required: true\n总学习时长,单位分钟",
+                    "type": "number"
+                },
+                "week_concation": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mdb.WeekConcation"
+                    }
+                },
+                "week_flow_state": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mdb.WeekFlowState"
+                    }
                 }
             }
         },
@@ -2470,6 +4449,17 @@ const docTemplate = `{
                 }
             }
         },
+        "mdb.ModifySharedDeviceRemarkReq": {
+            "type": "object",
+            "properties": {
+                "remark": {
+                    "type": "string"
+                },
+                "share_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "mdb.ModifyStudyRoomReq": {
             "type": "object",
             "properties": {
@@ -2499,7 +4489,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "description": "设备类型\nrequired: false\nenum: heart_rate,fall_check,lamp_type",
+                    "description": "设备类型\nrequired: false\n设备类型包括: heart_rate, fall_check, lamp_type, ed713_type, ed719_type, x1_type, H03pro",
                     "type": "string"
                 },
                 "user_id": {
@@ -2567,6 +4557,19 @@ const docTemplate = `{
                 }
             }
         },
+        "mdb.RecoverX1SleepReportReq": {
+            "type": "object",
+            "properties": {
+                "mac": {
+                    "description": "设备mac地址",
+                    "type": "string"
+                },
+                "report_date": {
+                    "description": "报告日期",
+                    "type": "string"
+                }
+            }
+        },
         "mdb.ReleaseStudyRoomReq": {
             "type": "object",
             "properties": {
@@ -2593,19 +4596,67 @@ const docTemplate = `{
                 }
             }
         },
+        "mdb.RemoveSharedDeviceReq": {
+            "type": "object",
+            "properties": {
+                "share_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "mdb.ShareDeviceReq": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "description": "required: true\n设备ID",
+                    "type": "integer"
+                },
+                "flag": {
+                    "description": "required: true\nflag 0:自己创建 1:共享",
+                    "type": "integer"
+                },
+                "from_user_id": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "to_user_id": {
+                    "type": "integer"
+                },
+                "wait_confirm": {
+                    "description": "是否等待确认",
+                    "type": "boolean"
+                }
+            }
+        },
+        "mdb.ShareDeviceWithMacReq": {
             "type": "object",
             "properties": {
                 "flag": {
                     "description": "required: true\nflag 0:自己创建 1:共享",
                     "type": "integer"
                 },
-                "id": {
-                    "description": "required: true\n设备ID",
+                "from_user_id": {
+                    "description": "required: true",
                     "type": "integer"
                 },
-                "user_id": {
-                    "type": "integer"
+                "mac": {
+                    "description": "required: true\n设备Mac",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "to_user_phone": {
+                    "description": "required: true",
+                    "type": "string"
+                },
+                "wait_confirm": {
+                    "description": "是否等待确认",
+                    "type": "boolean"
                 }
             }
         },
@@ -2684,6 +4735,29 @@ const docTemplate = `{
                 }
             }
         },
+        "mdb.TransferDeviceWithMacReq": {
+            "type": "object",
+            "properties": {
+                "from_user_id": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "description": "required: true\n设备Mac",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "to_user_phone": {
+                    "type": "string"
+                },
+                "wait_confirm": {
+                    "description": "是否等待确认",
+                    "type": "boolean"
+                }
+            }
+        },
         "mdb.UpdateDeviceReq": {
             "type": "object",
             "properties": {
@@ -2732,6 +4806,39 @@ const docTemplate = `{
                 }
             }
         },
+        "mdb.UserGenderReq": {
+            "type": "object",
+            "properties": {
+                "gender": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "description": "required: true\nexample: 1",
+                    "type": "integer"
+                }
+            }
+        },
+        "mdb.UserOverview": {
+            "type": "object",
+            "properties": {
+                "born_date": {
+                    "description": "出生日期",
+                    "type": "string"
+                },
+                "gender": {
+                    "description": "0 未知 1 男 2 女",
+                    "type": "integer"
+                },
+                "grade": {
+                    "description": "年级",
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "required: true",
+                    "type": "integer"
+                }
+            }
+        },
         "mdb.UserStudyData": {
             "type": "object",
             "properties": {
@@ -2770,11 +4877,137 @@ const docTemplate = `{
                 }
             }
         },
+        "mdb.VerifyTokenResp": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "description": "0: 过期 1: 有效",
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "mdb.WeekConcation": {
+            "type": "object",
+            "properties": {
+                "con_time": {
+                    "description": "时间",
+                    "type": "string"
+                },
+                "concentration": {
+                    "description": "专注度",
+                    "type": "number"
+                }
+            }
+        },
+        "mdb.WeekFlowState": {
+            "type": "object",
+            "properties": {
+                "deep_concentration": {
+                    "description": "深度占比",
+                    "type": "number"
+                },
+                "deep_study_time": {
+                    "description": "深度时间，单位分",
+                    "type": "number"
+                },
+                "flow_time": {
+                    "description": "时间",
+                    "type": "string"
+                },
+                "light_concentration": {
+                    "description": "轻度占比",
+                    "type": "number"
+                },
+                "light_study_time": {
+                    "description": "轻度时间，单位分",
+                    "type": "number"
+                },
+                "mid_concentration": {
+                    "description": "中度占比",
+                    "type": "number"
+                },
+                "mid_study_time": {
+                    "description": "中度时间，单位分",
+                    "type": "number"
+                },
+                "total_study_time": {
+                    "type": "number"
+                }
+            }
+        },
+        "mdb.X1sWhiteListReq": {
+            "type": "object",
+            "properties": {
+                "mac": {
+                    "type": "string"
+                }
+            }
+        },
+        "mdbwx.WxMiniLoginReq": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "encript_data": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "integer"
+                },
+                "iv": {
+                    "type": "string"
+                },
+                "login_code": {
+                    "type": "string"
+                },
+                "nick_name": {
+                    "type": "string"
+                },
+                "phone_code": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "mdbwx.WxMiniUrlReq": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "mysql.BannerSetting": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "img_url": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "mysql.Device": {
             "type": "object",
             "properties": {
                 "create_time": {
                     "type": "string"
+                },
+                "err_code": {
+                    "type": "integer"
                 },
                 "id": {
                     "description": "设备ID\nrequired: true",
@@ -2800,9 +5033,44 @@ const docTemplate = `{
                 "room_num": {
                     "type": "string"
                 },
+                "rssi": {
+                    "type": "integer"
+                },
                 "type": {
                     "description": "设备类型\nrequired: false\nenum: heart_rate,fall_check,lamp_type",
                     "type": "string"
+                }
+            }
+        },
+        "mysql.DeviceOverview": {
+            "type": "object",
+            "properties": {
+                "born_date": {
+                    "description": "出生日期",
+                    "type": "string"
+                },
+                "gender": {
+                    "description": "0 未知 1 男 2 女",
+                    "type": "integer",
+                    "default": 0
+                },
+                "grade": {
+                    "description": "年级",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "update_time": {
+                    "description": "更新日期",
+                    "type": "string"
+                },
+                "visible": {
+                    "description": "可见状态 0 不可见 1 可见",
+                    "type": "integer"
                 }
             }
         },
@@ -2915,6 +5183,237 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "state_delay": {
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.H03AttrData": {
+            "type": "object",
+            "properties": {
+                "body_angle": {
+                    "description": "身体角度",
+                    "type": "integer"
+                },
+                "body_distance": {
+                    "description": "身体距离",
+                    "type": "integer"
+                },
+                "body_movement": {
+                    "description": "身体活跃度",
+                    "type": "integer"
+                },
+                "brightness_val": {
+                    "description": "亮度值",
+                    "type": "integer"
+                },
+                "color_temp": {
+                    "description": "色温",
+                    "type": "integer"
+                },
+                "control_mode": {
+                    "description": "控制模式",
+                    "type": "integer"
+                },
+                "create_time": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "deep_study_time": {
+                    "description": "学习状态时长 深度学习时长 单位分钟",
+                    "type": "integer"
+                },
+                "delay_time": {
+                    "description": "延时时间",
+                    "type": "integer"
+                },
+                "gesture_mode": {
+                    "description": "手势模式",
+                    "type": "integer"
+                },
+                "heart_rate": {
+                    "description": "心率",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "low_study_time": {
+                    "description": "学习状态时长 轻度学习时长 单位分钟",
+                    "type": "integer"
+                },
+                "mac": {
+                    "description": "设备mac地址",
+                    "type": "string"
+                },
+                "mid_study_time": {
+                    "description": "学习状态时长 中度学习时长 单位分钟",
+                    "type": "integer"
+                },
+                "onoff_status": {
+                    "description": "开关状态",
+                    "type": "integer"
+                },
+                "position_interval": {
+                    "description": "坐姿位置间隔",
+                    "type": "integer"
+                },
+                "respiratory": {
+                    "description": "呼吸频率",
+                    "type": "integer"
+                },
+                "use_light_study_time": {
+                    "description": "使用灯学习时长 单位分钟",
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.H03Event": {
+            "type": "object",
+            "properties": {
+                "activity_freq": {
+                    "description": "required: true\n0:无人 1:频繁活动 2:轻微活动",
+                    "type": "integer"
+                },
+                "body_status": {
+                    "description": "required: true\n有人，无人",
+                    "type": "integer"
+                },
+                "create_time": {
+                    "type": "string"
+                },
+                "flow_state": {
+                    "description": "required: true\n0-离开; 1\\2\\3-浅(活动); 4\\5\\6-中(学习); 7\\8\\9-深(心流); 10-异常",
+                    "type": "integer"
+                },
+                "focus_status": {
+                    "description": "required: true\n学习状态,1: 轻度专注，2: 中度专注，3: 深度专注",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "description": "required: true\nmac 号",
+                    "type": "string"
+                },
+                "posture_state": {
+                    "description": "required: true\n0:无人 1:站立 2:端坐 3:趴伏",
+                    "type": "integer"
+                },
+                "warning_event": {
+                    "description": "required: true\n1:落座;2:专注度分数低; 3:专注度分数高 4:学习时长超时 5:反复离开 6:坐姿太偏",
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.H03ReportSwitchSetting": {
+            "type": "object",
+            "properties": {
+                "concentration_high_notify_switch": {
+                    "description": "专注度高通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "concentration_low_notify_switch": {
+                    "description": "专注度低通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "day_report_latest_time": {
+                    "description": "最近日报告推送时间",
+                    "type": "string"
+                },
+                "day_report_push_set_time": {
+                    "description": "required: true\n日报告推送设定时间 格式: 00:00:00",
+                    "type": "string"
+                },
+                "day_report_switch": {
+                    "description": "required: true\n日报告开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "every_report_latest_time": {
+                    "description": "最近次报告推送时间",
+                    "type": "string"
+                },
+                "every_time_report_switch": {
+                    "description": "required: true\n次报告开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "leave_notify_switch": {
+                    "description": "反复离开通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "posture_notify_switch": {
+                    "description": "坐姿提醒通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "seat_notify_switch": {
+                    "description": "落座通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                },
+                "study_timeout_notify_switch": {
+                    "description": "学习超时通知开关 0:关闭 1:开启",
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.H03WarningEventNotifyDailyStat": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "notify_date": {
+                    "type": "string"
+                },
+                "stat_week": {
+                    "type": "integer"
+                },
+                "stat_year": {
+                    "type": "integer"
+                },
+                "warning_event": {
+                    "description": "required: true\n警告事件",
+                    "type": "integer"
+                },
+                "warning_nums": {
+                    "description": "required: true\n警告次数",
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.H03WarningEventNotifyWeekStat": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "stat_week": {
+                    "type": "integer"
+                },
+                "stat_year": {
+                    "type": "integer"
+                },
+                "than_last_week": {
+                    "description": "required: true\n比上周增加次数",
+                    "type": "integer"
+                },
+                "warning_event": {
+                    "description": "required: true\n警告事件",
+                    "type": "integer"
+                },
+                "warning_nums": {
+                    "description": "required: true\n警告次数",
                     "type": "integer"
                 }
             }
@@ -3069,7 +5568,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "type": {
-                    "description": "通知类型\nrequired: true\nPeopleType         = 1\nBreathType         = 2\nBreathAbnormalType = 3\nHeartRateType      = 4\nNurseModeType      = 5\nBeeperType         = 6\nLightType          = 7",
+                    "description": "通知类型\nrequired: true\nPeopleType         = 1\nBreathType         = 2\nBreathAbnormalType = 3\nHeartRateType      = 4\nNurseModeType      = 5\nBeeperType         = 6\nLightType          = 7\nImproveType = 8",
                     "type": "integer"
                 }
             }
@@ -3356,6 +5855,9 @@ const docTemplate = `{
                 "address": {
                     "type": "string"
                 },
+                "born_date": {
+                    "type": "string"
+                },
                 "create_time": {
                     "type": "string"
                 },
@@ -3366,6 +5868,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "face": {
+                    "type": "string"
+                },
+                "gender": {
+                    "description": "0 未知 1 男 2 女",
+                    "type": "integer"
+                },
+                "grade": {
                     "type": "string"
                 },
                 "id": {
@@ -3401,6 +5910,9 @@ const docTemplate = `{
                 "create_time": {
                     "type": "string"
                 },
+                "err_code": {
+                    "type": "integer"
+                },
                 "flag": {
                     "description": "required: false\nflag 0:自己创建 1:共享",
                     "type": "integer"
@@ -3428,6 +5940,9 @@ const docTemplate = `{
                 },
                 "room_num": {
                     "type": "string"
+                },
+                "rssi": {
+                    "type": "integer"
                 },
                 "type": {
                     "description": "设备类型\nrequired: false\nenum: heart_rate,fall_check,lamp_type",
@@ -3470,6 +5985,86 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.UserShareDevice": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "from_user_id",
+                "to_user_id"
+            ],
+            "properties": {
+                "confirm": {
+                    "type": "integer"
+                },
+                "create_time": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "integer"
+                },
+                "from_user_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "to_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.UserShareDeviceDetail": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "integer"
+                },
+                "device_name": {
+                    "type": "string"
+                },
+                "device_type": {
+                    "type": "string"
+                },
+                "from_nick_name": {
+                    "type": "string"
+                },
+                "from_phone": {
+                    "type": "string"
+                },
+                "from_user_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "to_face": {
+                    "type": "string"
+                },
+                "to_nick_name": {
+                    "description": "分享用户昵称",
+                    "type": "string"
+                },
+                "to_phone": {
+                    "type": "string"
+                },
+                "to_remark": {
+                    "description": "分享用户备注",
+                    "type": "string"
+                },
+                "to_user_id": {
                     "type": "integer"
                 }
             }
@@ -3553,6 +6148,55 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "description": "required: true",
+                    "type": "integer"
+                }
+            }
+        },
+        "mysql.UserTransferDeviceDetail": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "integer"
+                },
+                "device_name": {
+                    "type": "string"
+                },
+                "device_type": {
+                    "type": "string"
+                },
+                "from_nick_name": {
+                    "type": "string"
+                },
+                "from_phone": {
+                    "type": "string"
+                },
+                "from_user_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "mac": {
+                    "type": "string"
+                },
+                "to_face": {
+                    "type": "string"
+                },
+                "to_nick_name": {
+                    "description": "分享用户昵称",
+                    "type": "string"
+                },
+                "to_phone": {
+                    "type": "string"
+                },
+                "to_remark": {
+                    "description": "分享用户备注",
+                    "type": "string"
+                },
+                "to_user_id": {
                     "type": "integer"
                 }
             }

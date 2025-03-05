@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-09-06 17:50:12
  * LastEditors: liguoqiang
- * LastEditTime: 2023-12-23 10:51:41
+ * LastEditTime: 2024-12-06 17:35:43
  * Description:
 ********************************************************************************/
 package mq
@@ -13,6 +13,8 @@ import (
 	"hjyserver/cfg"
 	"hjyserver/gopool"
 	mylog "hjyserver/log"
+	"hjyserver/mdb/common"
+	"strings"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -21,6 +23,7 @@ import (
 var mqttClient mqtt.Client
 var taskPool *gopool.Pool = nil
 var mqConnected bool = false
+var uuid string = common.GenerateUUID()
 
 /******************************************************************************
  * description: define a interface to process mqtt message
@@ -42,6 +45,13 @@ var msgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) 
 			proc, exist := topicMap[topic]
 			if exist {
 				proc.HandleMqttMsg(topic, payload)
+			} else {
+				for k, v := range topicMap {
+					if matchTopic(k, topic) {
+						v.HandleMqttMsg(topic, payload)
+						return
+					}
+				}
 			}
 		},
 	}
@@ -50,14 +60,34 @@ var msgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) 
 	}
 }
 
+func matchTopic(subscribed, topic string) bool {
+	subLevels := strings.Split(subscribed, "/")
+	topicLevels := strings.Split(topic, "/")
+
+	match := true
+	for i, subLevel := range subLevels {
+		if subLevel == "#" || subLevel == "+" {
+			continue
+		}
+		if subLevel != topicLevels[i] {
+			match = false
+			break
+		}
+	}
+	return match
+}
+
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 	mylog.Log.Infoln("mqtt connected")
 	mqConnected = true
 	for k, _ := range topicMap {
 		topic := k
-		token := client.Subscribe(topic, 0, nil)
-		if token.Wait() && token.Error() != nil {
-			mylog.Log.Errorln(token.Error())
+		token := client.Subscribe(topic, 0, msgHandler)
+		token.Wait()
+		if token.Error() != nil {
+			mylog.Log.Errorln("Subscribe error:", token.Error())
+		} else {
+			mylog.Log.Infoln("Subscribe success to", topic)
 		}
 	}
 }
@@ -67,12 +97,37 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 	mqConnected = false
 }
 
+func getMqClientId() string {
+	clientId := fmt.Sprintf("%s@@@%s", cfg.This.Mq.GroupId, uuid)
+	return clientId
+}
+func getMqUserName() string {
+	userName := fmt.Sprintf("Signature|%s|%s", cfg.This.Mq.AccessKey, cfg.This.Mq.InstanceId)
+	return userName
+}
+func getMqPassword() string {
+	clientId := getMqClientId()
+	password, err := common.GenerateMQPassword(clientId, cfg.This.Mq.SecretKey)
+	if err != nil {
+		mylog.Log.Errorln("generate mq password failed, err:", err)
+		return cfg.This.Mq.Password
+	}
+	return password
+}
+
+/******************************************************************************
+ * function: InitMqtt
+ * description: MQ 初始化函数，在项目启动时调用
+ * return {*}
+********************************************************************************/
 func InitMqtt() bool {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", cfg.This.Mq.Host, cfg.This.Mq.Port))
-	opts.SetClientID(cfg.This.Mq.ClientId)
-	opts.SetUsername(cfg.This.Mq.Username)
-	opts.SetPassword(cfg.This.Mq.Password)
+	opts.SetClientID(getMqClientId())
+	if cfg.This.Mq.Username != "" {
+		opts.SetUsername(getMqUserName())
+		opts.SetPassword(getMqPassword())
+	}
 	opts.SetDefaultPublishHandler(msgHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
@@ -112,8 +167,15 @@ func CloseMqtt() {
 func SubscribeTopic(topic string, msgProc MessageProc) bool {
 	topicMap[topic] = msgProc
 	if mqttClient != nil && mqConnected {
-		token := mqttClient.Subscribe(topic, 0, nil)
-		return token.WaitTimeout(2 * time.Second)
+		token := mqttClient.Subscribe(topic, 0, msgHandler)
+		token.Wait()
+		if token.Error() != nil {
+			mylog.Log.Errorln("Subscribe error:", token.Error())
+			return false
+		} else {
+			mylog.Log.Infoln("Subscribe success to", topic)
+			return true
+		}
 	}
 	return false
 }

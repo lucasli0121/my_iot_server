@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-09-06 17:50:11
  * LastEditors: liguoqiang
- * LastEditTime: 2024-05-22 15:51:57
+ * LastEditTime: 2024-07-11 17:38:01
  * Description:
 ********************************************************************************/
 /*
@@ -22,6 +22,7 @@ import (
 	"hjyserver/mdb"
 	"hjyserver/mdb/mysql"
 	"hjyserver/mq"
+	"hjyserver/redis"
 )
 
 func main() {
@@ -43,6 +44,12 @@ func main() {
 		return
 	}
 	defer mq.CloseMqtt()
+	// init redis object
+	if !redis.InitRedis() {
+		fmt.Println("init redis failed exit!")
+		return
+	}
+	defer redis.CloseRedis()
 	//启动web服务
 	api.StartWeb()
 }

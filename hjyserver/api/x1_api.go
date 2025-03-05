@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-12-26 19:38:45
  * LastEditors: liguoqiang
- * LastEditTime: 2024-06-02 19:08:02
+ * LastEditTime: 2024-08-07 10:59:39
  * Description:
 ********************************************************************************/
 /*********************************************************************
@@ -20,19 +20,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	@BasePath	/v1
-
 // askX1RealData godoc
 //
 //	@Summary	askX1RealData
 //	@Schemes
 //	@Description	ask X1 device to send real data
 //	@Tags			X1 device
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.AskX1RealDataReq	true	"ack X1 info"
 //	@Produce		json
 //	@Success		200	{none} {none}
-//	@Router			/v1/device/askX1RealData [post]
+//	@Router			/device/askX1RealData [post]
 func askX1RealData(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -51,11 +49,11 @@ func askX1RealData(c *gin.Context) {
 //	@Schemes
 //	@Description	clean event from X1 device
 //	@Tags			X1 device
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.CleanX1EventReq	true	"clean X1 event"
 //	@Produce		json
 //	@Success		200	{none} {none}
-//	@Router			/v1/device/cleanX1Event [post]
+//	@Router			/device/cleanX1Event [post]
 func cleanX1Event(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -74,11 +72,11 @@ func cleanX1Event(c *gin.Context) {
 //	@Schemes
 //	@Description	change sleep switch of X1 device
 //	@Tags			X1 device
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.SleepX1SwitchReq	true	"X1 switch"
 //	@Produce		json
 //	@Success		200	{none} {none}
-//	@Router			/v1/device/sleepX1Switch [post]
+//	@Router			/device/sleepX1Switch [post]
 func sleepX1Switch(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -97,11 +95,11 @@ func sleepX1Switch(c *gin.Context) {
 //	@Schemes
 //	@Description	import x1 device disturbed data
 //	@Tags			X1 device
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.ImproveDisturbedReq	true	"X1 distrube switch"
 //	@Produce		json
 //	@Success		200	{none} {none}
-//	@Router			/v1/device/improveDisturbed [post]
+//	@Router			/device/improveDisturbed [post]
 func improveDisturbed(c *gin.Context) {
 	apiCommonFunc(c, mdb.ImproveDisturbed)
 }
@@ -119,7 +117,7 @@ func improveDisturbed(c *gin.Context) {
 //
 //	@Produce		json
 //	@Success		200	{object} mysql.X1RealDataOrigin
-//	@Router			/v1/device/queryX1RealDataJson [get]
+//	@Router			/device/queryX1RealDataJson [get]
 func queryX1RealDataJson(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryX1RealDataJson)
 }
@@ -137,7 +135,22 @@ func queryX1RealDataJson(c *gin.Context) {
 //
 //	@Produce		json
 //	@Success		200	{object} mysql.X1DayReportOrigin
-//	@Router			/v1/device/queryX1SleepReportJson [get]
+//	@Router			/device/queryX1SleepReportJson [get]
 func queryX1SleepReportJson(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryX1SleepReportJson)
+}
+
+// recoverX1SleepReport godoc
+//
+//	@Summary	recoverX1SleepReport
+//	@Schemes
+//	@Description	recover x1 device sleep report from json table
+//	@Tags			X1 device
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.RecoverX1SleepReportReq	true	"X1 sleep report"
+//	@Produce		json
+//	@Success		200	{none} {none}
+//	@Router			/device/recoverX1SleepReport [post]
+func recoverX1SleepReport(c *gin.Context) {
+	apiCommonFunc(c, mdb.RecoverX1SleepReport)
 }

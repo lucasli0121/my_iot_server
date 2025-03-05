@@ -9,18 +9,22 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"time"
 
 	"hjyserver/cfg"
 	"hjyserver/exception"
 	"hjyserver/mdb/common"
+	"hjyserver/mdb/mysql"
+	wxapi "hjyserver/wx/api"
 
-	_ "hjyserver/docs"
+	docs "hjyserver/docs"
 
 	mylog "hjyserver/log"
 
@@ -42,29 +46,157 @@ func StartWeb() {
 	limt.SetIPLookups([]string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"}).SetMethods([]string{"GET", "POST"})
 	limt.SetMessage("{ \"code\": 201, \"message\": \"reached max request limit\"}")
 	router := gin.Default()
-	v1 := router.Group("/v1")
+	// 设置路由版本
+	verApi := router.Group("/" + cfg.This.Svr.ApiVersion)
+	// 设置swagger版本信息
+	docs.SwaggerInfo.BasePath = "/" + cfg.This.Svr.ApiVersion
+	// 初始化路由
 	initActions()
+
 	for k, v := range getAction {
-		v1.GET(k, tollbooth_gin.LimitHandler(limt), v)
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
 	}
 	for k, v := range postAction {
-		v1.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		if cfg.This.Svr.ApiVersion == "v1" {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		} else {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
+		}
 	}
+
+	// 初始化用户接口
+	userPosts, userGets := InitUserActions()
+	for k, v := range userGets {
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	for k, v := range userPosts {
+		if cfg.This.Svr.ApiVersion == "v1" {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		} else {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
+		}
+	}
+	// 初始化设备接口
+	devicesPost, devicesGets := InitDeviceActions()
+	for k, v := range devicesGets {
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	for k, v := range devicesPost {
+		if cfg.This.Svr.ApiVersion == "v1" {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		} else {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
+		}
+	}
+
+	// 初始化微信接口
+	wxPosts, wxGets := wxapi.InitWxActions()
+	for k, v := range wxGets {
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	for k, v := range wxPosts {
+		verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	// 初始化H03接口
+	h03Ports, h03Gets := InitH03Actions()
+	for k, v := range h03Gets {
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	for k, v := range h03Ports {
+		if cfg.This.Svr.ApiVersion == "v1" {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		} else {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
+		}
+	}
+	// 初始化X1s接口
+	x1sPorts, x1sGets := InitX1sActions()
+	for k, v := range x1sGets {
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	for k, v := range x1sPorts {
+		if cfg.This.Svr.ApiVersion == "v1" {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		} else {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
+		}
+	}
+	// 初始化setting接口
+	settingPorts, settingGets := InitSettingActions()
+	for k, v := range settingGets {
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	for k, v := range settingPorts {
+		if cfg.This.Svr.ApiVersion == "v1" {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		} else {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
+		}
+	}
+
 	router.MaxMultipartMemory = 8 << 40
-	router.Static("/public", cfg.This.StaticPath)
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	if cfg.This.Svr.ApiVersion == "v1" {
+		router.Static("/public", cfg.This.StaticPath)
+	} else {
+		verApi.Static("/public", cfg.This.StaticPath)
+	}
+	verApi.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	// 单独启动http server，用于后面的关闭操作
-	svcHttp = &http.Server{
-		Addr:         cfg.This.Svr.Host,
-		Handler:      router,
-		ReadTimeout:  120 * time.Second,
-		WriteTimeout: 120 * time.Second,
+	// 如果设置TLS，则启动https服务
+	if cfg.This.Svr.EnableTls {
+		// tsConfig := tls.Config{
+		// 	InsecureSkipVerify:       false,
+		// 	MinVersion:               tls.VersionTLS12,
+		// 	PreferServerCipherSuites: true,
+		// }
+		// cert, err := tls.LoadX509KeyPair(cfg.This.Svr.CertFile, cfg.This.Svr.KeyFile)
+		// if err != nil {
+		// 	mylog.Log.Errorln(err)
+		// 	return
+		// }
+		// tsConfig.Certificates = []tls.Certificate{cert}
+		// caPool := x509.NewCertPool()
+		// caPem, err := os.ReadFile(cfg.This.Svr.CaFile)
+		// if err != nil {
+		// 	mylog.Log.Errorln(err)
+		// 	return
+		// }
+		// caPool.AppendCertsFromPEM(caPem)
+		// tsConfig.RootCAs = caPool
+		// svcHttp = &http.Server{
+		// 	Addr:         cfg.This.Svr.Host,
+		// 	Handler:      router,
+		// 	ReadTimeout:  120 * time.Second,
+		// 	WriteTimeout: 120 * time.Second,
+		// 	TLSConfig:    &tsConfig,
+		// }
+		svcHttp = &http.Server{
+			Addr:         cfg.This.Svr.Host,
+			Handler:      router,
+			ReadTimeout:  120 * time.Second,
+			WriteTimeout: 120 * time.Second,
+		}
+	} else {
+		svcHttp = &http.Server{
+			Addr:         cfg.This.Svr.Host,
+			Handler:      router,
+			ReadTimeout:  120 * time.Second,
+			WriteTimeout: 120 * time.Second,
+			TLSConfig:    nil,
+		}
 	}
 	// 启动一个go例程用于启动服务
 	go func() {
-		err := svcHttp.ListenAndServeTLS(cfg.This.CertFile, cfg.This.KeyFile)
+		var err error
+		if cfg.This.Svr.EnableTls {
+			err = svcHttp.ListenAndServeTLS(cfg.This.Svr.CertFile, cfg.This.Svr.KeyFile)
+		} else {
+			err = svcHttp.ListenAndServe()
+		}
 		if err != nil {
-			mylog.Log.Errorf("start web server failed, %s", cfg.This.Svr.Host)
+			mylog.Log.Errorf("start web server failed, %s, %v", cfg.This.Svr.Host, err)
 		}
 	}()
 	quit := make(chan os.Signal, 1)
@@ -80,80 +212,12 @@ func StartWeb() {
 
 func initActions() {
 	getAction = make(map[string]gin.HandlerFunc)
-	getAction["/device/queryById"] = queryDeviceById
-	getAction["/device/queryByUser"] = queryDeviceByUser
-	getAction["/device/queryBindByMac"] = queryBindByMac
-	getAction["/user/queryById"] = queryUserById
-	getAction["/user/queryUserByPhone"] = queryUserByPhone
-	getAction["/user/queryUserByEmail"] = queryUserByEmail
-	getAction["/user/queryUserGroup"] = queryUserGroup
-	getAction["/user/queryFriendsByUser"] = queryFriendsByUser
-	getAction["/user/queryLampUsersByRoom"] = queryLampUsersByRoom
-	getAction["/user/queryLampUserInFriend"] = queryLampUserInFriend
-	getAction["/device/queryHeartRate"] = queryHeartRate
-	getAction["/device/statsHeartRateByMinute"] = statsHeartRateByMinute
-	getAction["/device/queryX1RealDataJson"] = queryX1RealDataJson
-	getAction["/device/queryX1SleepReportJson"] = queryX1SleepReportJson
-	getAction["/device/querySleepReport"] = querySleepReport
-	getAction["/device/queryDateListInReport"] = queryDateListInReport
-	getAction["/device/queryFallCheckStatus"] = queryFallCheckStatus
-	getAction["/device/queryAlarmRecord"] = queryAlarmRecord
-	getAction["/device/queryFallExistRecord"] = queryFallExistRecord
-	getAction["/device/queryFallParams"] = queryFallParams
-	getAction["/device/queryLampRealData"] = queryLampRealData
-	getAction["/device/queryLampEvent"] = queryLampEvent
-	getAction["/device/queryLampControl"] = queryLampControl
-	getAction["/device/queryLampReportStatus"] = queryLampReportStatus
-	getAction["/device/queryStudyRoom"] = queryStudyRoom
-	getAction["/device/queryInviteStudyRoom"] = queryInviteStudyRoom
-	getAction["/device/queryRankingByStudyRoom"] = queryRankingByStudyRoom
-	getAction["/device/statsLampFlowData"] = statsLampFlowData
-	getAction["/user/queryStudyRoomUser"] = queryStudyRoomUser
-	getAction["/user/queryUserStudyData"] = queryUserStudyData
-	getAction["/user/queryUserStudyTimeByDay"] = queryUserStudyTimeByDay
+
 	getAction["/notify/queryNotifySettingByType"] = queryNotifySettingByType
 	getAction["/notify/queryAllNotifySetting"] = queryAllNotifySetting
 
 	postAction = make(map[string]gin.HandlerFunc)
-	// post device tag action
-	postAction["/device/insert"] = insertDevice
-	postAction["/device/update"] = updateDevice
-	postAction["/device/share"] = shareDevice
-	postAction["/device/insertFallParams"] = insertFallParams
-	postAction["/device/openLampRealData"] = openLampRealData
-	postAction["/device/controlLamp"] = controlLamp
-	postAction["/device/createStudyRoom"] = createStudyRoom
-	postAction["/device/modifyStudyRoom"] = modifyStudyRoom
-	postAction["/device/releaseStudyRoom"] = releaseStudyRoom
-	postAction["/device/askEd713RealData"] = askEd713RealData
-	postAction["/device/askX1RealData"] = askX1RealData
-	postAction["/device/cleanX1Event"] = cleanX1Event
-	postAction["/device/sleepX1Switch"] = sleepX1Switch
-	postAction["/device/improveDisturbed"] = improveDisturbed
-	// post user tag action
-	postAction["/user/userLogin"] = userLogin
-	postAction["/user/userRegister"] = userRegister
-	postAction["/user/loginout"] = loginOut
-	postAction["/user/deleteUser"] = deleteUser
-	postAction["/user/online"] = userOnline
-	postAction["/user/offline"] = userOffline
-	postAction["/user/updateNickName"] = updateNickName
-	postAction["/user/updateHeadPic"] = updateHeadPic
-	postAction["/user/update"] = updateUser
-	postAction["/user/modifyPhone"] = modifyPhone
-	postAction["/user/modifyEmergentPhone"] = modifyEmergentPhone
-	postAction["/user/modifyEmail"] = modifyEmail
-	postAction["/user/modifyPasswd"] = modifyPasswd
-	postAction["/user/insertGroup"] = insertUserGroup
-	postAction["/user/deleteGroup"] = deleteUserGroup
-	postAction["/user/insertUserFriend"] = insertUserFriend
-	postAction["/user/removeUserFriend"] = removeUserFriend
-	postAction["/user/modifyUserFriend"] = modifyUserFriend
-	postAction["/user/removeUserDevice"] = removeUserDevice
-	postAction["/user/addUserToStudyRoom"] = addUserToStudyRoom
-	postAction["/user/removeUserFromStudyRoom"] = removeUserFromStudyRoom
-	postAction["/user/enterStudyRoom"] = enterStudyRoom
-	postAction["/user/leaveStudyRoom"] = leaveStudyRoom
+
 	// post notify setting action
 	// postAction["/notify/peopleNotifySetting"] = peopleNotifySetting
 	// postAction["/notify/breathNotifySetting"] = breathNotifySetting
@@ -184,9 +248,64 @@ func getPageDaoFromGin(c *gin.Context) *common.PageDao {
 	return page
 }
 
+/******************************************************************************
+ * function: AuthorizeToken
+ * description: 接口拦截器，用来验证token是否有效
+ * return {*}
+********************************************************************************/
+func AuthorizeToken(c *gin.Context) {
+	uri := c.Request.URL.String()
+	matched, err := regexp.Match("/swagger/*", []byte(uri))
+	fmt.Println("uri: ", uri, "matched: ", matched, "err: ", err)
+	if err == nil && matched {
+		c.Next()
+		return
+	}
+	// 如果是V1版本的接口，不需要验证token
+	if uri[1:3] == "v1" {
+		c.Next()
+		return
+	}
+
+	if uri == "/"+cfg.This.Svr.ApiVersion+"/user/userLogin" ||
+		uri == "/"+cfg.This.Svr.ApiVersion+"/user/loginout" ||
+		uri == "/"+cfg.This.Svr.ApiVersion+"/user/userRegister" ||
+		uri == "/"+cfg.This.Svr.ApiVersion+"/wx/wxMiniProgramLogin" ||
+		uri == "/"+cfg.This.Svr.ApiVersion+"/wx/wxPublicSubmit" {
+		c.Next()
+		return
+	}
+	token := c.Query("token")
+	mylog.Log.Debug("token: ", token)
+	if token == "" {
+		respJSON(c, common.TokenError, "token required")
+		c.Abort()
+		return
+	}
+	if !mysql.VerifyUserToken(token) {
+		respJSON(c, common.TokenError, "token invalid")
+		c.Abort()
+		return
+	}
+	c.Next()
+}
+
 /*
 上传图片接口
 */
+// uploadPicFun godoc
+//
+//	@Summary	uploadPicFun
+//	@Schemes
+//	@Description	上传图片接口
+//	@Tags			uploader
+//	@Produce		json
+//
+//	@Param			token	query	string		false	"token"
+//	@Param			file formData	file		true	"file to upload"
+//
+//	@Success		200		{string}	{string}
+//	@Router			/upload/picture [post]
 func uploadPicFun(c *gin.Context) {
 	uploadFileFunc(c, cfg.StaticPicPath)
 }

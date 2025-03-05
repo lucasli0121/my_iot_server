@@ -71,6 +71,30 @@ definitions:
           required: true
         type: string
     type: object
+  mdb.ConfirmSharedReq:
+    properties:
+      confirm:
+        description: |-
+          required: true
+          是否确认共享设备, true:确认共享设备, false:拒绝共享设备
+        type: boolean
+      device_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  mdb.ConfirmTransferReq:
+    properties:
+      confirm:
+        description: |-
+          required: true
+          是否确认共享设备, true:确认共享设备, false:拒绝共享设备
+        type: boolean
+      device_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   mdb.ControlLampReq:
     properties:
       brightness:
@@ -124,6 +148,364 @@ definitions:
       mac:
         description: 'required: true'
         type: string
+    type: object
+  mdb.DeviceOverviewReq:
+    properties:
+      born_date:
+        description: 出生日期
+        type: string
+      gender:
+        description: 0 未知 1 男 2 女
+        type: integer
+      grade:
+        description: 年级
+        type: string
+      mac:
+        description: 'required: true'
+        type: string
+    type: object
+  mdb.H03CurDayFocusStatus:
+    properties:
+      deep_study_time:
+        description: 学习状态时长 深度学习时长 单位分钟
+        type: integer
+      low_study_time:
+        description: 学习状态时长, 低度时长 单位分钟
+        type: integer
+      mac:
+        description: 设备mac地址
+        type: string
+      mid_study_time:
+        description: 学习状态时长, 中度时长 单位分钟
+        type: integer
+      total_time:
+        description: 当天学习的总时间，单位分钟
+        type: integer
+    type: object
+  mdb.H03CurrentDayStudyTimeDetail:
+    properties:
+      end_time:
+        type: string
+      start_time:
+        type: string
+      study_time_len:
+        description: 学习时长，单位分钟
+        type: number
+    type: object
+  mdb.H03RebootReq:
+    properties:
+      delay_tm:
+        type: integer
+      mac:
+        type: string
+    type: object
+  mdb.H03ReportDetail:
+    properties:
+      start_time:
+        description: 状态开始时间
+        type: string
+      status:
+        description: 状态 0:无人 1:低度 2:深度 3:离开 4:中度
+        type: integer
+    type: object
+  mdb.H03ReportItem:
+    properties:
+      detail_list:
+        description: 状态详情列表
+        items:
+          $ref: '#/definitions/mdb.H03ReportDetail'
+        type: array
+      end_time:
+        description: 学习结束时间
+        type: string
+      focus:
+        description: 专注度
+        type: integer
+      learning_continuity:
+        description: 学习效率
+        type: integer
+      posture:
+        description: 坐姿管理
+        type: integer
+      score:
+        description: 学习评分
+        type: integer
+      start_time:
+        description: 学习开始时间
+        type: string
+      study_eff:
+        description: 学习时长
+        type: integer
+    type: object
+  mdb.H03SettingReq:
+    properties:
+      mac:
+        description: 设备mac地址
+        type: string
+      set_brightness_val:
+        description: 设置亮度
+        type: integer
+      set_color_temp:
+        description: |-
+          required: true
+          设置色温
+        type: integer
+      set_control_mode:
+        description: |-
+          required: true
+          设置控制模式
+        type: integer
+      set_delay_time:
+        description: |-
+          required: true
+          设置延时时间
+        type: integer
+      set_gesture_mode:
+        description: |-
+          required: true
+          设置手势模式"
+        type: integer
+      set_onoff_status:
+        description: |-
+          required: true
+          设置开关状态
+        type: integer
+    type: object
+  mdb.H03StudyReportResp:
+    properties:
+      avg_focus:
+        description: 平均专注度
+        type: integer
+      avg_learning:
+        description: 平均学习效率
+        type: integer
+      avg_posture:
+        description: 平均坐姿管理
+        type: integer
+      avg_score:
+        description: 学习评分（平均值）
+        type: integer
+      avg_study_eff:
+        description: 平均学习时长
+        type: integer
+      beat_users:
+        description: 打败用户数
+        type: integer
+      mac:
+        type: string
+      report_list:
+        description: 学习记录列表
+        items:
+          $ref: '#/definitions/mdb.H03ReportItem'
+        type: array
+      total_time:
+        description: 总学习时间
+        type: integer
+    type: object
+  mdb.H03SwitchSettingReq:
+    properties:
+      concentration_high_notify_switch:
+        description: 专注度高通知开关 0:关闭 1:开启
+        type: integer
+      concentration_low_notify_switch:
+        description: 专注度低通知开关 0:关闭 1:开启
+        type: integer
+      day_report_push_set_time:
+        description: |-
+          required: true
+          日报告推送设定时间 格式: 00:00:00
+        type: string
+      day_report_switch:
+        description: |-
+          required: true
+          日报告开关 0:关闭 1:开启
+        type: integer
+      every_time_report_switch:
+        description: |-
+          required: true
+          次报告开关 0:关闭 1:开启
+        type: integer
+      leave_notify_switch:
+        description: 反复离开通知开关 0:关闭 1:开启
+        type: integer
+      mac:
+        type: string
+      posture_notify_switch:
+        description: 坐姿提醒通知开关 0:关闭 1:开启
+        type: integer
+      seat_notify_switch:
+        description: 落座通知开关 0:关闭 1:开启
+        type: integer
+      study_timeout_notify_switch:
+        description: 学习超时通知开关 0:关闭 1:开启
+        type: integer
+      temp_id_list:
+        description: |-
+          required: false
+          小程序订阅消息模板ID，后台返回给小程序端
+        items:
+          type: string
+        type: array
+    type: object
+  mdb.H03VersionResp:
+    properties:
+      coreVersion:
+        type: string
+      create_time:
+        type: string
+      deviceType:
+        type: string
+      hardwareVersion:
+        type: string
+      id:
+        type: integer
+      is_update:
+        type: boolean
+      mac:
+        type: string
+      softwareVersion:
+        type: string
+    type: object
+  mdb.H03WeekReportResp:
+    properties:
+      avg_concentration:
+        description: |-
+          required: true
+          一周平均专注度分数
+        type: number
+      avg_day_study_time:
+        description: |-
+          required: true
+          平均每天学习时长,单位分钟
+        type: number
+      avg_study_evaluation:
+        description: |-
+          required: true
+          平均学习评分
+        type: number
+      bronze_award_nums:
+        description: |-
+          required: true
+          铜奖数量
+        type: integer
+      create_time:
+        description: |-
+          required: true
+          创建时间
+        type: string
+      gold_award_nums:
+        description: |-
+          required: true
+          金奖数量
+        type: integer
+      gold_award_week_day:
+        description: |-
+          required: true
+          周几奖励金奖
+        type: integer
+      id:
+        description: |-
+          required: true
+          ID
+        type: integer
+      last_end_report_time:
+        description: |-
+          required: true
+          最近一次学习报告结束时间
+        type: string
+      mac:
+        description: |-
+          required: true
+          mac地址
+        type: string
+      max_concentration:
+        description: |-
+          required: true
+          最高专注度分数
+        type: number
+      max_concentration_week_day:
+        description: |-
+          required: true
+          周几最高专注度
+        type: integer
+      max_study_evaluation:
+        description: |-
+          required: true
+          最大学习评分
+        type: number
+      max_study_evaluation_week_day:
+        description: |-
+          required: true
+          最大学习评分周几
+        type: integer
+      max_study_time:
+        description: |-
+          required: true
+          最长学习时长,单位分钟
+        type: number
+      max_study_time_week_day:
+        description: |-
+          required: true
+          最长学习时长周几
+        type: integer
+      report_week:
+        description: |-
+          required: true
+          报告周数
+        type: integer
+      report_year:
+        description: |-
+          required: true
+          报告年份
+        type: integer
+      sliver_award_nums:
+        description: |-
+          required: true
+          银奖数量
+        type: integer
+      study_day_nums:
+        description: |-
+          required: true
+          一周学习天数
+        type: integer
+      than_last_concentration:
+        description: |-
+          required: true
+          比上周最高专注度
+        type: number
+      than_last_max_study_time:
+        description: |-
+          required: true
+          比上周最长学习时长
+        type: number
+      than_last_study_day_nums:
+        description: |-
+          required: true
+          比上周学习天数
+        type: integer
+      than_last_study_time:
+        description: |-
+          required: true
+          比上周学习时长,单位分钟
+        type: number
+      total_concentration:
+        description: |-
+          required: true
+          总专注度分数
+        type: number
+      total_study_time:
+        description: |-
+          required: true
+          总学习时长,单位分钟
+        type: number
+      week_concation:
+        items:
+          $ref: '#/definitions/mdb.WeekConcation'
+        type: array
+      week_flow_state:
+        items:
+          $ref: '#/definitions/mdb.WeekFlowState'
+        type: array
     type: object
   mdb.ImproveDisturbedReq:
     properties:
@@ -184,6 +566,13 @@ definitions:
         description: 'required: true'
         type: integer
     type: object
+  mdb.ModifySharedDeviceRemarkReq:
+    properties:
+      remark:
+        type: string
+      share_id:
+        type: integer
+    type: object
   mdb.ModifyStudyRoomReq:
     properties:
       name:
@@ -218,7 +607,7 @@ definitions:
         description: |-
           设备类型
           required: false
-          enum: heart_rate,fall_check,lamp_type
+          设备类型包括: heart_rate, fall_check, lamp_type, ed713_type, ed719_type, x1_type, H03pro
         type: string
       user_id:
         type: integer
@@ -264,6 +653,15 @@ definitions:
         description: 'required: true'
         type: string
     type: object
+  mdb.RecoverX1SleepReportReq:
+    properties:
+      mac:
+        description: 设备mac地址
+        type: string
+      report_date:
+        description: 报告日期
+        type: string
+    type: object
   mdb.ReleaseStudyRoomReq:
     properties:
       create_id:
@@ -286,20 +684,58 @@ definitions:
         description: 'required: true'
         type: integer
     type: object
+  mdb.RemoveSharedDeviceReq:
+    properties:
+      share_id:
+        type: integer
+    type: object
   mdb.ShareDeviceReq:
+    properties:
+      device_id:
+        description: |-
+          required: true
+          设备ID
+        type: integer
+      flag:
+        description: |-
+          required: true
+          flag 0:自己创建 1:共享
+        type: integer
+      from_user_id:
+        type: integer
+      remark:
+        description: 备注
+        type: string
+      to_user_id:
+        type: integer
+      wait_confirm:
+        description: 是否等待确认
+        type: boolean
+    type: object
+  mdb.ShareDeviceWithMacReq:
     properties:
       flag:
         description: |-
           required: true
           flag 0:自己创建 1:共享
         type: integer
-      id:
+      from_user_id:
+        description: 'required: true'
+        type: integer
+      mac:
         description: |-
           required: true
-          设备ID
-        type: integer
-      user_id:
-        type: integer
+          设备Mac
+        type: string
+      remark:
+        description: 备注
+        type: string
+      to_user_phone:
+        description: 'required: true'
+        type: string
+      wait_confirm:
+        description: 是否等待确认
+        type: boolean
     type: object
   mdb.SleepX1SwitchReq:
     properties:
@@ -356,6 +792,24 @@ definitions:
       low_physical:
         type: integer
     type: object
+  mdb.TransferDeviceWithMacReq:
+    properties:
+      from_user_id:
+        type: integer
+      mac:
+        description: |-
+          required: true
+          设备Mac
+        type: string
+      remark:
+        description: 备注
+        type: string
+      to_user_phone:
+        type: string
+      wait_confirm:
+        description: 是否等待确认
+        type: boolean
+    type: object
   mdb.UpdateDeviceReq:
     properties:
       id:
@@ -402,6 +856,31 @@ definitions:
           example: 1
         type: integer
     type: object
+  mdb.UserGenderReq:
+    properties:
+      gender:
+        type: integer
+      user_id:
+        description: |-
+          required: true
+          example: 1
+        type: integer
+    type: object
+  mdb.UserOverview:
+    properties:
+      born_date:
+        description: 出生日期
+        type: string
+      gender:
+        description: 0 未知 1 男 2 女
+        type: integer
+      grade:
+        description: 年级
+        type: string
+      user_id:
+        description: 'required: true'
+        type: integer
+    type: object
   mdb.UserStudyData:
     properties:
       day_data:
@@ -436,10 +915,95 @@ definitions:
           example: 1
         type: integer
     type: object
+  mdb.VerifyTokenResp:
+    properties:
+      result:
+        description: '0: 过期 1: 有效'
+        type: integer
+      token:
+        type: string
+    type: object
+  mdb.WeekConcation:
+    properties:
+      con_time:
+        description: 时间
+        type: string
+      concentration:
+        description: 专注度
+        type: number
+    type: object
+  mdb.WeekFlowState:
+    properties:
+      deep_concentration:
+        description: 深度占比
+        type: number
+      deep_study_time:
+        description: 深度时间，单位分
+        type: number
+      flow_time:
+        description: 时间
+        type: string
+      light_concentration:
+        description: 轻度占比
+        type: number
+      light_study_time:
+        description: 轻度时间，单位分
+        type: number
+      mid_concentration:
+        description: 中度占比
+        type: number
+      mid_study_time:
+        description: 中度时间，单位分
+        type: number
+      total_study_time:
+        type: number
+    type: object
+  mdb.X1sWhiteListReq:
+    properties:
+      mac:
+        type: string
+    type: object
+  mdbwx.WxMiniLoginReq:
+    properties:
+      avatar_url:
+        type: string
+      encript_data:
+        type: string
+      gender:
+        type: integer
+      iv:
+        type: string
+      login_code:
+        type: string
+      nick_name:
+        type: string
+      phone_code:
+        type: string
+      version:
+        type: string
+    type: object
+  mdbwx.WxMiniUrlReq:
+    properties:
+      path:
+        type: string
+      query:
+        type: string
+    type: object
+  mysql.BannerSetting:
+    properties:
+      id:
+        type: integer
+      img_url:
+        type: string
+      sort:
+        type: integer
+    type: object
   mysql.Device:
     properties:
       create_time:
         type: string
+      err_code:
+        type: integer
       id:
         description: |-
           设备ID
@@ -464,12 +1028,37 @@ definitions:
         type: string
       room_num:
         type: string
+      rssi:
+        type: integer
       type:
         description: |-
           设备类型
           required: false
           enum: heart_rate,fall_check,lamp_type
         type: string
+    type: object
+  mysql.DeviceOverview:
+    properties:
+      born_date:
+        description: 出生日期
+        type: string
+      gender:
+        default: 0
+        description: 0 未知 1 男 2 女
+        type: integer
+      grade:
+        description: 年级
+        type: string
+      id:
+        type: integer
+      mac:
+        type: string
+      update_time:
+        description: 更新日期
+        type: string
+      visible:
+        description: 可见状态 0 不可见 1 可见
+        type: integer
     type: object
   mysql.EventReportSql:
     properties:
@@ -544,6 +1133,202 @@ definitions:
         type: integer
     required:
     - device_id
+    type: object
+  mysql.H03AttrData:
+    properties:
+      body_angle:
+        description: 身体角度
+        type: integer
+      body_distance:
+        description: 身体距离
+        type: integer
+      body_movement:
+        description: 身体活跃度
+        type: integer
+      brightness_val:
+        description: 亮度值
+        type: integer
+      color_temp:
+        description: 色温
+        type: integer
+      control_mode:
+        description: 控制模式
+        type: integer
+      create_time:
+        description: 创建时间
+        type: string
+      deep_study_time:
+        description: 学习状态时长 深度学习时长 单位分钟
+        type: integer
+      delay_time:
+        description: 延时时间
+        type: integer
+      gesture_mode:
+        description: 手势模式
+        type: integer
+      heart_rate:
+        description: 心率
+        type: integer
+      id:
+        type: integer
+      low_study_time:
+        description: 学习状态时长 轻度学习时长 单位分钟
+        type: integer
+      mac:
+        description: 设备mac地址
+        type: string
+      mid_study_time:
+        description: 学习状态时长 中度学习时长 单位分钟
+        type: integer
+      onoff_status:
+        description: 开关状态
+        type: integer
+      position_interval:
+        description: 坐姿位置间隔
+        type: integer
+      respiratory:
+        description: 呼吸频率
+        type: integer
+      use_light_study_time:
+        description: 使用灯学习时长 单位分钟
+        type: integer
+    type: object
+  mysql.H03Event:
+    properties:
+      activity_freq:
+        description: |-
+          required: true
+          0:无人 1:频繁活动 2:轻微活动
+        type: integer
+      body_status:
+        description: |-
+          required: true
+          有人，无人
+        type: integer
+      create_time:
+        type: string
+      flow_state:
+        description: |-
+          required: true
+          0-离开; 1\2\3-浅(活动); 4\5\6-中(学习); 7\8\9-深(心流); 10-异常
+        type: integer
+      focus_status:
+        description: |-
+          required: true
+          学习状态,1: 轻度专注，2: 中度专注，3: 深度专注
+        type: integer
+      id:
+        type: integer
+      mac:
+        description: |-
+          required: true
+          mac 号
+        type: string
+      posture_state:
+        description: |-
+          required: true
+          0:无人 1:站立 2:端坐 3:趴伏
+        type: integer
+      warning_event:
+        description: |-
+          required: true
+          1:落座;2:专注度分数低; 3:专注度分数高 4:学习时长超时 5:反复离开 6:坐姿太偏
+        type: integer
+    type: object
+  mysql.H03ReportSwitchSetting:
+    properties:
+      concentration_high_notify_switch:
+        description: 专注度高通知开关 0:关闭 1:开启
+        type: integer
+      concentration_low_notify_switch:
+        description: 专注度低通知开关 0:关闭 1:开启
+        type: integer
+      day_report_latest_time:
+        description: 最近日报告推送时间
+        type: string
+      day_report_push_set_time:
+        description: |-
+          required: true
+          日报告推送设定时间 格式: 00:00:00
+        type: string
+      day_report_switch:
+        description: |-
+          required: true
+          日报告开关 0:关闭 1:开启
+        type: integer
+      every_report_latest_time:
+        description: 最近次报告推送时间
+        type: string
+      every_time_report_switch:
+        description: |-
+          required: true
+          次报告开关 0:关闭 1:开启
+        type: integer
+      id:
+        type: integer
+      leave_notify_switch:
+        description: 反复离开通知开关 0:关闭 1:开启
+        type: integer
+      mac:
+        type: string
+      posture_notify_switch:
+        description: 坐姿提醒通知开关 0:关闭 1:开启
+        type: integer
+      seat_notify_switch:
+        description: 落座通知开关 0:关闭 1:开启
+        type: integer
+      study_timeout_notify_switch:
+        description: 学习超时通知开关 0:关闭 1:开启
+        type: integer
+    type: object
+  mysql.H03WarningEventNotifyDailyStat:
+    properties:
+      id:
+        type: integer
+      mac:
+        type: string
+      notify_date:
+        type: string
+      stat_week:
+        type: integer
+      stat_year:
+        type: integer
+      warning_event:
+        description: |-
+          required: true
+          警告事件
+        type: integer
+      warning_nums:
+        description: |-
+          required: true
+          警告次数
+        type: integer
+    type: object
+  mysql.H03WarningEventNotifyWeekStat:
+    properties:
+      id:
+        type: integer
+      mac:
+        type: string
+      stat_week:
+        type: integer
+      stat_year:
+        type: integer
+      than_last_week:
+        description: |-
+          required: true
+          比上周增加次数
+        type: integer
+      warning_event:
+        description: |-
+          required: true
+          警告事件
+        type: integer
+      warning_nums:
+        description: |-
+          required: true
+          警告次数
+        type: integer
     type: object
   mysql.HeartRate:
     properties:
@@ -654,6 +1439,7 @@ definitions:
           NurseModeType      = 5
           BeeperType         = 6
           LightType          = 7
+          ImproveType = 8
         type: integer
     type: object
   mysql.RealDataReq:
@@ -844,6 +1630,8 @@ definitions:
         type: string
       address:
         type: string
+      born_date:
+        type: string
       create_time:
         type: string
       email:
@@ -851,6 +1639,11 @@ definitions:
       emergent_phone:
         type: string
       face:
+        type: string
+      gender:
+        description: 0 未知 1 男 2 女
+        type: integer
+      grade:
         type: string
       id:
         type: integer
@@ -874,6 +1667,8 @@ definitions:
     properties:
       create_time:
         type: string
+      err_code:
+        type: integer
       flag:
         description: |-
           required: false
@@ -903,6 +1698,8 @@ definitions:
         type: string
       room_num:
         type: string
+      rssi:
+        type: integer
       type:
         description: |-
           设备类型
@@ -937,6 +1734,60 @@ definitions:
         type: integer
     required:
     - user_id
+    type: object
+  mysql.UserShareDevice:
+    properties:
+      confirm:
+        type: integer
+      create_time:
+        type: string
+      device_id:
+        type: integer
+      from_user_id:
+        type: integer
+      id:
+        type: integer
+      remark:
+        type: string
+      to_user_id:
+        type: integer
+    required:
+    - device_id
+    - from_user_id
+    - to_user_id
+    type: object
+  mysql.UserShareDeviceDetail:
+    properties:
+      create_time:
+        type: string
+      device_id:
+        type: integer
+      device_name:
+        type: string
+      device_type:
+        type: string
+      from_nick_name:
+        type: string
+      from_phone:
+        type: string
+      from_user_id:
+        type: integer
+      id:
+        type: integer
+      mac:
+        type: string
+      to_face:
+        type: string
+      to_nick_name:
+        description: 分享用户昵称
+        type: string
+      to_phone:
+        type: string
+      to_remark:
+        description: 分享用户备注
+        type: string
+      to_user_id:
+        type: integer
     type: object
   mysql.UserStudyDataByDay:
     properties:
@@ -995,6 +1846,39 @@ definitions:
         description: 'required: true'
         type: integer
     type: object
+  mysql.UserTransferDeviceDetail:
+    properties:
+      create_time:
+        type: string
+      device_id:
+        type: integer
+      device_name:
+        type: string
+      device_type:
+        type: string
+      from_nick_name:
+        type: string
+      from_phone:
+        type: string
+      from_user_id:
+        type: integer
+      id:
+        type: integer
+      mac:
+        type: string
+      to_face:
+        type: string
+      to_nick_name:
+        description: 分享用户昵称
+        type: string
+      to_phone:
+        type: string
+      to_remark:
+        description: 分享用户备注
+        type: string
+      to_user_id:
+        type: integer
+    type: object
   mysql.X1DayReportOrigin:
     properties:
       create_time:
@@ -1026,10 +1910,14 @@ definitions:
 info:
   contact: {}
 paths:
-  /v1/device/askEd713RealData:
+  /device/askEd713RealData:
     post:
       description: ask Ed713 device to send real data
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: ack Ed713 info
         in: body
         name: in
@@ -1046,10 +1934,14 @@ paths:
       summary: askEd713RealData
       tags:
       - ED713 device
-  /v1/device/askX1RealData:
+  /device/askX1RealData:
     post:
       description: ask X1 device to send real data
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: ack X1 info
         in: body
         name: in
@@ -1066,10 +1958,14 @@ paths:
       summary: askX1RealData
       tags:
       - X1 device
-  /v1/device/cleanX1Event:
+  /device/cleanX1Event:
     post:
       description: clean event from X1 device
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: clean X1 event
         in: body
         name: in
@@ -1086,10 +1982,62 @@ paths:
       summary: cleanX1Event
       tags:
       - X1 device
-  /v1/device/controlLamp:
+  /device/confirmSharedDevice:
+    post:
+      description: confirm shared device
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: confirm shared device request
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ConfirmSharedReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Confirmed successfully"}
+          schema:
+            type: string
+      summary: confirmSharedDevice
+      tags:
+      - device
+  /device/confirmTransferDevice:
+    post:
+      description: confirmed transfer device to other user
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: confirmed transfer device
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ConfirmTransferReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Confirmed successfully"}
+          schema:
+            type: string
+      summary: confirmTransferDevice
+      tags:
+      - device
+  /device/controlLamp:
     post:
       description: control lamp status
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: control lamp
         in: body
         name: in
@@ -1106,10 +2054,14 @@ paths:
       summary: controlLamp
       tags:
       - lamp device
-  /v1/device/createStudyRoom:
+  /device/createStudyRoom:
     post:
       description: create study room
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: room information
         in: body
         name: in
@@ -1126,10 +2078,14 @@ paths:
       summary: createStudyRoom
       tags:
       - room
-  /v1/device/improveDisturbed:
+  /device/improveDisturbed:
     post:
       description: import x1 device disturbed data
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: X1 distrube switch
         in: body
         name: in
@@ -1146,10 +2102,14 @@ paths:
       summary: improveDisturbed
       tags:
       - X1 device
-  /v1/device/insert:
+  /device/insert:
     post:
       description: insert user device
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user device information
         in: body
         name: in
@@ -1166,10 +2126,14 @@ paths:
       summary: insertDevice
       tags:
       - device
-  /v1/device/insertFallParams:
+  /device/insertFallParams:
     post:
       description: query fall check device install params
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: fall check device params
         in: body
         name: in
@@ -1186,10 +2150,38 @@ paths:
       summary: insertFallParams
       tags:
       - fall check device
-  /v1/device/modifyStudyRoom:
+  /device/modifySharedDeviceRemark:
+    post:
+      description: modify shared device remark
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: modify share device remark
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ModifySharedDeviceRemarkReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserShareDevice'
+      summary: modifySharedDeviceRemark
+      tags:
+      - device
+  /device/modifyStudyRoom:
     post:
       description: 修改自习室信息
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: room information
         in: body
         name: in
@@ -1206,10 +2198,14 @@ paths:
       summary: modifyStudyRoom
       tags:
       - room
-  /v1/device/openLampRealData:
+  /device/openLampRealData:
     post:
       description: query fall check device install params
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: lamp real data
         in: body
         name: in
@@ -1226,7 +2222,7 @@ paths:
       summary: openLampRealData
       tags:
       - lamp device
-  /v1/device/queryAlarmRecord:
+  /device/queryAlarmRecord:
     get:
       description: query alarm record report from fall check device
       parameters:
@@ -1253,7 +2249,7 @@ paths:
       summary: queryAlarmRecord
       tags:
       - fall check device
-  /v1/device/queryBindByMac:
+  /device/queryBindByMac:
     get:
       description: query device has bind by mac
       parameters:
@@ -1277,7 +2273,7 @@ paths:
       summary: queryBindByMac
       tags:
       - device
-  /v1/device/queryById:
+  /device/queryById:
     get:
       description: query device infomaion
       parameters:
@@ -1296,7 +2292,7 @@ paths:
       summary: queryById
       tags:
       - device
-  /v1/device/queryByUser:
+  /device/queryByUser:
     get:
       description: query device infomaion by user id
       parameters:
@@ -1320,7 +2316,7 @@ paths:
       summary: queryByUser
       tags:
       - device
-  /v1/device/queryDateListInReport:
+  /device/queryDateListInReport:
     get:
       description: 查詢报表中含有数据的日期列表
       parameters:
@@ -1347,7 +2343,26 @@ paths:
       summary: queryDateListInReport
       tags:
       - device
-  /v1/device/queryFallCheckStatus:
+  /device/queryDeviceOverview:
+    get:
+      description: 查询设备的概览数据
+      parameters:
+      - description: mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.DeviceOverview'
+      summary: queryDeviceOverview
+      tags:
+      - device
+  /device/queryFallCheckStatus:
     get:
       description: query fall check data
       parameters:
@@ -1366,7 +2381,7 @@ paths:
       summary: queryFallCheckStatus
       tags:
       - fall check device
-  /v1/device/queryFallExistRecord:
+  /device/queryFallExistRecord:
     get:
       description: query fall check data if has person exist
       parameters:
@@ -1393,7 +2408,7 @@ paths:
       summary: queryFallExistRecord
       tags:
       - fall check device
-  /v1/device/queryFallParams:
+  /device/queryFallParams:
     get:
       description: query fall check device install params
       parameters:
@@ -1412,7 +2427,7 @@ paths:
       summary: queryFallParams
       tags:
       - fall check device
-  /v1/device/queryHeartRate:
+  /device/queryHeartRate:
     get:
       description: query heart data from heart rate table
       parameters:
@@ -1439,7 +2454,7 @@ paths:
       summary: queryHeartRate
       tags:
       - sleep device
-  /v1/device/queryInviteStudyRoom:
+  /device/queryInviteStudyRoom:
     get:
       description: query invited study room by create user
       parameters:
@@ -1458,7 +2473,7 @@ paths:
       summary: queryInviteStudyRoom
       tags:
       - room
-  /v1/device/queryLampControl:
+  /device/queryLampControl:
     get:
       description: query lamp control data by mac
       parameters:
@@ -1477,7 +2492,7 @@ paths:
       summary: queryLampControl
       tags:
       - lamp device
-  /v1/device/queryLampEvent:
+  /device/queryLampEvent:
     get:
       description: query lamp device real-data by mac and time
       parameters:
@@ -1504,7 +2519,7 @@ paths:
       summary: queryLampEvent
       tags:
       - lamp device
-  /v1/device/queryLampRealData:
+  /device/queryLampRealData:
     get:
       description: query lamp device real-data by mac and time
       parameters:
@@ -1531,7 +2546,7 @@ paths:
       summary: queryLampRealData
       tags:
       - lamp device
-  /v1/device/queryLampReportStatus:
+  /device/queryLampReportStatus:
     get:
       description: query lamp device report by mac and date
       parameters:
@@ -1558,7 +2573,7 @@ paths:
       summary: queryLampReportStatus
       tags:
       - lamp device
-  /v1/device/queryRankingByStudyRoom:
+  /device/queryRankingByStudyRoom:
     get:
       description: 查询自习室排行数据，查询条件自习室id
       parameters:
@@ -1577,7 +2592,31 @@ paths:
       summary: queryRankingByStudyRoom
       tags:
       - room
-  /v1/device/querySleepReport:
+  /device/queryShareUsers:
+    get:
+      description: query users to which device shared
+      parameters:
+      - description: login user id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserShareDeviceDetail'
+      summary: queryShareUsers
+      tags:
+      - device
+  /device/querySleepReport:
     get:
       description: query sleep report data
       parameters:
@@ -1604,7 +2643,7 @@ paths:
       summary: querySleepReport
       tags:
       - sleep device
-  /v1/device/queryStudyRoom:
+  /device/queryStudyRoom:
     get:
       description: query study room by create user id
       parameters:
@@ -1623,7 +2662,77 @@ paths:
       summary: queryStudyRoom
       tags:
       - room
-  /v1/device/queryX1RealDataJson:
+  /device/queryTransferUsers:
+    get:
+      description: query users to which device transfered
+      parameters:
+      - description: login user id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserTransferDeviceDetail'
+      summary: queryTransferUsers
+      tags:
+      - device
+  /device/queryUnconfirmedShareDevices:
+    get:
+      description: query unconfirmed share devices
+      parameters:
+      - description: login user id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: 设备mac地址
+        in: query
+        name: mac
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserShareDeviceDetail'
+      summary: queryUnconfirmedShareDevices
+      tags:
+      - device
+  /device/queryUnconfirmedTransferDevices:
+    get:
+      description: query unconfirmed transfered devices
+      parameters:
+      - description: login user id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: device mac address
+        in: query
+        name: mac
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserTransferDeviceDetail'
+      summary: queryUnconfirmedTransferDevices
+      tags:
+      - device
+  /device/queryX1RealDataJson:
     get:
       description: query X1 real data in json format
       parameters:
@@ -1646,7 +2755,7 @@ paths:
       summary: queryX1RealDataJson
       tags:
       - X1 device
-  /v1/device/queryX1SleepReportJson:
+  /device/queryX1SleepReportJson:
     get:
       description: query X1 sleep report in json format
       parameters:
@@ -1669,10 +2778,38 @@ paths:
       summary: queryX1SleepReportJson
       tags:
       - X1 device
-  /v1/device/releaseStudyRoom:
+  /device/recoverX1SleepReport:
+    post:
+      description: recover x1 device sleep report from json table
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: X1 sleep report
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.RecoverX1SleepReportReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: recoverX1SleepReport
+      tags:
+      - X1 device
+  /device/releaseStudyRoom:
     post:
       description: release study room
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: release room
         in: body
         name: in
@@ -1689,10 +2826,38 @@ paths:
       summary: releaseStudyRoom
       tags:
       - room
-  /v1/device/share:
+  /device/removeSharedDevice:
+    post:
+      description: delete shared device
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: delete share device
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.RemoveSharedDeviceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: delete shared device successfully"}
+          schema:
+            type: string
+      summary: removeSharedDevice
+      tags:
+      - device
+  /device/share:
     post:
       description: update user device
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user device information
         in: body
         name: in
@@ -1709,10 +2874,38 @@ paths:
       summary: shareDevice
       tags:
       - device
-  /v1/device/sleepX1Switch:
+  /device/shareDeviceToPhoneWithMac:
+    post:
+      description: share device to other user
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: user device information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.ShareDeviceWithMacReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserShareDevice'
+      summary: shareDeviceToPhoneWithMac
+      tags:
+      - device
+  /device/sleepX1Switch:
     post:
       description: change sleep switch of X1 device
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: X1 switch
         in: body
         name: in
@@ -1729,7 +2922,7 @@ paths:
       summary: sleepX1Switch
       tags:
       - X1 device
-  /v1/device/statsHeartRateByMinute:
+  /device/statsHeartRateByMinute:
     get:
       description: stats heart data per half of hour from heart rate table
       parameters:
@@ -1756,7 +2949,7 @@ paths:
       summary: statsHeartRateByMinute
       tags:
       - sleep device
-  /v1/device/statsLampFlowData:
+  /device/statsLampFlowData:
     get:
       description: 统计台灯的心流数据，根据日期返回心流的比率数据
       parameters:
@@ -1785,10 +2978,38 @@ paths:
       summary: statsLampFlowData
       tags:
       - lamp device
-  /v1/device/update:
+  /device/transferDeviceToPhoneWithMac:
+    post:
+      description: transfer device to other user
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: user device information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.TransferDeviceWithMacReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.UserDevice'
+      summary: transferDeviceToPhoneWithMac
+      tags:
+      - device
+  /device/update:
     post:
       description: update user device
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user device information
         in: body
         name: in
@@ -1805,10 +3026,348 @@ paths:
       summary: updateDevice
       tags:
       - device
-  /v1/notify/notifySetting:
+  /device/updateDeviceOverview:
+    post:
+      description: 更新设备概况
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: 概况数据
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.DeviceOverviewReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.DeviceOverview'
+      summary: updateDeviceOverview
+      tags:
+      - device
+  /h03/askH03Reboot:
+    post:
+      description: ask H03 device to reboot
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: reboot information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.H03RebootReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: askH03Reboot
+      tags:
+      - H03
+  /h03/askH03SyncVersion:
+    post:
+      description: ask H03 device to sync version
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: askH03SyncVersion
+      tags:
+      - H03
+  /h03/queryH03CurDayFocusStatus:
+    get:
+      description: 查询H03当天的专注状态
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.H03CurDayFocusStatus'
+      summary: queryH03CurDayFocusStatus
+      tags:
+      - H03
+  /h03/queryH03CurrentDayStudyTimeDetail:
+    get:
+      description: 查询H03当天学习时长的详情数据
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.H03CurrentDayStudyTimeDetail'
+      summary: queryH03CurrentDayStudyTimeDetail
+      tags:
+      - H03
+  /h03/queryH03LatestAttrs:
+    get:
+      description: 查询H03属性
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.H03AttrData'
+      summary: queryH03LatestAttrs
+      tags:
+      - H03
+  /h03/queryH03LatestStudyStatus:
+    get:
+      description: 查询H03学习状态
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.H03Event'
+      summary: queryH03LatestStudyStatus
+      tags:
+      - H03
+  /h03/queryH03ReportSwitch:
+    get:
+      description: 根据mac查报告开关设置
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.H03ReportSwitchSetting'
+      summary: queryH03ReportSwitch
+      tags:
+      - H03
+  /h03/queryH03StudyReport:
+    get:
+      description: 根据日期查询H03学习报告
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: start_day
+        in: query
+        name: start_day
+        required: true
+        type: string
+      - description: end_day
+        in: query
+        name: end_day
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.H03StudyReportResp'
+      summary: queryH03StudyReport
+      tags:
+      - H03
+  /h03/queryH03Version:
+    get:
+      description: 查询H03版本
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.H03VersionResp'
+      summary: queryH03Version
+      tags:
+      - H03
+  /h03/queryH03WarningEventStatDaily:
+    get:
+      description: 根据mac以及日期查询一周七天每天的告警事件统计次数
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: 查询的日期
+        in: query
+        name: daily_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.H03WarningEventNotifyDailyStat'
+      summary: queryH03WarningEventStatDaily
+      tags:
+      - H03
+  /h03/queryH03WarningEventStatWeekly:
+    get:
+      description: 根据mac以及日期查询一周告警事件统计次数
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: 周报日期
+        in: query
+        name: week_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.H03WarningEventNotifyWeekStat'
+      summary: queryH03WarningEventStatWeekly
+      tags:
+      - H03
+  /h03/queryH03WeekReport:
+    get:
+      description: 根据mac以及日期查询周报告
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: 周报日期
+        in: query
+        name: week_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.H03WeekReportResp'
+      summary: queryH03WeekReport
+      tags:
+      - H03
+  /h03/setH03Param:
+    post:
+      description: set H03 control params
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: params settting
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.H03SettingReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: setH03Param
+      tags:
+      - H03
+  /h03/setH03ReportSwitch:
+    post:
+      description: set H03 report setting
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: params settting
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.H03SwitchSettingReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: setH03ReportSwitch
+      tags:
+      - H03
+  /notify/notifySetting:
     post:
       description: set params for notify
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: people notify setting
         in: body
         name: in
@@ -1825,7 +3384,7 @@ paths:
       summary: notifySetting
       tags:
       - Notify
-  /v1/notify/queryAllNotifySetting:
+  /notify/queryAllNotifySetting:
     get:
       description: query params for notify setting
       parameters:
@@ -1844,7 +3403,7 @@ paths:
       summary: queryAllNotifySetting
       tags:
       - Notify
-  /v1/notify/queryNotifySettingByType:
+  /notify/queryNotifySettingByType:
     get:
       description: query params for notify setting
       parameters:
@@ -1868,7 +3427,67 @@ paths:
       summary: queryNotifySetting
       tags:
       - Notify
-  /v1/user/addUserToStudyRoom:
+  /setting/insertBanner:
+    post:
+      description: insert banner picture into database
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: banner settting
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mysql.BannerSetting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: insertBanner
+      tags:
+      - setting
+  /setting/queryBanner:
+    get:
+      description: 查询banner图片
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.BannerSetting'
+      summary: queryBanner
+      tags:
+      - setting
+  /upload/picture:
+    post:
+      description: 上传图片接口
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: uploadPicFun
+      tags:
+      - uploader
+  /user/addUserToStudyRoom:
     post:
       description: add user id to study room
       parameters:
@@ -1888,10 +3507,14 @@ paths:
       summary: addUserToStudyRoom
       tags:
       - room
-  /v1/user/deleteUser:
+  /user/deleteUser:
     post:
       description: delete user from server
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user id
         in: body
         name: in
@@ -1908,7 +3531,7 @@ paths:
       summary: deleteUser
       tags:
       - user
-  /v1/user/enterStudyRoom:
+  /user/enterStudyRoom:
     post:
       description: 用户进入已邀请的自习室
       parameters:
@@ -1928,10 +3551,14 @@ paths:
       summary: enterStudyRoom
       tags:
       - room
-  /v1/user/insertUserFriend:
+  /user/insertUserFriend:
     post:
       description: insert user's friend
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: friend info
         in: body
         name: in
@@ -1948,7 +3575,7 @@ paths:
       summary: insertUserFriend
       tags:
       - user
-  /v1/user/leaveStudyRoom:
+  /user/leaveStudyRoom:
     post:
       description: 用户离开已邀请的自习室
       parameters:
@@ -1968,10 +3595,14 @@ paths:
       summary: leaveStudyRoom
       tags:
       - room
-  /v1/user/loginout:
+  /user/loginout:
     post:
       description: login out from server
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user id
         in: body
         name: in
@@ -1988,10 +3619,14 @@ paths:
       summary: loginout
       tags:
       - user
-  /v1/user/modifyEmail:
+  /user/modifyEmail:
     post:
       description: modify user email
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user email
         in: body
         name: in
@@ -2008,10 +3643,14 @@ paths:
       summary: modifyEmail
       tags:
       - user
-  /v1/user/modifyEmergentPhone:
+  /user/modifyEmergentPhone:
     post:
       description: modify user emergent phone
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user information
         in: body
         name: in
@@ -2028,10 +3667,14 @@ paths:
       summary: modifyEmergentPhone
       tags:
       - user
-  /v1/user/modifyPasswd:
+  /user/modifyPasswd:
     post:
       description: modify user passwd
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user new passwd
         in: body
         name: in
@@ -2048,10 +3691,14 @@ paths:
       summary: modifyPasswd
       tags:
       - user
-  /v1/user/modifyPhone:
+  /user/modifyPhone:
     post:
       description: modify user phone
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user information
         in: body
         name: in
@@ -2068,10 +3715,14 @@ paths:
       summary: modifyPhone
       tags:
       - user
-  /v1/user/modifyUserFriend:
+  /user/modifyUserFriend:
     post:
       description: modify user's friend
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: modify friend request
         in: body
         name: in
@@ -2088,10 +3739,14 @@ paths:
       summary: modifyUserFriend
       tags:
       - user
-  /v1/user/offline:
+  /user/offline:
     post:
       description: set user offline
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user id
         in: body
         name: id
@@ -2108,10 +3763,14 @@ paths:
       summary: offline
       tags:
       - user
-  /v1/user/online:
+  /user/online:
     post:
       description: set user online
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user id
         in: body
         name: id
@@ -2128,7 +3787,7 @@ paths:
       summary: online
       tags:
       - user
-  /v1/user/queryById:
+  /user/queryById:
     get:
       description: query user by id
       parameters:
@@ -2147,7 +3806,7 @@ paths:
       summary: queryById
       tags:
       - user
-  /v1/user/queryFriendsByUser:
+  /user/queryFriendsByUser:
     get:
       description: query user's friend
       parameters:
@@ -2166,7 +3825,7 @@ paths:
       summary: queryFriendsByUser
       tags:
       - user
-  /v1/user/queryLampUserInFriend:
+  /user/queryLampUserInFriend:
     get:
       description: 查询好友中绑定灯的好友
       parameters:
@@ -2185,7 +3844,7 @@ paths:
       summary: queryLampUserInFriend
       tags:
       - room
-  /v1/user/queryLampUsersByRoom:
+  /user/queryLampUsersByRoom:
     get:
       description: 查询拥有灯的用户，条件自习室ID,id=0 时拥有灯控的所有用户
       parameters:
@@ -2204,7 +3863,7 @@ paths:
       summary: queryLampUsersByRoom
       tags:
       - room
-  /v1/user/queryStudyRoomUser:
+  /user/queryStudyRoomUser:
     get:
       description: query user list from study room
       parameters:
@@ -2233,7 +3892,7 @@ paths:
       summary: queryStudyRoomUser
       tags:
       - room
-  /v1/user/queryUserByEmail:
+  /user/queryUserByEmail:
     get:
       description: query user by email
       parameters:
@@ -2252,7 +3911,7 @@ paths:
       summary: queryUserByEmail
       tags:
       - user
-  /v1/user/queryUserByPhone:
+  /user/queryUserByPhone:
     get:
       description: query user by phone
       parameters:
@@ -2271,7 +3930,26 @@ paths:
       summary: queryUserByPhone
       tags:
       - user
-  /v1/user/queryUserStudyData:
+  /user/queryUserOverview:
+    get:
+      description: 查询用户概况数据
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.UserOverview'
+      summary: queryUserOverview
+      tags:
+      - user
+  /user/queryUserStudyData:
     get:
       description: 查询用户自习的数据,包括自习时长，自习天数，平均时长，最长时间, 以及根据日期进行分组统计每天的自习时长
       parameters:
@@ -2305,7 +3983,7 @@ paths:
       summary: queryUserStudyData
       tags:
       - room
-  /v1/user/queryUserStudyTimeByDay:
+  /user/queryUserStudyTimeByDay:
     get:
       description: 查询用户学习时间段，根据指定日期查询
       parameters:
@@ -2334,10 +4012,14 @@ paths:
       summary: queryUserStudyTimeByDay
       tags:
       - room
-  /v1/user/removeUserDevice:
+  /user/removeUserDevice:
     post:
       description: remove user device
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user device
         in: body
         name: in
@@ -2354,10 +4036,14 @@ paths:
       summary: removeUserDevice
       tags:
       - user
-  /v1/user/removeUserFriend:
+  /user/removeUserFriend:
     post:
       description: remove user's friend
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: remove friend request
         in: body
         name: in
@@ -2374,7 +4060,7 @@ paths:
       summary: removeUserFriend
       tags:
       - user
-  /v1/user/removeUserFromStudyRoom:
+  /user/removeUserFromStudyRoom:
     post:
       description: remove user id from study room
       parameters:
@@ -2394,10 +4080,14 @@ paths:
       summary: removeUserFromStudyRoom
       tags:
       - room
-  /v1/user/update:
+  /user/update:
     post:
       description: update user
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user information
         in: body
         name: in
@@ -2414,10 +4104,38 @@ paths:
       summary: update
       tags:
       - user
-  /v1/user/updateHeadPic:
+  /user/updateGender:
+    post:
+      description: update user gender
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: user gender
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UserGenderReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: updateGender
+      tags:
+      - user
+  /user/updateHeadPic:
     post:
       description: update user face picture
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user picture information
         in: body
         name: in
@@ -2434,10 +4152,14 @@ paths:
       summary: updateHeadPic
       tags:
       - user
-  /v1/user/updateNickName:
+  /user/updateNickName:
     post:
       description: update user nickname
       parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
       - description: user information
         in: body
         name: in
@@ -2454,7 +4176,31 @@ paths:
       summary: updateNickName
       tags:
       - user
-  /v1/user/userLogin:
+  /user/updateUserOverview:
+    post:
+      description: 更新用户概况数据
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: 用户概况数据
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.UserOverview'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: update success"}
+          schema:
+            type: string
+      summary: updateUserOverview
+      tags:
+      - user
+  /user/userLogin:
     post:
       description: login in
       parameters:
@@ -2474,7 +4220,7 @@ paths:
       summary: userLogin
       tags:
       - user
-  /v1/user/userRegister:
+  /user/userRegister:
     post:
       description: user register
       parameters:
@@ -2494,4 +4240,156 @@ paths:
       summary: userRegister
       tags:
       - user
+  /user/verifyUserToken:
+    get:
+      description: 验证用户token是否过期
+      parameters:
+      - description: user token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.VerifyTokenResp'
+      summary: verifyUserToken
+      tags:
+      - user
+  /wx/askMiniUrl:
+    post:
+      description: 获取url
+      parameters:
+      - description: 请求参数
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdbwx.WxMiniUrlReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: askMiniUrl
+      tags:
+      - wx
+  /wx/queryMiniAccessToken:
+    get:
+      description: 获取小程序的access_token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: queryMiniAccessToken
+      tags:
+      - wx
+  /wx/wxMiniProgramLogin:
+    post:
+      description: winxin mini program login api
+      parameters:
+      - description: wx mini program login request
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdbwx.WxMiniLoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.User'
+      summary: wxMiniProgramLogin
+      tags:
+      - wx
+  /wx/wxPublicSubmit:
+    post:
+      description: 公众号推送的服务器地址
+      parameters:
+      - description: xml字符串
+        in: body
+        name: in
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: wxPublicSubmit
+      tags:
+      - wx
+  /x1s/askX1sSyncVersion:
+    post:
+      description: ask X1s device to sync version
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: askX1sSyncVersion
+      tags:
+      - X1s
+  /x1s/insertX1sWhiteList:
+    post:
+      description: insert X1s White list
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: mac
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.X1sWhiteListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok"}
+          schema:
+            type: string
+      summary: insertX1sWhiteList
+      tags:
+      - X1s
+  /x1s/queryX1sWhiteList:
+    get:
+      description: query X1s White list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: queryX1sWhiteList
+      tags:
+      - X1s
 swagger: "2.0"

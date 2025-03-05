@@ -54,7 +54,7 @@ const (
 	replyVersionTopicPrefix         = "replyVersion/X1/"
 	cleanX1EventTopicPrefix         = "cleanEvent/X1/"
 	sleepX1SwitchTopicPrefix        = "sleepSwitch/X1/"
-	nurseModelTopicPrefix           = "nursingModel/X1/"
+	nurseModelTopicPrefix           = "nursingMode/X1/"
 	breathAbnormalTopicPrefix       = "breathAbnormal/X1/"
 	breathAbnormalSwitchTopicPrefix = "breathAbnormalSwitch/X1/"
 	improveDisturbedTopicPrefix     = "improveDisturbSwitch/X1/"
@@ -176,7 +176,7 @@ func (me *X1MqttMsgProc) HandleMqttMsg(topic string, payload []byte) {
 	case realDataX1TopicReplyPrefix:
 		handleX1RealDataMqttMsg(mac, payload)
 	case dayReportX1TopicPrefix:
-		handleX1DayReportMqttMsg(mac, payload)
+		handleX1DayReportMqttMsg(mac, payload, true)
 	case eventX1TopicPrefix:
 		handlerX1EventMqttMsg(mac, payload)
 	case ledReplyTopicPrefix:
@@ -226,7 +226,7 @@ func handleX1TimeMqttMsg(mac string, payload []byte) {
  * return {*}
 ********************************************************************************/
 func handleX1HeartBeatMqttMsg(mac string, payload []byte) {
-	SetDeviceOnline(mac, 1)
+	SetDeviceOnline(mac, 1, 0)
 }
 
 type X1RealDataJson struct {
@@ -316,13 +316,6 @@ func handleX1RealDataMqttMsg(mac string, payload []byte) {
 	if len(realDataJson.BodyPosition) > 0 {
 		realDataSql.BodyPosition = totalBodyPosition / len(realDataJson.BodyPosition)
 	}
-	taskPool.Put(&gopool.Task{
-		Params: []interface{}{realDataSql},
-		Do: func(params ...interface{}) {
-			var obj = params[0].(*X1RealDataMysql)
-			obj.Insert()
-		},
-	})
 
 	heartObj := &HeartRate{
 		ID:           0,
@@ -348,7 +341,17 @@ func handleX1RealDataMqttMsg(mac string, payload []byte) {
 	if heartObj.ActiveStatus == 3 && heartObj.PersonStatus == 3 {
 		heartObj.StagesStatus = 3
 	}
-	mq.PublishData(common.MakeHeartRateTopic(mac), heartObj)
+	if CheckDiffBetweenTwoSleepDeviceRecords(X1Type, mac, heartObj) {
+		// mq.PublishData("x1/realdata/test", heartObj)
+		mq.PublishData(common.MakeHeartRateTopic(mac), heartObj)
+		taskPool.Put(&gopool.Task{
+			Params: []interface{}{realDataSql},
+			Do: func(params ...interface{}) {
+				var obj = params[0].(*X1RealDataMysql)
+				obj.Insert()
+			},
+		})
+	}
 }
 
 // swagger:model X1RealDataMysql
@@ -561,21 +564,23 @@ type X1DayReportJson struct {
 ********************************************************************************/
 func TestX1DayReport() {
 	str := "{\"sleep_start\":1704218361,\"sleep_end\":1704255552,\"go_bed\":1704207665,\"leave_bed\":1704255552,\"evaluation\":63,\"base_respiratory\":12,\"base_heart_rate\":68,\"base_body_movement\":13,\"sleep_periodization\":[1,1704207665,2,1704218361,3,1704221121,2,1704221361,3,1704221721,2,1704221841,3,1704221961,2,1704222081,3,1704223521,2,1704224001,3,1704224961,2,1704226761,3,1704227001,2,1704227241,3,1704227361,2,1704227481,3,1704229521,2,1704229881,3,1704230121,2,1704231801,3,1704232041,2,1704233361,3,1704234321,2,1704234441,3,1704234561,2,1704234681,3,1704235401,2,1704235881,3,1704236601,2,1704237441,3,1704237681,2,1704238521,1,1704238744,2,1704239168,1,1704239951,2,1704240388,1,1704240486,2,1704240917,1,1704240966,2,1704241343,1,1704241512,2,1704242108,1,1704243178,2,1704243633,1,1704244333,2,1704244749,1,1704244893,2,1704245276,1,1704245321,2,1704245715,0,1704255552],\"sleep_events\":[1,1704211580,1,1704211738,1,1704213506,1,1704214960,1,1704216330,1,1704216398,1,1704221051,1,1704221475,1,1704221612,1,1704221684,1,1704221872,1,1704222830,1,1704222878,1,1704223177,1,1704223297,1,1704223349,1,1704223388,1,1704223427,1,1704223901,1,1704224081,1,1704224137,1,1704224194,1,1704224851,1,1704224898,1,1704226898,1,1704226931,1,1704227324,1,1704227585,1,1704228591,1,1704228874,1,1704229285,1,1704229426,1,1704230024,1,1704230080,1,1704231859,1,1704233456,1,1704233650,1,1704233940,1,1704233964,1,1704234158,1,1704235434,1,1704235812,1,1704236030,1,1704236095,1,1704236228,1,1704236294,1,1704236554,1,1704238681,2,1704238744,1,1704239337,2,1704239951,2,1704240486,2,1704240966,2,1704241512,2,1704243178,2,1704244333,2,1704244893,2,1704245321],\"start\":1704207665,\"end\":1704255552,\"sep\":191,\"respiratory\":[13,14,14,14,14,15,15,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,12,12,12,12,12,12,11,11,11,11,12,12,11,11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13,13,13,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,11,11,11,11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,12,12,12,12,12,12,12,12,12,12,12,11,11,11,11,11,11,11,11,11,11,11,11,12,12,13,14,14,14,15,15,15,15,15,15,15,15,15,14,14,13,13,13,13,13,13,13,13,13,12,13,14,14,14,14,15,15,15,16,16,16,16,16,16,16,15,16,15,15,15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,15,15,15,15,14,14,14,14,15,15,15,16,15,15,15,15,15,15,15],\"heart_rate\":[71,72,74,75,77,78,78,77,76,75,74,72,71,70,70,69,69,68,68,68,69,68,69,70,69,68,68,68,67,67,67,67,66,66,66,65,65,65,65,66,66,67,67,66,66,66,66,66,66,66,66,67,67,68,68,69,69,68,69,69,70,71,70,70,69,69,69,68,69,69,69,68,68,67,66,66,66,66,67,67,67,67,66,66,66,65,65,66,67,67,67,66,66,65,65,64,65,64,64,64,64,64,64,64,64,64,65,66,66,66,66,66,66,65,65,64,64,64,63,63,63,63,63,63,63,63,63,63,63,64,65,65,65,65,66,66,66,65,66,66,67,67,67,68,68,67,68,68,67,67,67,66,66,66,66,66,67,66,66,66,65,65,65,68,71,73,73,73,75,79,79,78,79,80,80,78,75,74,73,71,71,70,69,70,70,70,70,69,69,70,72,73,72,72,75,76,78,79,80,79,80,80,80,79,78,78,76,77,78,78,80,81,81,80,80,80,80,81,79,79,79,80,80,80,79,79,80,81,81,80,78,76,76,74,73,72,71,73,74,75,76,78,79,78,77,77,77,77,78,78],\"body_movement\":[42,26,8,0,0,0,8,19,36,13,2,0,0,0,0,0,0,0,0,0,12,13,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,6,2,0,0,0,0,0,6,20,0,0,0,0,0,0,0,0,0,12,10,5,0,0,0,0,0,0,0,0,0,0,0,9,10,2,18,5,17,0,0,0,0,10,5,17,17,0,5,8,6,0,0,8,7,0,0,0,0,0,0,0,0,0,22,0,5,3,3,0,0,0,0,8,4,4,13,14,0,0,9,6,0,0,0,0,0,0,0,0,9,8,0,0,0,0,0,0,14,10,14,16,4,0,0,0,0,0,2,7,0,5,17,10,13,3,0,0,0,0,19,0,0,0,0,0,10,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"id\":1704257505007,\"ack\":0}"
-	handleX1DayReportMqttMsg("test", []byte(str))
+	handleX1DayReportMqttMsg("test", []byte(str), false)
 }
-func handleX1DayReportMqttMsg(mac string, payload []byte) {
+func handleX1DayReportMqttMsg(mac string, payload []byte, saveJson bool) {
 	var reportData X1DayReportJson
 	err := json.Unmarshal(payload, &reportData)
 	if err != nil {
 		mylog.Log.Errorln("handleDayReportMqttMsg Unmarshal failed, err:", err)
 		return
 	}
-	dayReportOrigin := NewX1DayReportOrigin()
-	dayReportOrigin.Mac = mac
-	dayReportOrigin.Value = string(payload)
-	dayReportOrigin.CreateTime = time.Now().Format(cfg.TmFmtStr)
-	if !dayReportOrigin.Insert() {
-		mylog.Log.Errorln("handleDayReportMqttMsg insert day report origin failed")
+	if saveJson {
+		dayReportOrigin := NewX1DayReportOrigin()
+		dayReportOrigin.Mac = mac
+		dayReportOrigin.Value = string(payload)
+		dayReportOrigin.CreateTime = time.Now().Format(cfg.TmFmtStr)
+		if !dayReportOrigin.Insert() {
+			mylog.Log.Errorln("handleDayReportMqttMsg insert day report origin failed")
+		}
 	}
 	exception.TryEx{
 		Try: func() {
@@ -593,12 +598,33 @@ func handleX1DayReportMqttMsg(mac string, payload []byte) {
 			dayReportSql.InBedEndTime = common.SecondsToTimeStr(reportData.End)
 			dayReportSql.InBedSep = reportData.Sep
 			dayReportSql.CreateTime = time.Now().Format(cfg.TmFmtStr)
-			for i := 0; i < len(reportData.SleepPeriodization); i += 2 {
-				dayReportSql.SleepPeriodization = int(reportData.SleepPeriodization[i])
-				dayReportSql.PeriodizationTime = common.SecondsToTimeStr(reportData.SleepPeriodization[i+1])
-				if i < len(reportData.SleepEvents) {
+
+			lenSleepPeriodization := len(reportData.SleepPeriodization)
+			lenSleepEvents := len(reportData.SleepEvents)
+
+			maxLen := lenSleepPeriodization
+			if lenSleepPeriodization < lenSleepEvents {
+				maxLen = lenSleepEvents
+			}
+
+			mylog.Log.Infoln("handleX1DayReportMqttMsg, maxLen:", maxLen,
+				"len(reportData.SleepPeriodization):", lenSleepPeriodization,
+				"len(reportData.SleepEvents):", lenSleepEvents)
+
+			for i := 0; i < maxLen; i += 2 {
+				if i < lenSleepPeriodization {
+					dayReportSql.SleepPeriodization = int(reportData.SleepPeriodization[i])
+					dayReportSql.PeriodizationTime = common.SecondsToTimeStr(reportData.SleepPeriodization[i+1])
+				} else {
+					dayReportSql.SleepPeriodization = int(reportData.SleepPeriodization[lenSleepPeriodization-2])
+					dayReportSql.PeriodizationTime = common.SecondsToTimeStr(reportData.SleepPeriodization[lenSleepPeriodization-1])
+				}
+				if i < lenSleepEvents {
 					dayReportSql.SleepEvents = int(reportData.SleepEvents[i])
 					dayReportSql.SleepEventsTime = common.SecondsToTimeStr(reportData.SleepEvents[i+1])
+				} else {
+					dayReportSql.SleepEvents = 0
+					dayReportSql.SleepEventsTime = common.GetNowTime()
 				}
 				idx := i / 2
 				if idx < len(reportData.Respiratory) {
@@ -613,6 +639,30 @@ func handleX1DayReportMqttMsg(mac string, payload []byte) {
 			mylog.Log.Errorln("handleDayReportMqttMsg catch exception, err:", e.Error())
 		},
 	}.Run()
+}
+
+/******************************************************************************
+ * function:
+ * description:
+ * param {string} mac
+ * param {string} reportDate
+ * return {*}
+********************************************************************************/
+func RecoverX1DayReport(mac string, reportDate string) (int, string) {
+	var reportOrigin []X1DayReportOrigin
+	QueryX1DayReportJson(mac, reportDate, &reportOrigin)
+	if len(reportOrigin) == 0 {
+		return common.NoData, "not found json record"
+	}
+	for _, v := range reportOrigin {
+		mac := v.Mac
+		jsonVal := v.Value
+		reportSql := NewX1DayReportSql()
+		filter := fmt.Sprintf("mac='%s' and date(create_time)=date('%s')", mac, reportDate)
+		DeleteDaoByFilter(reportSql.myTable(), filter)
+		handleX1DayReportMqttMsg(mac, []byte(jsonVal), false)
+	}
+	return common.Success, ""
 }
 
 type X1OriginJson struct {
@@ -681,7 +731,10 @@ func (me *X1DayReportOrigin) SetID(id int64) {
 }
 func QueryX1DayReportJson(mac string, create_date string, result *[]X1DayReportOrigin) bool {
 	filter := fmt.Sprintf("mac='%s' and date(create_time)=date('%s')", mac, create_date)
-	return QueryDao(common.DeviceDayReportTbl(X1Type), filter, nil, 0, func(rows *sql.Rows) {
+	if mac == "" {
+		filter = fmt.Sprintf("date(create_time)=date('%s')", create_date)
+	}
+	return QueryDao(common.DeviceDayReportJsonTbl(X1Type), filter, nil, 0, func(rows *sql.Rows) {
 		obj := NewX1DayReportOrigin()
 		err := obj.DecodeFromRows(rows)
 		if err != nil {
@@ -907,7 +960,7 @@ func (me *X1DayReportSql) Insert() bool {
 			heart_rate int not null comment '心率',
 			body_movement int not null comment '体动',
 			create_time datetime comment '新增日期',
-			PRIMARY KEY (id, mac, create_time)
+			PRIMARY KEY (id)
 		)`
 		CreateTable(sql)
 	}
@@ -1004,10 +1057,12 @@ func handlerX1EventMqttMsg(mac string, payload []byte) {
 	var userDevices []UserDeviceDetail
 	QueryUserDeviceDetailByMac(mac, &userDevices)
 	if len(userDevices) > 0 {
-		heartEvent.UserDeviceDetail = userDevices[0]
-		mq.PublishData(common.MakeHeartEventTopic(mac), heartEvent)
-		// send sms
-		SendSleepAlarmSms(heartEvent)
+		for _, userDevice := range userDevices {
+			heartEvent.UserDeviceDetail = userDevice
+			mq.PublishData(common.MakeHeartEventTopic(mac), heartEvent)
+			// send sms
+			SendSleepAlarmSms(heartEvent)
+		}
 	}
 }
 
@@ -1236,26 +1291,38 @@ func handleX1AckVersionMqttMsg(mac string, payload []byte) {
 	var reply []X1VersionReplySql
 	QueryVersionReplyByMac(mac, &reply)
 	if len(reply) > 0 {
-		var replyJson X1VersionReplyJson
-		replyJson.Id = otaRspCmd
-		replyJson.Ack = 0
-		replyJson.Upgrade = reply[0].Upgrade
-		replyJson.BaseVersion = reply[0].BaseVersion
-		replyJson.BaseFileSize = reply[0].BaseFileSize
-		replyJson.BaseUrl = reply[0].BaseUrl
-		replyJson.CoreVersion = reply[0].CoreVersion
-		replyJson.CoreFileSize = reply[0].CoreFileSize
-		replyJson.CoreUrl = reply[0].CoreUrl
-		mq.PublishData(MakeX1ReplyVersionTopic(mac), replyJson)
+		if ackVersion.BaseVersion != reply[0].BaseVersion {
+			var baseVerJson X1BaseVersionReplyJson
+			baseVerJson.Id = otaRspCmd
+			baseVerJson.Ack = 0
+			baseVerJson.Upgrade = reply[0].Upgrade
+			baseVerJson.BaseVersion = reply[0].BaseVersion
+			baseVerJson.BaseFileSize = reply[0].BaseFileSize
+			baseVerJson.BaseUrl = reply[0].BaseUrl
+			mq.PublishData(MakeX1ReplyVersionTopic(mac), baseVerJson)
+		} else if ackVersion.CoreVersion != reply[0].CoreVersion {
+			var coreVerJson X1CoreVersionReplyJson
+			coreVerJson.Id = otaRspCmd
+			coreVerJson.Ack = 0
+			coreVerJson.Upgrade = reply[0].Upgrade
+			coreVerJson.CoreVersion = reply[0].CoreVersion
+			coreVerJson.CoreFileSize = reply[0].CoreFileSize
+			coreVerJson.CoreUrl = reply[0].CoreUrl
+			mq.PublishData(MakeX1ReplyVersionTopic(mac), coreVerJson)
+		}
 	}
 }
 
-type X1VersionReplyJson struct {
+type X1BaseVersionReplyJson struct {
 	X1MsgHeader
 	Upgrade      int    `json:"upgrade"`
 	BaseVersion  int    `json:"base_version"`
 	BaseFileSize int64  `json:"base_file_size"`
 	BaseUrl      string `json:"base_url"`
+}
+type X1CoreVersionReplyJson struct {
+	X1MsgHeader
+	Upgrade      int    `json:"upgrade"`
 	CoreVersion  int    `json:"core_version"`
 	CoreFileSize int64  `json:"core_file_size"`
 	CoreUrl      string `json:"core_url"`
@@ -1360,7 +1427,8 @@ func (me *X1VersionReplySql) Delete() bool {
 }
 
 func QueryVersionReplyByMac(mac string, results *[]X1VersionReplySql) bool {
-	filter := fmt.Sprintf("upgrade=1 and mac='%s'", mac)
+	// filter := fmt.Sprintf("upgrade=1 and mac='%s'", mac)
+	filter := "upgrade=1"
 	backFunc := func(rows *sql.Rows) {
 		obj := NewX1VersionReplySql()
 		err := obj.DecodeFromRows(rows)

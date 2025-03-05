@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-12-04 09:36:43
  * LastEditors: liguoqiang
- * LastEditTime: 2023-12-04 14:17:15
+ * LastEditTime: 2025-01-14 14:29:51
  * Description:
 ********************************************************************************/
 package log
@@ -10,6 +10,7 @@ package log
 import (
 	"fmt"
 	"hjyserver/cfg"
+	"runtime"
 	"time"
 
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
@@ -63,4 +64,17 @@ func LogWriter(logFile string, level string, backups int) *rotatelogs.RotateLogs
 		fmt.Printf("config local file system logger error. %v", err)
 	}
 	return writter
+}
+
+func CurrFunName() string {
+	pc, _, _, ok := runtime.Caller(1)
+	if !ok {
+		return ""
+	}
+
+	fn := runtime.FuncForPC(pc)
+	if fn == nil {
+		return ""
+	}
+	return fn.Name()
 }

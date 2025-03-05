@@ -19,6 +19,7 @@ import (
 	mylog "hjyserver/log"
 	"hjyserver/mdb/common"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,11 +36,14 @@ type User struct {
 	Account       string `json:"account" mysql:"account"`
 	Password      string `json:"password" mysql:"password" `
 	NickName      string `json:"nick_name" mysql:"nick_name"`
+	Gender        int    `json:"gender" mysql:"gender"`         // 0 未知 1 男 2 女
 	LoginType     int    `json:"login_type" mysql:"login_type"` // 0:phone 1:email
 	Phone         string `json:"phone" mysql:"phone"`
 	Email         string `json:"email" mysql:"email"`
 	EmergentPhone string `json:"emergent_phone" mysql:"emergent_phone"`
 	Face          string `json:"face" mysql:"face"`
+	BornDate      string `json:"born_date" mysql:"born_date" size:"32"`
+	Grade         string `json:"grade" mysql:"grade" size:"32"`
 	Address       string `json:"address" mysql:"address"`
 	RoomNum       string `json:"room_num" mysql:"room_num"`
 	IsLogin       int    `json:"is_login" mysql:"is_login"`
@@ -55,11 +59,14 @@ func NewUser() *User {
 		Account:       "",
 		Password:      "",
 		NickName:      "",
+		Gender:        0,
 		LoginType:     0,
 		Phone:         "",
 		Email:         "",
 		EmergentPhone: "",
 		Face:          "",
+		BornDate:      "",
+		Grade:         "",
 		Address:       "",
 		RoomNum:       "",
 		IsLogin:       1,
@@ -110,17 +117,67 @@ func QueryUserByCond(filter interface{}, page *common.PageDao, sort interface{},
 
 func (me *User) DecodeFromRows(rows *sql.Rows) error {
 	var emergentPhone sql.NullString
-	err := rows.Scan(&me.ID, &me.Account, &me.Password, &me.NickName, &me.LoginType, &me.Phone, &me.Email, &emergentPhone, &me.Face, &me.Address, &me.RoomNum, &me.IsLogin, &me.LoginTime, &me.CreateTime)
+	var bornDate sql.NullString
+	var grade sql.NullString
+	err := rows.Scan(
+		&me.ID,
+		&me.Account,
+		&me.Password,
+		&me.NickName,
+		&me.Gender,
+		&me.LoginType,
+		&me.Phone,
+		&me.Email,
+		&emergentPhone,
+		&me.Face,
+		&bornDate,
+		&grade,
+		&me.Address,
+		&me.RoomNum,
+		&me.IsLogin,
+		&me.LoginTime,
+		&me.CreateTime)
 	if emergentPhone.Valid {
 		me.EmergentPhone = emergentPhone.String
+	}
+	if bornDate.Valid {
+		me.BornDate = bornDate.String
+	}
+	if grade.Valid {
+		me.Grade = grade.String
 	}
 	return err
 }
 func (me *User) DecodeFromRow(row *sql.Row) error {
 	var emergentPhone sql.NullString
-	err := row.Scan(&me.ID, &me.Account, &me.Password, &me.NickName, &me.LoginType, &me.Phone, &me.Email, &emergentPhone, &me.Face, &me.Address, &me.RoomNum, &me.IsLogin, &me.LoginTime, &me.CreateTime)
+	var bornDate sql.NullString
+	var grade sql.NullString
+	err := row.Scan(
+		&me.ID,
+		&me.Account,
+		&me.Password,
+		&me.NickName,
+		&me.Gender,
+		&me.LoginType,
+		&me.Phone,
+		&me.Email,
+		&emergentPhone,
+		&me.Face,
+		&bornDate,
+		&grade,
+		&me.Address,
+		&me.RoomNum,
+		&me.IsLogin,
+		&me.LoginTime,
+		&me.CreateTime)
 	if emergentPhone.Valid {
 		me.EmergentPhone = emergentPhone.String
+	}
+	if bornDate.Valid {
+		me.BornDate = bornDate.String
+	}
+	if grade.Valid {
+		me.Grade = grade.String
 	}
 	return err
 }
@@ -158,11 +215,14 @@ func (me *User) Insert() bool {
             account char(32) NOT NULL COMMENT '账号',
 			password char(32) NOT NULL COMMENT '密码',
             nick_name varchar(32) NOT NULL COMMENT '昵称',
+			gender int default 0 comment '性别 0:未知 1:男 2:女',
 			login_type int NOT NULL COMMENT '登录类型 0:phone 1:email',
             phone varchar(32) comment '手机号',
 			email varchar(32) comment '邮箱',
 			emergent_phone varchar(32) comment '紧急联系电话',
-            face varchar(128) comment '头像',
+            face varchar(255) comment '头像',
+			born_date varchar(32) comment '出生日期',
+			grade varchar(32) comment '年级',
             address varchar(128) comment '地址',
             room_num varchar(32) comment '房间号',
 			is_login int default 0 comment '是否登录',
@@ -537,9 +597,9 @@ func (me *UserFriend) DecodeFromGin(c *gin.Context) {
 */
 type UserDeviceRelation struct {
 	ID         int64  `json:"id" mysql:"id" binding:"omitempty"`
-	UserId     int64  `json:"user_id" mysql:"user_id" binding:"required"`
+	UserId     int64  `json:"user_id" mysql:"user_id" key:"true" binding:"required"`
 	DeviceId   int64  `json:"device_id" mysql:"device_id" binding:"required"`
-	Flag       int    `json:"flag" mysql:"flag"`
+	Flag       int    `json:"flag" mysql:"flag"` // 0:自己创建 1:共享
 	CreateTime string `json:"create_time" mysql:"create_time"`
 }
 
@@ -610,15 +670,7 @@ Insert UserDevice
 func (me *UserDeviceRelation) Insert() bool {
 	tblName := common.UserDeviceRelationTbl
 	if !CheckTableExist(tblName) {
-		sql := `create table ` + tblName + ` (
-            id MEDIUMINT NOT NULL AUTO_INCREMENT,
-            user_id MEDIUMINT NOT NULL COMMENT '用户id',
-			device_id MEDIUMINT NOT NULL COMMENT '设备id',
-			flag int NOT NULL COMMENT '标志 0:自己创建 1:共享',
-            create_time datetime comment '创建时间',
-            PRIMARY KEY (id, user_id, create_time)
-        )`
-		CreateTable(sql)
+		CreateTableWithStruct(tblName, me)
 	}
 	return InsertDao(tblName, me)
 }
@@ -705,7 +757,7 @@ func NewUserDevice() *UserDevice {
 QueryUserDeviceByUserId...
 */
 func QueryUserDeviceByUserId(userId int64, flag int, results *[]UserDevice) bool {
-	sql := "select a.user_id as user_id, a.flag, b.* from " +
+	sql := "select a.user_id as user_id, a.flag, b.id, b.name, b.type, b.mac, b.online ,b.online_time, b.create_time, b.remark from " +
 		common.UserDeviceRelationTbl + " a join " + common.DeviceTbl + " b on a.device_id = b.id and a.user_id = " + fmt.Sprintf("%d", userId)
 	if flag != -1 {
 		sql += " and a.flag = " + fmt.Sprintf("%d", flag)
@@ -731,11 +783,11 @@ func QueryUserDeviceByUserId(userId int64, flag int, results *[]UserDevice) bool
 }
 
 func (me *UserDevice) DecodeFromRows(rows *sql.Rows) error {
-	err := rows.Scan(&me.UserId, &me.Flag, &me.ID, &me.Name, &me.Type, &me.Mac, &me.RoomNum, &me.Online, &me.OnlineTime, &me.CreateTime, &me.Remark)
+	err := rows.Scan(&me.UserId, &me.Flag, &me.ID, &me.Name, &me.Type, &me.Mac, &me.Online, &me.OnlineTime, &me.CreateTime, &me.Remark)
 	return err
 }
 func (me *UserDevice) DecodeFromRow(row *sql.Row) error {
-	err := row.Scan(&me.UserId, &me.Flag, &me.ID, &me.Name, &me.Type, &me.Mac, &me.RoomNum, &me.Online, &me.OnlineTime, &me.CreateTime, &me.Remark)
+	err := row.Scan(&me.UserId, &me.Flag, &me.ID, &me.Name, &me.Type, &me.Mac, &me.Online, &me.OnlineTime, &me.CreateTime, &me.Remark)
 	return err
 }
 
@@ -793,6 +845,564 @@ func QueryUserDeviceDetailByMac(mac string, results *[]UserDeviceDetail) bool {
 				obj.EmergentPhone = emergentPhone.String
 			}
 			*results = append(*results, *obj)
+		}
+	}
+	return true
+}
+
+/******************************************************************************
+ * function: RegisterWithUserObj
+ * description: 注册一个用户，参数为User对象
+ * param {*mysql.User} me
+ * return {*}
+********************************************************************************/
+func RegisterWithUserObj(me *User) (int, interface{}) {
+	me.Account = strings.Trim(me.Account, " ")
+	me.Phone = strings.Trim(me.Phone, " ")
+	me.Email = strings.Trim(me.Email, " ")
+	if me.Account == "" {
+		return common.ParamError, "account required"
+	}
+	if me.Phone == "" && me.Email == "" {
+		return common.ParamError, "password or email required"
+	}
+	if me.Phone != "" {
+		me.Phone = common.FixPlusInPhoneString(me.Phone)
+	}
+	filter := fmt.Sprintf("account = '%s'", me.Account)
+	var gList []User
+	QueryUserByCond(filter, nil, nil, &gList)
+	if len(gList) > 0 {
+		return common.AccountHasReg, "account has registered"
+	}
+	if me.Phone != "" {
+		filter = fmt.Sprintf("phone = '%s'", me.Phone)
+		QueryUserByCond(filter, nil, nil, &gList)
+		if len(gList) > 0 {
+			return common.PhoneHasReg, "phone has registered"
+		}
+	}
+	if me.Email != "" {
+		filter = fmt.Sprintf("email = '%s'", me.Email)
+		QueryUserByCond(filter, nil, nil, &gList)
+		if len(gList) > 0 {
+			return common.EmailHasReg, "email has registered"
+		}
+	}
+	me.Password, _ = common.EncryptDataWithDefaultkey(me.Password)
+	me.IsLogin = 1
+	me.LoginTime = common.GetNowTime()
+	me.CreateTime = common.GetNowTime()
+	if me.Insert() {
+		return http.StatusOK, me
+	}
+	return common.RegisterFail, "account registe failed!"
+}
+
+/******************************************************************************
+ * class: UserShareDevice
+ * description: 定义用户共享设备表
+ * return {*}
+********************************************************************************/
+
+// swagger:model UserShareDevice
+type UserShareDevice struct {
+	ID         int64  `json:"id" mysql:"id" binding:"omitempty"`
+	FromUserId int64  `json:"from_user_id" mysql:"from_user_id" key:"true" binding:"required"`
+	ToUserId   int64  `json:"to_user_id" mysql:"to_user_id" key:"true" binding:"required"`
+	DeviceId   int64  `json:"device_id" mysql:"device_id" binding:"required"`
+	Confirm    int    `json:"confirm" mysql:"confirm"`
+	Remark     string `json:"remark" mysql:"remark"`
+	CreateTime string `json:"create_time" mysql:"create_time"`
+}
+
+func NewUserShareDevice() *UserShareDevice {
+	return &UserShareDevice{
+		ID:         0,
+		FromUserId: 0,
+		ToUserId:   0,
+		DeviceId:   0,
+		Confirm:    0,
+		Remark:     "",
+		CreateTime: time.Now().Format(cfg.TmFmtStr),
+	}
+}
+func (me *UserShareDevice) MyTableName() string {
+	return common.UserShareDeviceTbl
+}
+
+func (me *UserShareDevice) DecodeFromRows(rows *sql.Rows) error {
+	err := rows.Scan(&me.ID, &me.FromUserId, &me.ToUserId, &me.DeviceId, &me.Confirm, &me.Remark, &me.CreateTime)
+	return err
+}
+func (me *UserShareDevice) DecodeFromRow(row *sql.Row) error {
+	err := row.Scan(&me.ID, &me.FromUserId, &me.ToUserId, &me.DeviceId, &me.Confirm, &me.Remark, &me.CreateTime)
+	return err
+}
+
+/*
+Decode 解析从gin获取的数据 转换成UserDevice
+*/
+func (me *UserShareDevice) DecodeFromGin(c *gin.Context) {
+	if err := c.ShouldBindBodyWith(me, binding.JSON); err != nil {
+		exception.Throw(common.JsonError, err.Error())
+	}
+	if me.FromUserId == 0 {
+		exception.Throw(common.ParamError, "user id is empty!")
+	}
+}
+
+/*
+QueryByID() 查询股票基本信息
+*/
+func (me *UserShareDevice) QueryByID(id int64) bool {
+	return QueryDaoByID(me.MyTableName(), id, me)
+}
+
+/*
+Insert UserDevice
+*/
+func (me *UserShareDevice) Insert() bool {
+	if !CheckTableExist(me.MyTableName()) {
+		CreateTableWithStruct(me.MyTableName(), me)
+	}
+	return InsertDao(me.MyTableName(), me)
+}
+
+/*
+Update() 更新
+*/
+func (me *UserShareDevice) Update() bool {
+	return UpdateDaoByID(me.MyTableName(), me.ID, me)
+}
+
+/*
+Delete() 删除
+*/
+func (me *UserShareDevice) Delete() bool {
+	return DeleteDaoByID(me.MyTableName(), me.ID)
+}
+
+/*
+设置ID
+*/
+func (me *UserShareDevice) SetID(id int64) {
+	me.ID = id
+}
+
+func DeleteUserShareDeviceByUserId(fromUserId int64, toUserId int64, deviceId int64) bool {
+	filter := ""
+	if fromUserId != 0 {
+		filter += " from_user_id=" + fmt.Sprintf("%d", fromUserId)
+	}
+	if toUserId != 0 {
+		filter += " and to_user_id=" + fmt.Sprintf("%d", toUserId)
+	}
+	if deviceId != 0 {
+		filter += " and device_id=" + fmt.Sprintf("%d", deviceId)
+	}
+	return DeleteDaoByFilter(common.UserShareDeviceTbl, filter)
+}
+
+/******************************************************************************
+ * function:
+ * description:
+ * return {*}
+********************************************************************************/
+func QueryUserShareDevice(fromUserId int64, toUserId int64, deviceId int64, confirm int, results *[]UserShareDevice) bool {
+	sql := "select * from " + common.UserShareDeviceTbl
+	filter := ""
+	if fromUserId > 0 {
+		filter = " from_user_id = " + fmt.Sprintf("%d", fromUserId)
+	}
+	if toUserId > 0 {
+		if filter != "" {
+			filter += " and "
+		}
+		filter += " to_user_id = " + fmt.Sprintf("%d", toUserId)
+	}
+	if deviceId > 0 {
+		if filter != "" {
+			filter += " and "
+		}
+		filter += " device_id = " + fmt.Sprintf("%d", deviceId)
+	}
+	if confirm > -1 {
+		if filter != "" {
+			filter += " and "
+		}
+		filter += " confirm = " + fmt.Sprintf("%d", confirm)
+	}
+	if filter != "" {
+		sql += " where " + filter
+	}
+	sql += " order by create_time desc"
+	rows, err := mDb.Query(sql)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return false
+	}
+	defer rows.Close()
+	for rows.Next() {
+		obj := NewUserShareDevice()
+		err := obj.DecodeFromRows(rows)
+		if err != nil {
+			mylog.Log.Errorln(err)
+		} else {
+			*results = append(*results, *obj)
+		}
+	}
+	return true
+}
+
+// swagger:model UserShareDeviceDetail
+type UserShareDeviceDetail struct {
+	ID           int64  `json:"id" mysql:"id" binding:"omitempty"`
+	FromUserId   int64  `json:"from_user_id" mysql:"from_user_id" `
+	FromNickName string `json:"from_nick_name" mysql:"from_nick_name" `
+	FromPhone    string `json:"from_phone" mysql:"from_phone" `
+	ToUserId     int64  `json:"to_user_id" mysql:"to_user_id" `
+	// 分享用户昵称
+	ToNickName string `json:"to_nick_name" mysql:"to_nick_name" `
+	ToFace     string `json:"to_face" mysql:"to_face" `
+	// 分享用户备注
+	ToRemark   string `json:"to_remark" mysql:"to_remark" `
+	ToPhone    string `json:"to_phone" mysql:"to_phone" `
+	DeviceId   int64  `json:"device_id" mysql:"device_id" `
+	DeviceName string `json:"device_name" mysql:"device_name" `
+	Mac        string `json:"mac" mysql:"mac" `
+	DeviceType string `json:"device_type" mysql:"device_type" `
+	CreateTime string `json:"create_time" mysql:"create_time" `
+}
+
+func (me *UserShareDeviceDetail) DecodeFromRows(rows *sql.Rows) error {
+	err := rows.Scan(
+		&me.ID,
+		&me.FromUserId,
+		&me.FromNickName,
+		&me.FromPhone,
+		&me.ToUserId,
+		&me.ToNickName,
+		&me.ToFace,
+		&me.ToRemark,
+		&me.ToPhone,
+		&me.DeviceId,
+		&me.DeviceName,
+		&me.Mac,
+		&me.DeviceType,
+		&me.CreateTime,
+	)
+	return err
+}
+func (me *UserShareDeviceDetail) DecodeFromRow(row *sql.Row) error {
+	err := row.Scan(
+		&me.ID,
+		&me.FromUserId,
+		&me.FromNickName,
+		&me.FromPhone,
+		&me.ToUserId,
+		&me.ToNickName,
+		&me.ToFace,
+		&me.ToRemark,
+		&me.ToPhone,
+		&me.DeviceId,
+		&me.DeviceName,
+		&me.Mac,
+		&me.DeviceType,
+		&me.CreateTime,
+	)
+	return err
+}
+
+func QueryUserShareDeviceDetail(fromUserId int64, toUserId int64, deviceId int64, confirm int, result *[]UserShareDeviceDetail) bool {
+	sqlStr := "select a.id, a.from_user_id, b.nick_name as from_nick_name, b.phone as from_phone, a.to_user_id, c.nick_name as to_nick_name, c.face as to_face, a.remark as to_remark, c.phone as to_phone, a.device_id, d.name as device_name, d.mac, d.type as device_type, a.create_time from " +
+		common.UserShareDeviceTbl + " a, " +
+		common.UserTbl + " b, " +
+		common.UserTbl + " c, " +
+		common.DeviceTbl + " d where a.from_user_id=b.id and a.to_user_id=c.id and a.device_id=d.id "
+
+	if fromUserId > 0 {
+		sqlStr += " and a.from_user_id=" + fmt.Sprintf("%d", fromUserId)
+	}
+	if toUserId > 0 {
+		sqlStr += " and a.to_user_id=" + fmt.Sprintf("%d", toUserId)
+	}
+	if deviceId > 0 {
+		sqlStr += " and a.device_id=" + fmt.Sprintf("%d", deviceId)
+	}
+	if confirm != -1 {
+		sqlStr += " and a.confirm=" + fmt.Sprintf("%d", confirm)
+	}
+	sqlStr += " order by a.create_time desc"
+
+	rows, err := mDb.Query(sqlStr)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return false
+	}
+	defer rows.Close()
+	for rows.Next() {
+		obj := &UserShareDeviceDetail{}
+		err := obj.DecodeFromRows(rows)
+		if err != nil {
+			mylog.Log.Errorln(err)
+		} else {
+			*result = append(*result, *obj)
+		}
+	}
+	return true
+}
+
+/******************************************************************************
+ * function: UserTransferDevice
+ * description: 设备过户类，与UserShareDevice结构一样
+ * return {*}
+********************************************************************************/
+// swagger:model UserTransferDevice
+type UserTransferDevice UserShareDevice
+
+func NewUserTransferDevice() *UserTransferDevice {
+	return &UserTransferDevice{
+		ID:         0,
+		FromUserId: 0,
+		ToUserId:   0,
+		DeviceId:   0,
+		Confirm:    0,
+		Remark:     "",
+		CreateTime: time.Now().Format(cfg.TmFmtStr),
+	}
+}
+func (me *UserTransferDevice) MyTableName() string {
+	return common.UserTransferDeviceTbl
+}
+
+func (me *UserTransferDevice) DecodeFromRows(rows *sql.Rows) error {
+	err := rows.Scan(
+		&me.ID,
+		&me.FromUserId,
+		&me.ToUserId,
+		&me.DeviceId,
+		&me.Confirm,
+		&me.Remark,
+		&me.CreateTime)
+	return err
+}
+func (me *UserTransferDevice) DecodeFromRow(row *sql.Row) error {
+	err := row.Scan(
+		&me.ID,
+		&me.FromUserId,
+		&me.ToUserId,
+		&me.DeviceId,
+		&me.Confirm,
+		&me.Remark,
+		&me.CreateTime)
+	return err
+}
+
+/*
+Decode 解析从gin获取的数据 转换成UserDevice
+*/
+func (me *UserTransferDevice) DecodeFromGin(c *gin.Context) {
+	if err := c.ShouldBindBodyWith(me, binding.JSON); err != nil {
+		exception.Throw(common.JsonError, err.Error())
+	}
+	if me.FromUserId == 0 {
+		exception.Throw(common.ParamError, "user id is empty!")
+	}
+}
+
+/*
+QueryByID() 查询股票基本信息
+*/
+func (me *UserTransferDevice) QueryByID(id int64) bool {
+	return QueryDaoByID(me.MyTableName(), id, me)
+}
+
+/*
+Insert UserDevice
+*/
+func (me *UserTransferDevice) Insert() bool {
+	if !CheckTableExist(me.MyTableName()) {
+		CreateTableWithStruct(me.MyTableName(), me)
+	}
+	return InsertDao(me.MyTableName(), me)
+}
+
+/*
+Update() 更新
+*/
+func (me *UserTransferDevice) Update() bool {
+	return UpdateDaoByID(me.MyTableName(), me.ID, me)
+}
+
+/*
+Delete() 删除
+*/
+func (me *UserTransferDevice) Delete() bool {
+	return DeleteDaoByID(me.MyTableName(), me.ID)
+}
+
+/*
+设置ID
+*/
+func (me *UserTransferDevice) SetID(id int64) {
+	me.ID = id
+}
+
+/******************************************************************************
+ * function: DeleteUserTransferDeviceByUserId
+ * description: 根据用户id删除设备过户记录
+ * param {int64} fromUserId
+ * param {int64} toUserId
+ * param {int64} deviceId
+ * return {*}
+********************************************************************************/
+func DeleteUserTransferDeviceByUserId(fromUserId int64, toUserId int64, deviceId int64) bool {
+	filter := ""
+	if fromUserId > 0 {
+		filter += " from_user_id=" + fmt.Sprintf("%d", fromUserId)
+	}
+	if toUserId > 0 {
+		filter += " and to_user_id=" + fmt.Sprintf("%d", toUserId)
+	}
+	if deviceId > 0 {
+		filter += " and device_id=" + fmt.Sprintf("%d", deviceId)
+	}
+	return DeleteDaoByFilter(common.UserTransferDeviceTbl, filter)
+}
+
+/******************************************************************************
+ * function:
+ * description:
+ * return {*}
+********************************************************************************/
+func QueryUserTransferDevice(fromUserId int64, toUserId int64, deviceId int64, confirm int, results *[]UserTransferDevice) bool {
+	sql := "select * from " + common.UserTransferDeviceTbl
+	filter := ""
+	if fromUserId != 0 {
+		filter = " from_user_id = " + fmt.Sprintf("%d", fromUserId)
+	}
+	if toUserId != 0 {
+		if filter != "" {
+			filter += " and "
+		}
+		filter += " to_user_id = " + fmt.Sprintf("%d", toUserId)
+	}
+	if deviceId != 0 {
+		if filter != "" {
+			filter += " and "
+		}
+		filter += " device_id = " + fmt.Sprintf("%d", deviceId)
+	}
+	if confirm != -1 {
+		if filter != "" {
+			filter += " and "
+		}
+		filter += " confirm = " + fmt.Sprintf("%d", confirm)
+	}
+	if filter != "" {
+		sql += " where " + filter
+	}
+	sql += " order by create_time desc"
+	rows, err := mDb.Query(sql)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return false
+	}
+	defer rows.Close()
+	for rows.Next() {
+		obj := NewUserTransferDevice()
+		err := obj.DecodeFromRows(rows)
+		if err != nil {
+			mylog.Log.Errorln(err)
+		} else {
+			*results = append(*results, *obj)
+		}
+	}
+	return true
+}
+
+/******************************************************************************
+ * function: UserTransferDeviceDetail
+ * description: 定义设备过户详情表，与UserShareDeviceDetail结构一样
+ * return {*}
+********************************************************************************/
+// swagger:model UserTransferDeviceDetail
+type UserTransferDeviceDetail UserShareDeviceDetail
+
+func (me *UserTransferDeviceDetail) DecodeFromRows(rows *sql.Rows) error {
+	err := rows.Scan(
+		&me.ID,
+		&me.FromUserId,
+		&me.FromNickName,
+		&me.FromPhone,
+		&me.ToUserId,
+		&me.ToNickName,
+		&me.ToFace,
+		&me.ToRemark,
+		&me.ToPhone,
+		&me.DeviceId,
+		&me.DeviceName,
+		&me.Mac,
+		&me.DeviceType,
+		&me.CreateTime,
+	)
+	return err
+}
+func (me *UserTransferDeviceDetail) DecodeFromRow(row *sql.Row) error {
+	err := row.Scan(
+		&me.ID,
+		&me.FromUserId,
+		&me.FromNickName,
+		&me.FromPhone,
+		&me.ToUserId,
+		&me.ToNickName,
+		&me.ToFace,
+		&me.ToRemark,
+		&me.ToPhone,
+		&me.DeviceId,
+		&me.DeviceName,
+		&me.Mac,
+		&me.DeviceType,
+		&me.CreateTime,
+	)
+	return err
+}
+
+func QueryUserTransferDeviceDetail(fromUserId int64, toUserId int64, deviceId int64, confirm int, result *[]UserTransferDeviceDetail) bool {
+	sqlStr := "select a.id, a.from_user_id, b.nick_name as from_nick_name, b.phone as from_phone, a.to_user_id, c.nick_name as to_nick_name, c.face as to_face, a.remark as to_remark, c.phone as to_phone, a.device_id, d.name as device_name, d.mac, d.type as device_type, a.create_time from " +
+		common.UserTransferDeviceTbl + " a, " +
+		common.UserTbl + " b, " +
+		common.UserTbl + " c, " +
+		common.DeviceTbl + " d where a.from_user_id=b.id and a.to_user_id=c.id and a.device_id=d.id "
+
+	if fromUserId > 0 {
+		sqlStr += " and a.from_user_id=" + fmt.Sprintf("%d", fromUserId)
+	}
+	if toUserId > 0 {
+		sqlStr += " and a.to_user_id=" + fmt.Sprintf("%d", toUserId)
+	}
+	if deviceId > 0 {
+		sqlStr += " and a.device_id=" + fmt.Sprintf("%d", deviceId)
+	}
+	if confirm != -1 {
+		sqlStr += " and a.confirm=" + fmt.Sprintf("%d", confirm)
+	}
+	sqlStr += " order by a.create_time desc"
+
+	rows, err := mDb.Query(sqlStr)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return false
+	}
+	defer rows.Close()
+	for rows.Next() {
+		obj := &UserTransferDeviceDetail{}
+		err := obj.DecodeFromRows(rows)
+		if err != nil {
+			mylog.Log.Errorln(err)
+		} else {
+			*result = append(*result, *obj)
 		}
 	}
 	return true

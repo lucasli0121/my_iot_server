@@ -11,6 +11,7 @@ package mysql
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"math"
 	"reflect"
@@ -23,6 +24,7 @@ import (
 	mylog "hjyserver/log"
 	"hjyserver/mdb/common"
 	"hjyserver/mq"
+	"hjyserver/redis"
 	"hjyserver/sms"
 
 	"github.com/gin-gonic/gin"
@@ -57,6 +59,7 @@ type HeartEvent struct {
 type HeartBeatMsg struct {
 	Mac    string `json:"mac"`
 	Online int    `json:"online"`
+	Rssi   int    `json:"rssi"`
 }
 
 /*
@@ -117,9 +120,10 @@ func Open() bool {
 	// open a goroutine to check whether device is online
 	checkOnlineTimeout := make(chan struct{}, 1)
 	checkDataTimeout := make(chan struct{}, 1)
+	cleanupOldRealData := make(chan struct{}, 1)
 	go func() {
 		for {
-			time.Sleep(5 * time.Minute)
+			time.Sleep(1 * time.Minute)
 			checkOnlineTimeout <- struct{}{}
 		}
 	}()
@@ -127,6 +131,12 @@ func Open() bool {
 		for {
 			time.Sleep(30 * time.Second)
 			checkDataTimeout <- struct{}{}
+		}
+	}()
+	go func() {
+		for {
+			time.Sleep(24 * time.Hour)
+			cleanupOldRealData <- struct{}{}
 		}
 	}()
 
@@ -140,17 +150,23 @@ func Open() bool {
 				checkDeviceOnline()
 				askAllRealData()
 			case <-checkDataTimeout:
-				checkNoRealDataLamp()
+				if cfg.This.Svr.EnableHl77 {
+					checkNoRealDataLamp()
+				}
+			case <-cleanupOldRealData:
+				cleanupOldRealDataTbl()
 			}
 		}
 	}()
 
-	go func() {
-		for {
-			NotifyTask()
-			time.Sleep(30 * time.Second)
-		}
-	}()
+	if cfg.This.Svr.EnableX1 {
+		go func() {
+			for {
+				NotifyTask()
+				time.Sleep(30 * time.Second)
+			}
+		}()
+	}
 	return true
 }
 
@@ -166,6 +182,13 @@ func Close() {
 	if err != nil {
 		mylog.Log.Errorln(err)
 	}
+}
+
+func GetTaskPool() *gopool.Pool {
+	return taskPool
+}
+func GetDB() *sql.DB {
+	return mDb
 }
 
 /******************************************************************************
@@ -186,13 +209,17 @@ func checkDeviceOnline() {
 	// 	mylog.Log.Errorln(err)
 	// 	return
 	// }
-	filter := fmt.Sprintf("online=1 and online_time<='%s'", time.Now().Add(-6*time.Minute).Format(cfg.TmFmtStr))
+	tm := time.Now().Add(-6 * time.Minute).Format(cfg.TmFmtStr)
+	if cfg.This.Svr.EnableH03 {
+		tm = time.Now().Add(-1 * time.Minute).Format(cfg.TmFmtStr)
+	}
+	filter := fmt.Sprintf("online=1 and online_time<='%s'", tm)
 	var gList = []Device{}
 	QueryDeviceByCond(filter, nil, "", &gList)
 	for _, v := range gList {
 		v.Online = 0
 		v.Update()
-		status := HeartBeatMsg{Mac: v.Mac, Online: 0}
+		status := HeartBeatMsg{Mac: v.Mac, Online: 0, Rssi: v.Rssi}
 		mq.PublishData(common.MakeDeviceHeartBeatTopic(v.Mac), status)
 	}
 }
@@ -201,18 +228,28 @@ func checkDeviceOnline() {
  * @description:设置设备在线状态
  * @param {string} mac
  * @param {int} online
+ * @param {int} rssi
  * @return {*}
  */
-func SetDeviceOnline(mac string, online int) {
-	var gList = []Device{}
-	QueryDeviceByCond(fmt.Sprintf("mac='%s'", mac), nil, nil, &gList)
-	if len(gList) > 0 {
-		gList[0].Online = online
-		gList[0].OnlineTime = time.Now().Format(cfg.TmFmtStr)
-		gList[0].Update()
-		status := HeartBeatMsg{Mac: mac, Online: online}
-		mq.PublishData(common.MakeDeviceHeartBeatTopic(mac), status)
-	}
+func SetDeviceOnline(mac string, online int, rssi int) {
+	status := HeartBeatMsg{Mac: mac, Online: online, Rssi: rssi}
+	GetTaskPool().Put(&gopool.Task{
+		Params: []interface{}{&status},
+		Do: func(params ...interface{}) {
+			var obj = params[0].(*HeartBeatMsg)
+			var gList = []Device{}
+			QueryDeviceByCond(fmt.Sprintf("mac='%s'", obj.Mac), nil, nil, &gList)
+			if len(gList) > 0 {
+				gList[0].Online = obj.Online
+				if rssi != 0 {
+					gList[0].Rssi = obj.Rssi
+				}
+				gList[0].OnlineTime = time.Now().Format(cfg.TmFmtStr)
+				gList[0].Update()
+			}
+		},
+	})
+	mq.PublishData(common.MakeDeviceHeartBeatTopic(mac), status)
 }
 
 /******************************************************************************
@@ -261,57 +298,108 @@ func askAllRealData() {
 		var curTm = time.Now()
 		switch v.Type {
 		case X1Type:
-			var objs = []X1RealDataMysql{}
-			QueryX1RealDataByCond(filter, nil, "create_time desc", 1, &objs)
-			if len(objs) > 0 {
-				obj := objs[0]
-				t, err := common.StrToTime(obj.CreateTime)
-				if err != nil {
-					mylog.Log.Error(err)
-					continue
+			if cfg.This.Svr.EnableX1 {
+				var objs = []X1RealDataMysql{}
+				QueryX1RealDataByCond(filter, nil, "create_time desc", 1, &objs)
+				if len(objs) > 0 {
+					obj := objs[0]
+					t, err := common.StrToTime(obj.CreateTime)
+					if err != nil {
+						mylog.Log.Error(err)
+						continue
+					}
+					diff := curTm.Sub(t)
+					if int64(diff.Minutes()) >= 10 {
+						AskX1RealData(obj.Mac, 6, 1)
+					}
+				} else {
+					AskX1RealData(v.Mac, 6, 1)
 				}
-				diff := curTm.Sub(t)
-				if int64(diff.Minutes()) >= 10 {
-					AskX1RealData(obj.Mac, 6, 1)
-				}
-			} else {
-				AskX1RealData(v.Mac, 6, 1)
 			}
 		case Ed713Type:
-			var objs = []Ed713RealDataMysql{}
-			QueryEd713RealDataByCond(filter, nil, "create_time desc", 1, &objs)
-			if len(objs) > 0 {
-				obj := objs[0]
-				t, err := common.StrToTime(obj.CreateTime)
-				if err != nil {
-					mylog.Log.Error(err)
-					continue
+			if cfg.This.Svr.EnableEd713 {
+				var objs = []Ed713RealDataMysql{}
+				QueryEd713RealDataByCond(filter, nil, "create_time desc", 1, &objs)
+				if len(objs) > 0 {
+					obj := objs[0]
+					t, err := common.StrToTime(obj.CreateTime)
+					if err != nil {
+						mylog.Log.Error(err)
+						continue
+					}
+					diff := curTm.Sub(t)
+					if int64(diff.Minutes()) >= 10 {
+						AskEd713RealData(obj.Mac, 6, 1)
+					}
+				} else {
+					AskEd713RealData(v.Mac, 6, 1)
 				}
-				diff := curTm.Sub(t)
-				if int64(diff.Minutes()) >= 10 {
-					AskEd713RealData(obj.Mac, 6, 1)
-				}
-			} else {
-				AskEd713RealData(v.Mac, 6, 1)
 			}
 		case LampType:
-			var objs = []RealDataSql{}
-			QueryLampRealDataByCond(filter, nil, "create_time desc", 1, &objs)
-			if len(objs) > 0 {
-				obj := objs[0]
-				t, err := common.StrToTime(obj.CreateTime)
-				if err != nil {
-					mylog.Log.Error(err)
-					continue
+			if cfg.This.Svr.EnableHl77 {
+				var objs = []RealDataSql{}
+				QueryLampRealDataByCond(filter, nil, "create_time desc", 1, &objs)
+				if len(objs) > 0 {
+					obj := objs[0]
+					t, err := common.StrToTime(obj.CreateTime)
+					if err != nil {
+						mylog.Log.Error(err)
+						continue
+					}
+					diff := curTm.Sub(t)
+					if int64(diff.Minutes()) >= 10 {
+						AskHl77RealData(obj.Mac, 6, 1)
+					}
+				} else {
+					AskHl77RealData(v.Mac, 6, 1)
 				}
-				diff := curTm.Sub(t)
-				if int64(diff.Minutes()) >= 10 {
-					AskHl77RealData(obj.Mac, 6, 1)
-				}
-			} else {
-				AskHl77RealData(v.Mac, 6, 1)
 			}
 		}
+	}
+}
+
+/******************************************************************************
+ * function: cleanupOldRealDataTbl
+ * description: clean up expired real data exceed 24 hours
+ * return {*}
+********************************************************************************/
+func cleanupOldRealDataTbl() {
+	// cleanup lamp table
+	var tmDiff = time.Now().Add(-24 * 30 * time.Hour).Format(cfg.TmFmtStr)
+	sql := "delete from " + common.LampRealDataTbl + " where create_time<?"
+	_, err := mDb.Exec(sql, tmDiff)
+	if err != nil {
+		mylog.Log.Errorln(err)
+	}
+	// cleanup x1 table
+	sql = "delete from " + common.DeviceRecordTbl(X1Type) + " where create_time<?"
+	_, err = mDb.Exec(sql, tmDiff)
+	if err != nil {
+		mylog.Log.Errorln(err)
+	}
+	// cleanup ed713 table
+	sql = "delete from " + common.DeviceRecordTbl(Ed713Type) + " where create_time<?"
+	_, err = mDb.Exec(sql, tmDiff)
+	if err != nil {
+		mylog.Log.Errorln(err)
+	}
+	// cleanup x1 json table
+	sql = "delete from " + common.DeviceDayReportJsonTbl(X1Type) + " where create_time<?"
+	_, err = mDb.Exec(sql, tmDiff)
+	if err != nil {
+		mylog.Log.Errorln(err)
+	}
+	// cleanup h03 attr old data
+	sql = "delete from " + H03AttrData{}.TableName() + " where create_time<?"
+	_, err = mDb.Exec(sql, tmDiff)
+	if err != nil {
+		mylog.Log.Errorln(err)
+	}
+	// clean h03 event old data
+	sql = "delete from " + H03Event{}.TableName() + " where create_time<?"
+	_, err = mDb.Exec(sql, tmDiff)
+	if err != nil {
+		mylog.Log.Errorln(err)
 	}
 }
 
@@ -321,28 +409,97 @@ func askAllRealData() {
  * return {*}
 ********************************************************************************/
 func subscribeDeviceTopic() {
-	filter := fmt.Sprintf("type='%s'", LampType)
+	var filter string
 	var results []Device
-	QueryDeviceByCond(filter, nil, "create_time desc", &results)
-	if len(results) > 0 {
-		for _, v := range results {
-			mq.SubscribeTopic(MakeHl77DeliverTopicByMac(v.Mac), NewLampMqttMsgProc())
+	// subscribe device topic
+	// subscribe hl77 topic if enable hl77
+	if cfg.This.Svr.EnableHl77 {
+		filter = fmt.Sprintf("type='%s'", LampType)
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				mq.SubscribeTopic(MakeHl77DeliverTopicByMac(v.Mac), NewLampMqttMsgProc())
+			}
 		}
 	}
 	results = nil
-	filter = fmt.Sprintf("type='%s'", Ed713Type)
-	QueryDeviceByCond(filter, nil, "create_time desc", &results)
-	if len(results) > 0 {
-		for _, v := range results {
-			SubscribeEd713MqttTopic(v.Mac)
+	// subscribe ed713 topic if enable ed713
+	if cfg.This.Svr.EnableEd713 {
+		filter = fmt.Sprintf("type='%s'", Ed713Type)
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				SubscribeEd713MqttTopic(v.Mac)
+			}
 		}
 	}
 	results = nil
-	filter = fmt.Sprintf("type='%s'", X1Type)
-	QueryDeviceByCond(filter, nil, "create_time desc", &results)
-	if len(results) > 0 {
-		for _, v := range results {
-			SubscribeX1MqttTopic(v.Mac)
+	// subscribe x1 topic if enable x1
+	if cfg.This.Svr.EnableX1 {
+		filter = fmt.Sprintf("type='%s'", X1Type)
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				SubscribeX1MqttTopic(v.Mac)
+			}
+		}
+	}
+	results = nil
+	// subscribe h03 topic if enable h03
+	if cfg.This.Svr.EnableH03 {
+		filter = fmt.Sprintf("type='%s'", H03Type)
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				SubscribeH03MqttTopic(v.Mac)
+			}
+		}
+	}
+	results = nil
+	// subscribe x1s topic if enable x1s
+	if cfg.This.Svr.EnableX1s {
+		SubscribeX1sWildcardTopic()
+		filter = fmt.Sprintf("type='%s'", X1sType)
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				SubscribeX1sMqttTopic(v.Mac)
+			}
+		}
+	}
+}
+
+func UnsubscribeDeviceTopic(mac string) {
+	var results []Device
+	var filter string
+	// subscribe h03 topic if enable h03
+	if cfg.This.Svr.EnableH03 {
+		if mac != "" {
+			filter = fmt.Sprintf("type='%s' and mac like '%s' ", H03Type, mac)
+		} else {
+			filter = fmt.Sprintf("type='%s'", H03Type)
+		}
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				UnsubscribeH03MqttTopic(v.Mac)
+			}
+		}
+	}
+	results = nil
+	// subscribe x1s topic if enable x1s
+	if cfg.This.Svr.EnableX1s {
+		UnsubscribeX1sWildcardTopic()
+		if mac != "" {
+			filter = fmt.Sprintf("type='%s' and mac like '%s' ", X1sType, mac)
+		} else {
+			filter = fmt.Sprintf("type='%s'", X1sType)
+		}
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				UnsubscribeX1sMqttTopic(v.Mac)
+			}
 		}
 	}
 }
@@ -386,6 +543,9 @@ func QueryPage(table string, page *common.PageDao, filter interface{}, sort inte
  *
  */
 func QueryDao(table string, filter interface{}, sort interface{}, limited int, cb func(*sql.Rows)) bool {
+	if !CheckTableExist(table) {
+		return false
+	}
 	sql := "select * from " + table
 	if filter != nil && len(filter.(string)) > 0 {
 		sql += " where " + filter.(string)
@@ -449,7 +609,7 @@ func QueryFirstByCond(table string, filter string, sort string, obj Dao) bool {
 }
 
 func CheckTableExist(tblName string) bool {
-	sql := "show tables"
+	sql := fmt.Sprintf("show tables like '%%%s%%'", tblName)
 	rows, err := mDb.Query(sql)
 	if err != nil {
 		mylog.Log.Errorln(err)
@@ -482,10 +642,13 @@ func CreateTableWithStruct(tblName string, obj interface{}) bool {
 	numField := u.Elem().NumField()
 	for num := 0; num < numField; num++ {
 		f := u.Elem().Field(num)
+		tag := f.Tag.Get("mysql")
+		if tag == "" {
+			continue
+		}
 		if len(fields) > 0 {
 			fields += `,`
 		}
-		tag := f.Tag.Get("mysql")
 		common := f.Tag.Get("common")
 		fields += tag
 		if tag == "id" {
@@ -499,15 +662,20 @@ func CreateTableWithStruct(tblName string, obj interface{}) bool {
 				fields += " int"
 			case reflect.Int64:
 				fields += " bigint"
+			case reflect.Float32:
+				fields += " float"
 			case reflect.Float64:
 				fields += " double"
 			case reflect.String:
 				binding := f.Tag.Get("binding")
-				if len(binding) > 0 && strings.Split(binding, "=")[0] == "datetime" {
-					if len(strings.Split(binding, "=")) > 1 && len(strings.Split(binding, "=")[1]) <= 11 {
-						fields += " date"
-					} else {
+				if len(binding) > 0 && len(strings.Split(binding, "=")) > 1 {
+					v1 := strings.Split(binding, "=")[0]
+					if v1 == "datetime" {
 						fields += " datetime"
+					} else if v1 == "date" {
+						fields += " date"
+					} else if v1 == "time" {
+						fields += " time"
 					}
 				} else {
 					if f.Tag.Get("size") != "" {
@@ -519,11 +687,14 @@ func CreateTableWithStruct(tblName string, obj interface{}) bool {
 			case reflect.Pointer:
 				if f.Type.Elem().Kind() == reflect.String {
 					binding := f.Tag.Get("binding")
-					if len(binding) > 0 && strings.Split(binding, "=")[0] == "datetime" {
-						if len(strings.Split(binding, "=")) > 1 && len(strings.Split(binding, "=")[1]) <= 11 {
-							fields += " date"
-						} else {
+					if len(binding) > 0 && len(strings.Split(binding, "=")) > 1 {
+						v1 := strings.Split(binding, "=")[0]
+						if v1 == "datetime" {
 							fields += " datetime"
+						} else if v1 == "date" {
+							fields += " date"
+						} else if v1 == "time" {
+							fields += " time"
 						}
 					} else {
 						if f.Tag.Get("size") != "" {
@@ -533,10 +704,21 @@ func CreateTableWithStruct(tblName string, obj interface{}) bool {
 						}
 					}
 				}
+			case reflect.Array:
+				fallthrough
+			case reflect.Slice:
+				if f.Tag.Get("size") != "" {
+					fields += " varchar(" + f.Tag.Get("size") + ")"
+				} else {
+					fields += " varchar(255)"
+				}
 			}
 			if f.Tag.Get("isnull") == "false" || f.Tag.Get("binding") == "required" {
 				fields += " not null"
+			} else if f.Tag.Get("isnull") == "true" {
+				fields += " null"
 			}
+
 			if f.Tag.Get("default") != "" {
 				fields += " default " + f.Tag.Get("default")
 			}
@@ -580,6 +762,9 @@ func InsertDao(tblName string, obj Dao) bool {
 	for num := 0; num < numField; num++ {
 		f := u.Elem().Field(num)
 		v := vf.Elem().Field(num)
+		if f.Tag.Get("mysql") == "" {
+			continue
+		}
 		if len(fields) > 0 {
 			fields += ","
 		}
@@ -596,6 +781,8 @@ func InsertDao(tblName string, obj Dao) bool {
 			}
 		case reflect.Int:
 			values += fmt.Sprintf("%d", v.Int())
+		case reflect.Float32:
+			fallthrough
 		case reflect.Float64:
 			if math.IsNaN(v.Float()) {
 				values += "NULL"
@@ -610,8 +797,31 @@ func InsertDao(tblName string, obj Dao) bool {
 			} else {
 				if f.Type.Elem().Kind() == reflect.String {
 					values += "'" + v.Elem().String() + "'"
+				} else if f.Type.Elem().Kind() == reflect.Array {
+					values += "'" + v.Elem().String() + "'"
 				}
 			}
+		case reflect.Array:
+			fallthrough
+		case reflect.Slice:
+			str := ""
+			for i := 0; i < v.Len(); i++ {
+				elemVal := v.Index(i)
+				s := ""
+				if elemVal.Kind() == reflect.String {
+					s = elemVal.String()
+				} else if elemVal.Kind() == reflect.Int {
+					s = fmt.Sprintf("%d", elemVal.Int())
+				} else if elemVal.Kind() == reflect.Float64 {
+					s = fmt.Sprintf("%v", elemVal.Float())
+				}
+				if i == 0 {
+					str = s
+				} else {
+					str += "," + s
+				}
+			}
+			values += "'" + str + "'"
 		}
 	}
 	sql += fmt.Sprintf(" (%s) values (%s)", fields, values)
@@ -643,6 +853,9 @@ func UpdateDaoByID(tblName string, id int64, obj Dao) bool {
 		f := u.Elem().Field(num)
 		v := vf.Elem().Field(num)
 		var setval string
+		if f.Tag.Get("mysql") == "" {
+			continue
+		}
 		if f.Tag.Get("mysql") != "id" {
 			setval = fmt.Sprintf(" %s=", f.Tag.Get("mysql"))
 		}
@@ -651,6 +864,8 @@ func UpdateDaoByID(tblName string, id int64, obj Dao) bool {
 			if f.Name != "ID" {
 				setval += fmt.Sprintf("%d", v.Int())
 			}
+		case reflect.Float32:
+			fallthrough
 		case reflect.Float64:
 			if math.IsNaN(v.Float()) {
 				setval += "NULL"
@@ -669,6 +884,27 @@ func UpdateDaoByID(tblName string, id int64, obj Dao) bool {
 					setval += "'" + v.Elem().String() + "'"
 				}
 			}
+		case reflect.Array:
+			fallthrough
+		case reflect.Slice:
+			str := ""
+			for i := 0; i < v.Len(); i++ {
+				elemVal := v.Index(i)
+				s := ""
+				if elemVal.Kind() == reflect.String {
+					s = elemVal.String()
+				} else if elemVal.Kind() == reflect.Int {
+					s = fmt.Sprintf("%d", elemVal.Int())
+				} else if elemVal.Kind() == reflect.Float64 {
+					s = fmt.Sprintf("%v", elemVal.Float())
+				}
+				if i == 0 {
+					str = s
+				} else {
+					str += "," + s
+				}
+			}
+			setval += "'" + str + "'"
 		}
 		if len(setsql) > 0 {
 			setsql += "," + setval
@@ -745,6 +981,9 @@ func SendSleepAlarmSms(userEvent *HeartEvent) {
 	if len(alarmDesc) == 0 {
 		return
 	}
+	if userEvent.Type == 3001 || userEvent.Type == 3012 {
+		return
+	}
 	err := sms.SendSms(userEvent.EmergentPhone, userEvent.NickName, alarmDesc)
 	if err != nil {
 		mylog.Log.Errorln(err)
@@ -774,4 +1013,116 @@ func SendSleepNotifySms(mac string, notifyType int, status int) {
 			mylog.Log.Errorln(err)
 		}
 	}
+}
+
+/******************************************************************************
+ * function:CheckDiffBetweenTwoSleepDeviceRecords
+ * description: check differance between two real data from sleep devices
+ * param {string} deviceType
+ * param {string} mac
+ * param {interface{}} obj
+ * return {*}
+********************************************************************************/
+func CheckDiffBetweenTwoSleepDeviceRecords(deviceType string, mac string, obj *HeartRate) bool {
+	result := true
+	oldObj := &HeartRate{}
+	err := redis.GetValueFromHash(deviceType, mac, true, oldObj)
+	if err == nil {
+		result = oldObj.HeartRate != obj.HeartRate ||
+			oldObj.BreatheRate != obj.BreatheRate ||
+			oldObj.ActiveStatus != obj.ActiveStatus ||
+			oldObj.PersonStatus != obj.PersonStatus
+	}
+	t := time.Now().Add(time.Minute * 2)
+	redis.SaveValueToHash(deviceType, mac, &t, obj)
+	return result
+}
+
+/******************************************************************************
+ * function: CheckDiffBetweenTwoLampDeviceRecords
+ * description:
+ * param {string} deviceType
+ * param {string} mac
+ * param {*RealDataSql} obj
+ * return {*}
+********************************************************************************/
+func CheckDiffBetweenTwoLampDeviceRecords(deviceType string, mac string, obj *RealDataSql) bool {
+	result := true
+	oldObj := &RealDataSql{}
+	err := redis.GetValueFromHash(deviceType, mac, true, oldObj)
+	if err == nil {
+		result = oldObj.FlowState != obj.FlowState ||
+			oldObj.HeartRate != obj.HeartRate ||
+			oldObj.Respiratory != obj.Respiratory ||
+			oldObj.ActivityFreq != obj.ActivityFreq ||
+			oldObj.PostureState != obj.PostureState ||
+			oldObj.BodyMovement != obj.BodyMovement ||
+			oldObj.BodyStatus != obj.BodyStatus
+	}
+	t := time.Now().Add(time.Minute * 2)
+	redis.SaveValueToHash(deviceType, mac, &t, obj)
+	return result
+}
+
+/******************************************************************************
+ * function: GetUserToken
+ * description: 创建用户的token，创建后保存到redis，并设置过期时间为3个月
+ * param {*User} user
+ * return {*}
+********************************************************************************/
+type UserToken struct {
+	UserID int64  `json:"user_id"`
+	Phone  string `json:"phone"`
+}
+
+func GetUserToken(user *User) (string, error) {
+	tokenKey := fmt.Sprintf("%s_%d", common.UserTbl, user.ID)
+	token, err := redis.GetValue(tokenKey)
+	if err == nil && token != "" {
+		return token, nil
+	}
+	userToken := &UserToken{UserID: user.ID, Phone: user.Phone}
+	js, err := json.Marshal(userToken)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return "", err
+	}
+	token, err = common.EncryptDataWithDefaultkey(string(js))
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return "", err
+	}
+	redis.SetValueEx(tokenKey, token, 3*30*24*3600)
+	return token, nil
+}
+
+/******************************************************************************
+ * function: VerifyUserToken
+ * description: 检查用户的token是否有效
+ * param {string} token
+ * return {*}
+********************************************************************************/
+func VerifyUserToken(token string) bool {
+	js, err := common.DecryptDataNoCBCWithDefaultkey(token)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return false
+	}
+	userToken := &UserToken{}
+	err = json.Unmarshal([]byte(js), userToken)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return false
+	}
+	tokenKey := fmt.Sprintf("%s_%d", common.UserTbl, userToken.UserID)
+	tokenInRedis, err := redis.GetValue(tokenKey)
+	if err != nil || tokenInRedis == "" {
+		mylog.Log.Errorln("token not found in redis")
+		return false
+	}
+	if tokenInRedis != token {
+		mylog.Log.Errorln("token not match")
+		return false
+	}
+	return true
 }

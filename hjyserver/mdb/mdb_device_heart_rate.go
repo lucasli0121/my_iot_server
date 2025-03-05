@@ -1,8 +1,60 @@
 /******************************************************************************
+ *                        _oo0oo_
+ *                       o8888888o
+ *                       88" . "88
+ *                       (| -_- |)
+ *                       0\  =  /0
+ *                     ___/`---'\___
+ *                   .' \\|     |// '.
+ *                  / \\|||  :  |||// \
+ *                 / _||||| -:- |||||- \
+ *                |   | \\\  - /// |   |
+ *                | \_|  ''\---/''  |_/ |
+ *                \  .-\__  '-'  ___/-. /
+ *              ___'. .'  /--.--\  `. .'___
+ *           ."" '<  `.___\_<|>_/___.' >' "".
+ *          | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+ *          \  \ `_.   \_ __\ /__ _/   .-` /  /
+ *      =====`-.____`.___ \_____/___.-`___.-'=====
+ *                        `=---='
+ *
+ *
+ *      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *            佛祖保佑     永不宕机     永无BUG
+********************************************************************************/
+
+/******************************************************************************
+ *                        _oo0oo_
+ *                       o8888888o
+ *                       88" . "88
+ *                       (| -_- |)
+ *                       0\  =  /0
+ *                     ___/`---'\___
+ *                   .' \\|     |// '.
+ *                  / \\|||  :  |||// \
+ *                 / _||||| -:- |||||- \
+ *                |   | \\\  - /// |   |
+ *                | \_|  ''\---/''  |_/ |
+ *                \  .-\__  '-'  ___/-. /
+ *              ___'. .'  /--.--\  `. .'___
+ *           ."" '<  `.___\_<|>_/___.' >' "".
+ *          | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+ *          \  \ `_.   \_ __\ /__ _/   .-` /  /
+ *      =====`-.____`.___ \_____/___.-`___.-'=====
+ *                        `=---='
+ *
+ *
+ *      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *            佛祖保佑     永不宕机     永无BUG
+********************************************************************************/
+
+/******************************************************************************
  * Author: liguoqiang
  * Date: 2023-11-17 23:31:03
  * LastEditors: liguoqiang
- * LastEditTime: 2024-04-25 08:49:56
+ * LastEditTime: 2024-07-09 14:36:39
  * Description:
 ********************************************************************************/
 package mdb
@@ -752,6 +804,15 @@ func handleEd713OrX1Report(deviceType string, dayReport interface{}) (int, inter
 	return http.StatusOK, sleepReport
 }
 
+// 暂时用的是这个函数
+func queryX1TypeSleepReport(mac string, beginDay string, endDay string) (int, interface{}) {
+	var dayReport []mysql.X1DayReportSql
+	mysql.QueryX1DayReportByMacAndTime(mac, beginDay, endDay, &dayReport)
+	if len(dayReport) == 0 {
+		return http.StatusAccepted, "not find any data in the condition"
+	}
+	return handleX1TypeSleepReport(dayReport)
+}
 func handleX1TypeSleepReport(dayReport interface{}) (int, interface{}) {
 	sleepReport := mysql.NewSleepReport()
 	var isAwake bool = false
@@ -806,13 +867,16 @@ func handleX1TypeSleepReport(dayReport interface{}) (int, interface{}) {
 			sleepReport.SleepNum++
 			lastCreateTm = v.CreateTime
 		}
+		//翻身
 		if v.SleepEvents == 1 {
 			sleepReport.TurnOver++
 		}
+		//离床
 		if v.SleepEvents == 2 {
 			sleepReport.LeaveBedTime = append(sleepReport.LeaveBedTime, v.SleepEventsTime)
 			sleepReport.LeaveBedNum++
 		}
+		// 如果是清醒
 		if v.SleepPeriodization == 1 {
 			if !isAwake {
 				beginAwakeTm = t
@@ -839,15 +903,12 @@ func handleX1TypeSleepReport(dayReport interface{}) (int, interface{}) {
 				isDeep = false
 			}
 			if isSleep {
-				// sleepTime := mysql.SleepTime{
-				// 	BeginSleepTime: beginSleepTm.Format(cfg.TmFmtStr),
-				// 	EndSleepTime:   t.Format(cfg.TmFmtStr),
-				// }
-				// sleepReport.SleepTimeList = append(sleepReport.SleepTimeList, sleepTime)
 				isSleep = false
 			}
 		}
+		// 如果是睡眠包括浅睡和深睡，则处理如下
 		if v.SleepPeriodization > 1 {
+			// 如果之前是清醒状态，则计算清醒时间
 			if isAwake {
 				sleepReport.AwakeLong += int64(t.Sub(beginAwakeTm).Seconds())
 				sleepReport.StagesSleepTime = append(sleepReport.StagesSleepTime,
@@ -863,12 +924,14 @@ func handleX1TypeSleepReport(dayReport interface{}) (int, interface{}) {
 				isSleep = true
 				// beginSleepTm = t
 			}
-
+			// 如果现在是浅睡则开始浅睡
 			if v.SleepPeriodization == 2 {
+				// 如果之前不是浅睡，则记录开始浅睡时间
 				if !isLight {
 					isLight = true
 					beginLightTm = t
 				}
+				// 如果之前是深睡，则计算深睡时间
 				if isDeep {
 					sleepReport.SleepDeep += int64(t.Sub(beginDeepTm).Seconds())
 					sleepReport.StagesSleepTime = append(sleepReport.StagesSleepTime,
@@ -880,11 +943,14 @@ func handleX1TypeSleepReport(dayReport interface{}) (int, interface{}) {
 					isDeep = false
 				}
 			}
+			// 如果现在是深睡则开始深睡
 			if v.SleepPeriodization == 3 {
+				// 如果之前不是深睡，则记录开始深睡时间
 				if !isDeep {
 					isDeep = true
 					beginDeepTm = t
 				}
+				// 如果之前是浅睡，则计算浅睡时间
 				if isLight {
 					sleepReport.SleepLight += int64(t.Sub(beginLightTm).Seconds())
 					sleepReport.StagesSleepTime = append(sleepReport.StagesSleepTime,
@@ -896,8 +962,48 @@ func handleX1TypeSleepReport(dayReport interface{}) (int, interface{}) {
 					isLight = false
 				}
 			}
+			// 如果无人时段，则处理
+			if v.SleepPeriodization == 0 {
+				// 离床+1
+				sleepReport.LeaveBedNum++
+				sleepReport.LeaveBedTime = append(sleepReport.LeaveBedTime, t.Format(cfg.TmFmtStr))
+				if isAwake {
+					sleepReport.AwakeLong += int64(t.Sub(beginAwakeTm).Seconds())
+					sleepReport.StagesSleepTime = append(sleepReport.StagesSleepTime,
+						mysql.StagesSleepTime{
+							StagesStatus:   1,
+							BeginSleepTime: beginAwakeTm.Format(cfg.TmFmtStr),
+							EndSleepTime:   t.Format(cfg.TmFmtStr),
+						})
+					isAwake = false
+				}
+				if isLight {
+					sleepReport.SleepLight += int64(t.Sub(beginLightTm).Seconds())
+					sleepReport.StagesSleepTime = append(sleepReport.StagesSleepTime,
+						mysql.StagesSleepTime{
+							StagesStatus:   2,
+							BeginSleepTime: beginLightTm.Format(cfg.TmFmtStr),
+							EndSleepTime:   t.Format(cfg.TmFmtStr),
+						})
+					isLight = false
+				}
+				if isDeep {
+					sleepReport.SleepDeep += int64(t.Sub(beginDeepTm).Seconds())
+					sleepReport.StagesSleepTime = append(sleepReport.StagesSleepTime,
+						mysql.StagesSleepTime{
+							StagesStatus:   3,
+							BeginSleepTime: beginDeepTm.Format(cfg.TmFmtStr),
+							EndSleepTime:   t.Format(cfg.TmFmtStr),
+						})
+					isDeep = false
+				}
+				if isSleep {
+					isSleep = false
+				}
+			}
 		}
 	}
+	// 循环结束后，如果还有状态未处理，则处理
 	if isAwake {
 		sleepReport.AwakeLong += int64(endTm.Sub(beginAwakeTm).Seconds())
 		sleepReport.StagesSleepTime = append(sleepReport.StagesSleepTime,
@@ -930,26 +1036,14 @@ func handleX1TypeSleepReport(dayReport interface{}) (int, interface{}) {
 	}
 	if isSleep {
 		isSleep = false
-		// sleepTime := mysql.SleepTime{
-		// 	BeginSleepTime: beginSleepTm.Format(cfg.TmFmtStr),
-		// 	EndSleepTime:   endTm.Format(cfg.TmFmtStr),
-		// }
-		// sleepReport.SleepTimeList = append(sleepReport.SleepTimeList, sleepTime)
 	}
 	sleepReport.SleepLong = sleepReport.SleepLight + sleepReport.SleepDeep
 	sleepReport.StartTime = startTm.Format(cfg.TmFmtStr)
 	sleepReport.EndTime = endTm.Format(cfg.TmFmtStr)
 	return http.StatusOK, sleepReport
 }
-func queryX1TypeSleepReport(mac string, beginDay string, endDay string) (int, interface{}) {
-	var dayReport []mysql.X1DayReportSql
-	mysql.QueryX1DayReportByMacAndTime(mac, beginDay, endDay, &dayReport)
-	if len(dayReport) == 0 {
-		return http.StatusAccepted, "not find any data in the condition"
-	}
-	return handleX1TypeSleepReport(dayReport)
-}
 
+// 暂时弃用
 func queryX1TypeSleepReport2(mac string, beginDay string, endDay string) (int, interface{}) {
 	sleepReport := mysql.NewSleepReport()
 	var dayReport []mysql.X1DayReportSql
@@ -1090,6 +1184,9 @@ func queryX1TypeSleepReport2(mac string, beginDay string, endDay string) (int, i
 		}
 		sleepReport.SleepTimeList = append(sleepReport.SleepTimeList, sleepTime)
 	}
+	if sleepReport.LeaveBedNum == 0 {
+		sleepReport.LeaveBedNum = 1
+	}
 	sleepReport.SleepLong = sleepReport.SleepLight + sleepReport.SleepDeep
 	sleepReport.StartTime = startTm.Format(cfg.TmFmtStr)
 	sleepReport.EndTime = endTm.Format(cfg.TmFmtStr)
@@ -1139,6 +1236,8 @@ func QueryDateListInReport(c *gin.Context) (int, interface{}) {
 		ok = mysql.QueryEd713DateListInReport(mac, beginDay, endDay, &resp.Days)
 	case mysql.X1Type:
 		ok = mysql.QueryX1DateListInReport(mac, beginDay, endDay, &resp.Days)
+	case mysql.H03Type:
+		ok = mysql.QueryH03DateListInReport(mac, beginDay, endDay, &resp.Days)
 	}
 	if ok {
 		return http.StatusOK, resp

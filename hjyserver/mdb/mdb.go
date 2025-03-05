@@ -2,12 +2,13 @@
  * Author: liguoqiang
  * Date: 2023-09-06 17:50:12
  * LastEditors: liguoqiang
- * LastEditTime: 2023-12-07 12:06:14
+ * LastEditTime: 2024-11-30 16:06:43
  * Description:
 ********************************************************************************/
 package mdb
 
 import (
+	"hjyserver/cfg"
 	"hjyserver/mdb/mysql"
 )
 
@@ -17,9 +18,24 @@ import (
 *******************************************************/
 
 func Open() bool {
-	return mysql.Open()
+	result := mysql.Open()
+	if result {
+		if cfg.This.Svr.EnableH03 {
+			H03MdbInit()
+		}
+		if cfg.This.Svr.EnableX1s {
+			X1sMdbInit()
+		}
+	}
+	return result
 }
 
 func Close() {
+	if cfg.This.Svr.EnableH03 {
+		H03MdbUnini()
+	}
+	if cfg.This.Svr.EnableX1s {
+		X1sMdbUnini()
+	}
 	mysql.Close()
 }

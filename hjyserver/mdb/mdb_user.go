@@ -1,22 +1,54 @@
 /******************************************************************************
  * Author: liguoqiang
+ * Date: 2024-08-27 18:47:25
+ * LastEditors: liguoqiang
+ * LastEditTime: 2024-12-20 19:59:50
+ * Description:
+********************************************************************************/
+/******************************************************************************
+ * Author: liguoqiang
  * Date: 2023-09-06 17:50:12
  * LastEditors: liguoqiang
- * LastEditTime: 2024-06-11 14:18:49
+ * LastEditTime: 2024-09-11 17:41:50
  * Description:
 ********************************************************************************/
 package mdb
 
 import (
 	"fmt"
+	"hjyserver/cfg"
 	"hjyserver/mdb/common"
 	"hjyserver/mdb/mysql"
 	"hjyserver/mq"
+	mysqlwx "hjyserver/wx/mdb/mysql"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
+// swagger:model VerifyTokenResp
+type VerifyTokenResp struct {
+	Token string `json:"token"`
+	// 0: 过期 1: 有效
+	Result int `json:"result"`
+}
+
+func VerifyUserToken(c *gin.Context) (int, interface{}) {
+	token := c.Query("token")
+	if token == "" {
+		return common.ParamError, "token required"
+	}
+	resp := VerifyTokenResp{}
+	resp.Token = token
+	resp.Result = func() int {
+		if mysql.VerifyUserToken(token) {
+			return 1
+		}
+		return 0
+	}()
+	return common.Success, resp
+}
 
 // swagger:model LoginReq
 type LoginReq struct {
@@ -57,7 +89,7 @@ func UserLogin(c *gin.Context) (int, interface{}) {
 		if obj.Account == "guest" {
 			return http.StatusOK, obj
 		}
-		passwd, _ := common.EncryptData(me.Passwd)
+		passwd, _ := common.EncryptDataWithDefaultkey(me.Passwd)
 		if passwd == obj.Password {
 			obj.IsLogin = 1
 			obj.LoginTime = common.GetNowTime()
@@ -77,43 +109,7 @@ func UserLogin(c *gin.Context) (int, interface{}) {
 func UserRegister(c *gin.Context) (int, interface{}) {
 	me := mysql.NewUser()
 	me.DecodeFromGin(c)
-	if me.Account == "" {
-		return common.ParamError, "account required"
-	}
-	if me.Phone == "" && me.Email == "" {
-		return common.ParamError, "password or email required"
-	}
-	if me.Phone != "" {
-		me.Phone = common.FixPlusInPhoneString(me.Phone)
-	}
-	filter := fmt.Sprintf("account = '%s'", me.Account)
-	var gList []mysql.User
-	mysql.QueryUserByCond(filter, nil, nil, &gList)
-	if len(gList) > 0 {
-		return common.AccountHasReg, "account has registered"
-	}
-	if me.Phone != "" {
-		filter = fmt.Sprintf("phone = '%s'", me.Phone)
-		mysql.QueryUserByCond(filter, nil, nil, &gList)
-		if len(gList) > 0 {
-			return common.PhoneHasReg, "phone has registered"
-		}
-	}
-	if me.Email != "" {
-		filter = fmt.Sprintf("email = '%s'", me.Email)
-		mysql.QueryUserByCond(filter, nil, nil, &gList)
-		if len(gList) > 0 {
-			return common.EmailHasReg, "email has registered"
-		}
-	}
-	me.Password, _ = common.EncryptData(me.Password)
-	me.IsLogin = 0
-	me.LoginTime = common.GetNowTime()
-	me.CreateTime = common.GetNowTime()
-	if me.Insert() {
-		return http.StatusOK, me
-	}
-	return common.RegisterFail, "account registe failed!"
+	return mysql.RegisterWithUserObj(me)
 }
 
 /******************************************************************************
@@ -163,16 +159,27 @@ type DeleteUserReq struct {
 func DeleteUser(c *gin.Context) (int, interface{}) {
 	var req *DeleteUserReq = &DeleteUserReq{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		return http.StatusBadRequest, "json format error"
+		return common.JsonError, "json format error"
 	}
 	me := mysql.NewUser()
 	me.ID = req.ID
 	if me.Delete() {
 		mysql.DeleteDeviceRelationByUserId(me.ID)
 		mysql.DeleteUserRelationByUserId(me.ID, 0)
-		return http.StatusOK, "delete user success!"
+		// 删除用户分享过的记录
+		mysql.DeleteUserShareDeviceByUserId(me.ID, 0, 0)
+		// 删除用户被分享过的记录
+		mysql.DeleteUserShareDeviceByUserId(0, me.ID, 0)
+		// 删除此用户过户出去的记录
+		mysql.DeleteUserTransferDeviceByUserId(me.ID, 0, 0)
+		// 删除此用户过户进来的记录
+		mysql.DeleteUserTransferDeviceByUserId(0, me.ID, 0)
+		if cfg.This.Svr.EnableWx {
+			mysqlwx.DeleteMiniProgramByUserId(me.ID)
+		}
+		return common.Success, "delete user success!"
 	}
-	return http.StatusAccepted, "delete failed!"
+	return common.DBError, "delete failed!"
 }
 
 /******************************************************************************
@@ -251,6 +258,36 @@ func UpdateNickName(c *gin.Context) (int, interface{}) {
 	me.ID = req.UserId
 	if me.QueryByID(me.ID) {
 		me.NickName = req.NickName
+		if me.Update() {
+			return common.Success, me
+		}
+	}
+	return common.DBError, "update failed!"
+}
+
+// swagger:model UserGenderReq
+type UserGenderReq struct {
+	// required: true
+	// example: 1
+	UserId int64 `json:"user_id"`
+	Gender int   `json:"gender"`
+}
+
+/******************************************************************************
+ * function:
+ * description:
+ * param {*gin.Context} c
+ * return {*}
+********************************************************************************/
+func UpdateGender(c *gin.Context) (int, interface{}) {
+	var req *UserGenderReq = &UserGenderReq{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		return common.ParamError, "json format error"
+	}
+	me := mysql.NewUser()
+	me.ID = req.UserId
+	if me.QueryByID(me.ID) {
+		me.Gender = req.Gender
 		if me.Update() {
 			return common.Success, me
 		}
@@ -442,7 +479,7 @@ func ModifyPasswd(c *gin.Context) (int, interface{}) {
 	if !me.QueryByID(newPasswd.UserId) {
 		return common.NoExist, "user record not exist"
 	}
-	me.Password, _ = common.EncryptData(newPasswd.Passwd)
+	me.Password, _ = common.EncryptDataWithDefaultkey(newPasswd.Passwd)
 	me.Update()
 	return http.StatusOK, me
 }
@@ -1015,4 +1052,73 @@ func LeaveStudyRoom(c *gin.Context) (int, interface{}) {
 	// 	}
 	// }
 	return http.StatusOK, "leave room success!"
+}
+
+/******************************************************************************
+ * function: QueryUserOverview
+ * description: 根据用户ID查询用户概况
+ * param {*gin.Context} c
+ * return {*}
+********************************************************************************/
+// swagger:model UserOverview
+type UserOverview struct {
+	// required: true
+	UserId int64 `json:"user_id"`
+	// 0 未知 1 男 2 女
+	Gender int `json:"gender" mysql:"gender"`
+	// 出生日期
+	BornDate string `json:"born_date"`
+	// 年级
+	Grade string `json:"grade"`
+}
+
+func QueryUserOverview(c *gin.Context) (int, interface{}) {
+	userId := c.Query("user_id")
+	if userId == "" {
+		return common.ParamError, "user id required"
+	}
+	mId, err := strconv.ParseInt(userId, 10, 64)
+	if err != nil {
+		return common.ParamError, "user id format error"
+	}
+	userOverview := &UserOverview{
+		UserId: mId,
+	}
+	user := mysql.NewUser()
+	if user.QueryByID(mId) {
+		userOverview.BornDate = user.BornDate
+		userOverview.Gender = user.Gender
+		userOverview.Grade = user.Grade
+	} else {
+		return common.NoExist, "user not exist"
+	}
+	return http.StatusOK, userOverview
+}
+
+/******************************************************************************
+ * function: UpdateUserOverview
+ * description: 更新用户概况数据
+ * param {*gin.Context} c
+ * return {*}
+********************************************************************************/
+func UpdateUserOverview(c *gin.Context) (int, interface{}) {
+	var userOverview = &UserOverview{}
+	if err := c.ShouldBindJSON(userOverview); err != nil {
+		return common.JsonError, "json format error"
+	}
+	if userOverview.UserId <= 0 {
+		return common.ParamError, "user id required"
+	}
+	user := mysql.NewUser()
+	if user.QueryByID(userOverview.UserId) {
+		user.BornDate = userOverview.BornDate
+		user.Gender = userOverview.Gender
+		user.Grade = userOverview.Grade
+		if user.Update() {
+			return common.Success, "user overview update success"
+		} else {
+			return common.DBError, "update failed"
+		}
+	}
+	return common.NoExist, "user not exist"
 }

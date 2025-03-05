@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-09-06 17:50:12
  * LastEditors: liguoqiang
- * LastEditTime: 2024-05-25 13:07:50
+ * LastEditTime: 2024-12-09 20:46:38
  * Description:
 ********************************************************************************/
 package api
@@ -14,6 +14,72 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+func InitUserActions() (map[string]gin.HandlerFunc, map[string]gin.HandlerFunc) {
+	postAction := make(map[string]gin.HandlerFunc)
+	getAction := make(map[string]gin.HandlerFunc)
+
+	getAction["/user/queryById"] = queryUserById
+	getAction["/user/queryUserByPhone"] = queryUserByPhone
+	getAction["/user/queryUserByEmail"] = queryUserByEmail
+	getAction["/user/queryUserGroup"] = queryUserGroup
+	getAction["/user/queryFriendsByUser"] = queryFriendsByUser
+	getAction["/user/queryLampUsersByRoom"] = queryLampUsersByRoom
+	getAction["/user/queryLampUserInFriend"] = queryLampUserInFriend
+
+	getAction["/user/queryStudyRoomUser"] = queryStudyRoomUser
+	getAction["/user/queryUserStudyData"] = queryUserStudyData
+	getAction["/user/queryUserStudyTimeByDay"] = queryUserStudyTimeByDay
+
+	getAction["/user/queryUserOverview"] = queryUserOverview
+
+	getAction["/user/verifyUserToken"] = verifyUserToken
+
+	// post user tag action
+	postAction["/user/userLogin"] = userLogin
+	postAction["/user/userRegister"] = userRegister
+	postAction["/user/loginout"] = loginOut
+	postAction["/user/deleteUser"] = deleteUser
+	postAction["/user/online"] = userOnline
+	postAction["/user/offline"] = userOffline
+	postAction["/user/updateNickName"] = updateNickName
+	postAction["/user/updateGender"] = updateGender
+	postAction["/user/updateHeadPic"] = updateHeadPic
+	postAction["/user/update"] = updateUser
+	postAction["/user/modifyPhone"] = modifyPhone
+	postAction["/user/modifyEmergentPhone"] = modifyEmergentPhone
+	postAction["/user/modifyEmail"] = modifyEmail
+	postAction["/user/modifyPasswd"] = modifyPasswd
+	postAction["/user/insertGroup"] = insertUserGroup
+	postAction["/user/deleteGroup"] = deleteUserGroup
+	postAction["/user/insertUserFriend"] = insertUserFriend
+	postAction["/user/removeUserFriend"] = removeUserFriend
+	postAction["/user/modifyUserFriend"] = modifyUserFriend
+	postAction["/user/removeUserDevice"] = removeUserDevice
+	postAction["/user/addUserToStudyRoom"] = addUserToStudyRoom
+	postAction["/user/removeUserFromStudyRoom"] = removeUserFromStudyRoom
+	postAction["/user/enterStudyRoom"] = enterStudyRoom
+	postAction["/user/leaveStudyRoom"] = leaveStudyRoom
+
+	postAction["/user/updateUserOverview"] = updateUserOverview
+	return postAction, getAction
+}
+
+// verifyUserToken godoc
+//
+//	@Summary	verifyUserToken
+//	@Schemes
+//	@Description	验证用户token是否过期
+//	@Tags			user
+//	@Produce		json
+//
+//	@Param			token	query	string	 true	"user token"
+//
+//	@Success		200			{object}	mdb.VerifyTokenResp
+//	@Router			/user/verifyUserToken [get]
+func verifyUserToken(c *gin.Context) {
+	apiCommonFunc(c, mdb.VerifyUserToken)
+}
 
 /******************************************************************************
  * function: userLogin
@@ -32,7 +98,7 @@ import (
 //	@Param			in		body	mdb.LoginReq true	"user info"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/userLogin [post]
+//	@Router			/user/userLogin [post]
 func userLogin(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -56,7 +122,7 @@ func userLogin(c *gin.Context) {
 //	@Param			in		body	mysql.User true	"user info"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/userRegister [post]
+//	@Router			/user/userRegister [post]
 func userRegister(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -82,11 +148,11 @@ func userRegister(c *gin.Context) {
 //	@Description	login out from server
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.LoginoutReq	 true	"user id"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/loginout [post]
+//	@Router			/user/loginout [post]
 func loginOut(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -113,11 +179,11 @@ func loginOut(c *gin.Context) {
 //	@Description	delete user from server
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.DeleteUserReq	 true	"user id"
 //
 //	@Success		200			{string}	{"delete user ok""}
-//	@Router			/v1/user/deleteUser [post]
+//	@Router			/user/deleteUser [post]
 func deleteUser(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -145,7 +211,7 @@ WEB 接口，For query user infomaion
 //	@Param			id	query	int	 true	"user id"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/queryById [get]
+//	@Router			/user/queryById [get]
 func queryUserById(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -174,7 +240,7 @@ func queryUserById(c *gin.Context) {
 //	@Param			phone	query	string	 true	"user phone"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/queryUserByPhone [get]
+//	@Router			/user/queryUserByPhone [get]
 func queryUserByPhone(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -200,7 +266,7 @@ func queryUserByPhone(c *gin.Context) {
 //	@Param			email	query	string	 true	"user email"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/queryUserByEmail [get]
+//	@Router			/user/queryUserByEmail [get]
 func queryUserByEmail(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryUserByEmail)
 }
@@ -217,11 +283,11 @@ For update user online status
 //	@Description	set user online
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			id	body	int	 true	"user id"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/online [post]
+//	@Router			/user/online [post]
 func userOnline(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -246,11 +312,11 @@ For update user online status
 //	@Description	set user offline
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			id	body	int	 true	"user id"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/offline [post]
+//	@Router			/user/offline [post]
 func userOffline(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -286,13 +352,29 @@ type UpdateUserReq struct {
 //	@Description	update user nickname
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.NickNameReq	 true	"user information"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/updateNickName [post]
+//	@Router			/user/updateNickName [post]
 func updateNickName(c *gin.Context) {
 	apiCommonFunc(c, mdb.UpdateNickName)
+}
+
+// updateGender godoc
+//
+//	@Summary	updateGender
+//	@Schemes
+//	@Description	update user gender
+//	@Tags			user
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.UserGenderReq	 true	"user gender"
+//
+//	@Success		200			{object}	mysql.User
+//	@Router			/user/updateGender [post]
+func updateGender(c *gin.Context) {
+	apiCommonFunc(c, mdb.UpdateGender)
 }
 
 // updateHeadPic godoc
@@ -302,11 +384,11 @@ func updateNickName(c *gin.Context) {
 //	@Description	update user face picture
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.UserFacePicReq	 true	"user picture information"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/updateHeadPic [post]
+//	@Router			/user/updateHeadPic [post]
 func updateHeadPic(c *gin.Context) {
 	apiCommonFunc(c, mdb.UpdateHeadPic)
 }
@@ -318,11 +400,11 @@ func updateHeadPic(c *gin.Context) {
 //	@Description	update user
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mysql.User	 true	"user information"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/update [post]
+//	@Router			/user/update [post]
 func updateUser(c *gin.Context) {
 	apiCommonFunc(c, mdb.UpdateUser)
 }
@@ -339,11 +421,11 @@ func updateUser(c *gin.Context) {
 //	@Description	modify user phone
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.NewPhone	 true	"user information"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/modifyPhone [post]
+//	@Router			/user/modifyPhone [post]
 func modifyPhone(c *gin.Context) {
 	apiCommonFunc(c, mdb.ModifyPhone)
 }
@@ -355,11 +437,11 @@ func modifyPhone(c *gin.Context) {
 //	@Description	modify user emergent phone
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.NewPhone	 true	"user information"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/modifyEmergentPhone [post]
+//	@Router			/user/modifyEmergentPhone [post]
 func modifyEmergentPhone(c *gin.Context) {
 	apiCommonFunc(c, mdb.ModifyEmergentPhone)
 }
@@ -371,11 +453,11 @@ func modifyEmergentPhone(c *gin.Context) {
 //	@Description	modify user email
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.NewEmail	 true	"user email"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/modifyEmail [post]
+//	@Router			/user/modifyEmail [post]
 func modifyEmail(c *gin.Context) {
 	apiCommonFunc(c, mdb.ModifyEmail)
 }
@@ -387,11 +469,11 @@ func modifyEmail(c *gin.Context) {
 //	@Description	modify user passwd
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.NewPasswd	 true	"user new passwd"
 //
 //	@Success		200			{object}	mysql.User
-//	@Router			/v1/user/modifyPasswd [post]
+//	@Router			/user/modifyPasswd [post]
 func modifyPasswd(c *gin.Context) {
 	apiCommonFunc(c, mdb.ModifyPasswd)
 }
@@ -463,7 +545,7 @@ func insertUserGroup(c *gin.Context) {
 //	@Param			user_id	query	int	 true	"user id"
 //
 //	@Success		200			{object}	mysql.UserFriend
-//	@Router			/v1/user/queryFriendsByUser [get]
+//	@Router			/user/queryFriendsByUser [get]
 func queryFriendsByUser(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -499,11 +581,11 @@ type InsertUserFriendReq struct {
 //	@Description	insert user's friend
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	InsertUserFriendReq	 true	"friend info"
 //
 //	@Success		200			{object}	mysql.UserFriend
-//	@Router			/v1/user/insertUserFriend [post]
+//	@Router			/user/insertUserFriend [post]
 func insertUserFriend(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -525,11 +607,11 @@ func insertUserFriend(c *gin.Context) {
 //	@Description	modify user's friend
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.ModifyFriendReq	 true	"modify friend request"
 //
 //	@Success		200			{string}	{"modify user friend ok""}
-//	@Router			/v1/user/modifyUserFriend [post]
+//	@Router			/user/modifyUserFriend [post]
 func modifyUserFriend(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -551,11 +633,11 @@ func modifyUserFriend(c *gin.Context) {
 //	@Description	remove user's friend
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.RemoveFriendReq	 true	"remove friend request"
 //
 //	@Success		200			{string}	{"remove user friend ok""}
-//	@Router			/v1/user/removeUserFriend [post]
+//	@Router			/user/removeUserFriend [post]
 func removeUserFriend(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -586,11 +668,11 @@ type RemoveUserDeviceReq struct {
 //	@Description	remove user device
 //	@Tags			user
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in		body	RemoveUserDeviceReq		true	"user device"
 //
 //	@Success		200			{string}	{"remove user device ok"}
-//	@Router			/v1/user/removeUserDevice [post]
+//	@Router			/user/removeUserDevice [post]
 func removeUserDevice(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -615,7 +697,7 @@ func removeUserDevice(c *gin.Context) {
 //	@Param			in	body	mdb.UserToStudyRoomReq		true	"add user to study room"
 //
 //	@Success		200			{object}	mysql.StudyRoomUser
-//	@Router			/v1/user/addUserToStudyRoom [post]
+//	@Router			/user/addUserToStudyRoom [post]
 func addUserToStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -640,7 +722,7 @@ func addUserToStudyRoom(c *gin.Context) {
 //	@Param			in	body	mdb.UserToStudyRoomReq		true	"remove user from study room"
 //
 //	@Success		200			{string}	{string}	removeUserFromStudyRoom
-//	@Router			/v1/user/removeUserFromStudyRoom [post]
+//	@Router			/user/removeUserFromStudyRoom [post]
 func removeUserFromStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -667,7 +749,7 @@ func removeUserFromStudyRoom(c *gin.Context) {
 //	 @Param flag query int true "flag 0:all 1:study user"
 //
 //		@Success		200			{object}	mysql.StudyRoomUserDetail
-//		@Router			/v1/user/queryStudyRoomUser [get]
+//		@Router			/user/queryStudyRoomUser [get]
 func queryStudyRoomUser(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryStudyRoomUser)
 }
@@ -687,7 +769,7 @@ func queryStudyRoomUser(c *gin.Context) {
 // @Param			end_time	query	string	true	"end time"
 //
 //	@Success		200			{object}	mdb.UserStudyData
-//	@Router			/v1/user/queryUserStudyData [get]
+//	@Router			/user/queryUserStudyData [get]
 func queryUserStudyData(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -715,7 +797,7 @@ func queryUserStudyData(c *gin.Context) {
 // @Param			query_date	query	string	true	"query date"
 //
 //	@Success		200			{object}	mysql.UserStudyTime
-//	@Router			/v1/user/queryUserStudyTimeByDay [get]
+//	@Router			/user/queryUserStudyTimeByDay [get]
 func queryUserStudyTimeByDay(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -740,7 +822,7 @@ func queryUserStudyTimeByDay(c *gin.Context) {
 //	@Param			room_id		query	int		true	"room id"
 //
 // @Success		200			{object}	mysql.LampUserWithStudyRoom
-// @Router			/v1/user/queryLampUsersByRoom [get]
+// @Router			/user/queryLampUsersByRoom [get]
 func queryLampUsersByRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -765,7 +847,7 @@ func queryLampUsersByRoom(c *gin.Context) {
 //	@Param			user_id		query	int		true	"user id"
 //
 // @Success		200			{object}	mysql.LampUserWithStudyRoom
-// @Router			/v1/user/queryLampUserInFriend [get]
+// @Router			/user/queryLampUserInFriend [get]
 func queryLampUserInFriend(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryLampUserInFriend)
 }
@@ -781,7 +863,7 @@ func queryLampUserInFriend(c *gin.Context) {
 //	@Param			in		body	mdb.UserEnterStudyReq		true	"study info"
 //
 // @Success		200			{object}	mysql.UserStudyRecord
-// @Router			/v1/user/enterStudyRoom [post]
+// @Router			/user/enterStudyRoom [post]
 func enterStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -805,7 +887,7 @@ func enterStudyRoom(c *gin.Context) {
 //	@Param			in		body	mdb.UserEnterStudyReq		true	"study info"
 //
 // @Success		200			{string}	{"leave room success"}
-// @Router			/v1/user/leaveStudyRoom [post]
+// @Router			/user/leaveStudyRoom [post]
 func leaveStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -816,4 +898,36 @@ func leaveStudyRoom(c *gin.Context) {
 			respJSON(c, e.Code, e.Msg)
 		},
 	}.Run()
+}
+
+// queryUserOverview godoc
+//
+//	@Summary	queryUserOverview
+//	@Schemes
+//	@Description	查询用户概况数据
+//	@Tags			user
+//	@Produce		json
+//
+//	@Param			user_id		query	int		true	"user id"
+//
+// @Success		200			{object}	mdb.UserOverview
+// @Router			/user/queryUserOverview [get]
+func queryUserOverview(c *gin.Context) {
+	apiCommonFunc(c, mdb.QueryUserOverview)
+}
+
+// updateUserOverview godoc
+//
+//	@Summary	updateUserOverview
+//	@Schemes
+//	@Description	更新用户概况数据
+//	@Tags			user
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.UserOverview	true	"用户概况数据"
+//
+// @Success		200			{string}	{"update success"}
+// @Router			/user/updateUserOverview [post]
+func updateUserOverview(c *gin.Context) {
+	apiCommonFunc(c, mdb.UpdateUserOverview)
 }

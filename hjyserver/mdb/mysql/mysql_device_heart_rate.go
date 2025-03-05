@@ -8,9 +8,7 @@ import (
 	"hjyserver/exception"
 	mylog "hjyserver/log"
 	"hjyserver/mdb/common"
-	"math"
 	"net/http"
-	"reflect"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -61,56 +59,57 @@ func NewHeartRate() *HeartRate {
 		DateTime:      time.Now().Format(cfg.TmFmtStr),
 	}
 }
-func (me *HeartRate) MarshalJSON() ([]byte, error) {
-	var b []byte
-	u := reflect.TypeOf(me)
-	vf := reflect.ValueOf(me)
-	numField := u.Elem().NumField()
-	b = append(b, "{"...)
-	for num := 0; num < numField; num++ {
-		f := u.Elem().Field(num)
-		v := vf.Elem().Field(num)
-		switch v.Kind() {
-		case reflect.Int64:
-			var val string
-			if f.Name == "ID" && v.Int() <= 0 {
-				val = fmt.Sprintf("\"%v\":\"NaN\"", f.Tag.Get("json"))
-			} else {
-				val = fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.Int())
-			}
-			if num < (numField - 1) {
-				val += ","
-			}
-			b = append(b, val...)
-		case reflect.Int:
-			var val string
-			val = fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.Int())
-			if num < (numField - 1) {
-				val += ","
-			}
-			b = append(b, val...)
-		case reflect.Float64:
-			var val string
-			if math.IsNaN(v.Float()) {
-				val = fmt.Sprintf("\"%v\":\"NaN\"", f.Tag.Get("json"))
-			} else {
-				val = fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.Float())
-			}
-			if num < (numField - 1) {
-				val += ","
-			}
-			b = append(b, val...)
-		case reflect.String:
-			val := fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.String())
-			if num < (numField - 1) {
-				val += ","
-			}
-			b = append(b, val...)
-		}
-	}
-	b = append(b, "}"...)
-	return b, nil
-}
+
+// func (me *HeartRate) MarshalJSON() ([]byte, error) {
+// 	var b []byte
+// 	u := reflect.TypeOf(me)
+// 	vf := reflect.ValueOf(me)
+// 	numField := u.Elem().NumField()
+// 	b = append(b, "{"...)
+// 	for num := 0; num < numField; num++ {
+// 		f := u.Elem().Field(num)
+// 		v := vf.Elem().Field(num)
+// 		switch v.Kind() {
+// 		case reflect.Int64:
+// 			var val string
+// 			if f.Name == "ID" && v.Int() <= 0 {
+// 				val = fmt.Sprintf("\"%v\":\"NaN\"", f.Tag.Get("json"))
+// 			} else {
+// 				val = fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.Int())
+// 			}
+// 			if num < (numField - 1) {
+// 				val += ","
+// 			}
+// 			b = append(b, val...)
+// 		case reflect.Int:
+// 			var val string
+// 			val = fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.Int())
+// 			if num < (numField - 1) {
+// 				val += ","
+// 			}
+// 			b = append(b, val...)
+// 		case reflect.Float64:
+// 			var val string
+// 			if math.IsNaN(v.Float()) {
+// 				val = fmt.Sprintf("\"%v\":\"NaN\"", f.Tag.Get("json"))
+// 			} else {
+// 				val = fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.Float())
+// 			}
+// 			if num < (numField - 1) {
+// 				val += ","
+// 			}
+// 			b = append(b, val...)
+// 		case reflect.String:
+// 			val := fmt.Sprintf("\"%v\":\"%v\"", f.Tag.Get("json"), v.String())
+// 			if num < (numField - 1) {
+// 				val += ","
+// 			}
+// 			b = append(b, val...)
+// 		}
+// 	}
+// 	b = append(b, "}"...)
+// 	return b, nil
+// }
 
 func (me *HeartRate) MarshalBinary() ([]byte, error) {
 	return json.Marshal(me)

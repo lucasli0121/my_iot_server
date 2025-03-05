@@ -14,7 +14,63 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	@BasePath	/v1
+func InitDeviceActions() (map[string]gin.HandlerFunc, map[string]gin.HandlerFunc) {
+	postAction := make(map[string]gin.HandlerFunc)
+	getAction := make(map[string]gin.HandlerFunc)
+
+	getAction["/device/queryById"] = queryDeviceById
+	getAction["/device/queryByUser"] = queryDeviceByUser
+	getAction["/device/queryBindByMac"] = queryBindByMac
+	getAction["/device/queryHeartRate"] = queryHeartRate
+	getAction["/device/statsHeartRateByMinute"] = statsHeartRateByMinute
+	getAction["/device/queryX1RealDataJson"] = queryX1RealDataJson
+	getAction["/device/queryX1SleepReportJson"] = queryX1SleepReportJson
+	getAction["/device/querySleepReport"] = querySleepReport
+	getAction["/device/queryDateListInReport"] = queryDateListInReport
+	getAction["/device/queryFallCheckStatus"] = queryFallCheckStatus
+	getAction["/device/queryAlarmRecord"] = queryAlarmRecord
+	getAction["/device/queryFallExistRecord"] = queryFallExistRecord
+	getAction["/device/queryFallParams"] = queryFallParams
+	getAction["/device/queryLampRealData"] = queryLampRealData
+	getAction["/device/queryLampEvent"] = queryLampEvent
+	getAction["/device/queryLampControl"] = queryLampControl
+	getAction["/device/queryLampReportStatus"] = queryLampReportStatus
+	getAction["/device/queryStudyRoom"] = queryStudyRoom
+	getAction["/device/queryInviteStudyRoom"] = queryInviteStudyRoom
+	getAction["/device/queryRankingByStudyRoom"] = queryRankingByStudyRoom
+	getAction["/device/statsLampFlowData"] = statsLampFlowData
+	getAction["/device/queryShareUsers"] = queryShareUsers
+	getAction["/device/queryUnconfirmedShareDevices"] = queryUnconfirmedShareDevices
+	getAction["/device/queryTransferUsers"] = queryTransferUsers
+	getAction["/device/queryUnconfirmedTransferDevices"] = queryUnconfirmedTransferDevices
+	getAction["/device/queryDeviceOverview"] = queryDeviceOverview
+
+	// post device tag action
+	postAction["/device/insert"] = insertDevice
+	postAction["/device/update"] = updateDevice
+	postAction["/device/share"] = shareDevice
+	postAction["/device/shareDeviceToPhoneWithMac"] = shareDeviceToPhoneWithMac
+	postAction["/device/confirmSharedDevice"] = confirmSharedDevice
+	postAction["/device/modifySharedDeviceRemark"] = modifySharedDeviceRemark
+	postAction["/device/removeSharedDevice"] = removeSharedDevice
+	postAction["/device/transferDeviceToPhoneWithMac"] = transferDeviceToPhoneWithMac
+	postAction["/device/confirmTransferDevice"] = confirmTransferDevice
+	postAction["/device/insertFallParams"] = insertFallParams
+	postAction["/device/openLampRealData"] = openLampRealData
+	postAction["/device/controlLamp"] = controlLamp
+	postAction["/device/createStudyRoom"] = createStudyRoom
+	postAction["/device/modifyStudyRoom"] = modifyStudyRoom
+	postAction["/device/releaseStudyRoom"] = releaseStudyRoom
+	postAction["/device/askEd713RealData"] = askEd713RealData
+	postAction["/device/askX1RealData"] = askX1RealData
+	postAction["/device/cleanX1Event"] = cleanX1Event
+	postAction["/device/sleepX1Switch"] = sleepX1Switch
+	postAction["/device/improveDisturbed"] = improveDisturbed
+	postAction["/device/recoverX1SleepReport"] = recoverX1SleepReport
+	postAction["/device/updateDeviceOverview"] = updateDeviceOverview
+
+	return postAction, getAction
+}
 
 // queryById godoc
 //
@@ -27,7 +83,7 @@ import (
 //
 //	@Produce		json
 //	@Success		200	{object}	mysql.Device
-//	@Router			/v1/device/queryById [get]
+//	@Router			/device/queryById [get]
 func queryDeviceById(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -48,8 +104,6 @@ func queryDeviceById(c *gin.Context) {
 	}.Run()
 }
 
-//	@BasePath	/v1
-
 // queryBindByMac godoc
 //
 //	@Summary	queryBindByMac
@@ -63,7 +117,7 @@ func queryDeviceById(c *gin.Context) {
 //
 //	@Produce		json
 //	@Success		200	{object}	mdb.DeviceBindResp
-//	@Router			/v1/device/queryBindByMac [get]
+//	@Router			/device/queryBindByMac [get]
 func queryBindByMac(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -100,17 +154,9 @@ func queryBindByMac(c *gin.Context) {
 //	@Param			flag	query	int		true	"flag"
 //
 //	@Success		200		{object}	mysql.Device
-//	@Router			/v1/device/queryByUser [get]
+//	@Router			/device/queryByUser [get]
 func queryDeviceByUser(c *gin.Context) {
-	exception.TryEx{
-		Try: func() {
-			status, result := mdb.QueryDeviceByUser(c)
-			respJSON(c, status, result)
-		},
-		Catch: func(e exception.Exception) {
-			respJSON(c, e.Code, e.Msg)
-		},
-	}.Run()
+	apiCommonFunc(c, mdb.QueryDeviceByUser)
 }
 
 // insertDevice godoc
@@ -121,20 +167,13 @@ func queryDeviceByUser(c *gin.Context) {
 //	@Tags			device
 //	@Produce		json
 //
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.NewDeviceReq		true	"user device information"
 //
 //	@Success		200		{object}	mysql.UserDevice
-//	@Router			/v1/device/insert [post]
+//	@Router			/device/insert [post]
 func insertDevice(c *gin.Context) {
-	exception.TryEx{
-		Try: func() {
-			status, result := mdb.InsertDevice(c)
-			respJSON(c, status, result)
-		},
-		Catch: func(e exception.Exception) {
-			respJSON(c, e.Code, e.Msg)
-		},
-	}.Run()
+	apiCommonFunc(c, mdb.InsertDevice)
 }
 
 /*
@@ -148,21 +187,13 @@ updateDevice...
 //	@Description	update user device
 //	@Tags			device
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.UpdateDeviceReq		true	"user device information"
 //
 //	@Success		200		{object}	mysql.Device
-//	@Router			/v1/device/update [post]
+//	@Router			/device/update [post]
 func updateDevice(c *gin.Context) {
-	exception.TryEx{
-		Try: func() {
-			status, result := mdb.UpdateDevice(c)
-			respJSON(c, status, result)
-		},
-		Catch: func(e exception.Exception) {
-			respJSON(c, e.Code, e.Msg)
-		},
-	}.Run()
+	apiCommonFunc(c, mdb.UpdateDevice)
 }
 
 /******************************************************************************
@@ -178,21 +209,171 @@ func updateDevice(c *gin.Context) {
 //	@Description	update user device
 //	@Tags			device
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.ShareDeviceReq		true	"user device information"
 //
 //	@Success		200		{object}	mysql.UserDevice
-//	@Router			/v1/device/share [post]
+//	@Router			/device/share [post]
 func shareDevice(c *gin.Context) {
-	exception.TryEx{
-		Try: func() {
-			status, result := mdb.ShareDeviceToOtherUser(c)
-			respJSON(c, status, result)
-		},
-		Catch: func(e exception.Exception) {
-			respJSON(c, e.Code, e.Msg)
-		},
-	}.Run()
+	apiCommonFunc(c, mdb.ShareDeviceToOtherUser)
+}
+
+// shareDeviceToPhoneWithMac godoc
+//
+//	@Summary	shareDeviceToPhoneWithMac
+//	@Schemes
+//	@Description	share device to other user
+//	@Tags			device
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.ShareDeviceWithMacReq		true	"user device information"
+//
+//	@Success		200		{object}	mysql.UserShareDevice
+//	@Router			/device/shareDeviceToPhoneWithMac [post]
+func shareDeviceToPhoneWithMac(c *gin.Context) {
+	apiCommonFunc(c, mdb.ShareDeviceToPhoneWithMac)
+}
+
+// confirmSharedDevice godoc
+//
+//	@Summary	confirmSharedDevice
+//	@Schemes
+//	@Description	confirm shared device
+//	@Tags			device
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.ConfirmSharedReq		true	"confirm shared device request"
+//
+//	@Success		200		{string}	{"Confirmed successfully"}
+//	@Router			/device/confirmSharedDevice [post]
+func confirmSharedDevice(c *gin.Context) {
+	apiCommonFunc(c, mdb.ConfirmSharedDevice)
+}
+
+// modifySharedDeviceRemark godoc
+//
+//	@Summary	modifySharedDeviceRemark
+//	@Schemes
+//	@Description	modify shared device remark
+//	@Tags			device
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.ModifySharedDeviceRemarkReq		true	"modify share device remark"
+//
+//	@Success		200		{object}	mysql.UserShareDevice
+//	@Router			/device/modifySharedDeviceRemark [post]
+func modifySharedDeviceRemark(c *gin.Context) {
+	apiCommonFunc(c, mdb.ModifySharedDeviceRemark)
+}
+
+// removeSharedDevice godoc
+//
+//	@Summary	removeSharedDevice
+//	@Schemes
+//	@Description	delete shared device
+//	@Tags			device
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.RemoveSharedDeviceReq		true	"delete share device"
+//
+//	@Success		200		{string}	{"delete shared device successfully"}
+//	@Router			/device/removeSharedDevice [post]
+func removeSharedDevice(c *gin.Context) {
+	apiCommonFunc(c, mdb.RemoveSharedDevice)
+}
+
+// queryShareUsers godoc
+//
+//	@Summary	queryShareUsers
+//	@Schemes
+//	@Description	query users to which device shared
+//	@Tags			device
+//	@Produce		json
+//	@Param			user_id	query	string		true	"login user id"
+//	@Param			mac	query	string		true	"device mac address"
+//
+//	@Success		200		{object}	mysql.UserShareDeviceDetail
+//	@Router			/device/queryShareUsers [get]
+func queryShareUsers(c *gin.Context) {
+	apiCommonFunc(c, mdb.QueryShareUsers)
+}
+
+// queryUnconfirmedShareDevices godoc
+//
+//	@Summary	queryUnconfirmedShareDevices
+//	@Schemes
+//	@Description	query unconfirmed share devices
+//	@Tags			device
+//	@Produce		json
+//	@Param			user_id	query	string		true	"login user id"
+//	@Param			mac	query	string		false	"设备mac地址"
+//	@Success		200		{object}	mysql.UserShareDeviceDetail
+//	@Router			/device/queryUnconfirmedShareDevices [get]
+func queryUnconfirmedShareDevices(c *gin.Context) {
+	apiCommonFunc(c, mdb.QueryUnconfirmedShareDevices)
+}
+
+// queryTransferUsers godoc
+//
+//	@Summary	queryTransferUsers
+//	@Schemes
+//	@Description	query users to which device transfered
+//	@Tags			device
+//	@Produce		json
+//	@Param			user_id	query	string		true	"login user id"
+//	@Param			mac	query	string		true	"device mac address"
+//
+//	@Success		200		{object}	mysql.UserTransferDeviceDetail
+//	@Router			/device/queryTransferUsers [get]
+func queryTransferUsers(c *gin.Context) {
+	apiCommonFunc(c, mdb.QueryTransferedUsers)
+}
+
+// queryUnconfirmedTransferDevices godoc
+//
+//	@Summary	queryUnconfirmedTransferDevices
+//	@Schemes
+//	@Description	query unconfirmed transfered devices
+//	@Tags			device
+//	@Produce		json
+//	@Param			user_id	query	string		true	"login user id"
+//	@Param			mac	query	string		false	"device mac address"
+//	@Success		200		{object}	mysql.UserTransferDeviceDetail
+//	@Router			/device/queryUnconfirmedTransferDevices [get]
+func queryUnconfirmedTransferDevices(c *gin.Context) {
+	apiCommonFunc(c, mdb.QueryUnconfirmedTransferDevices)
+}
+
+// transferDeviceToPhoneWithMac godoc
+//
+//	@Summary	transferDeviceToPhoneWithMac
+//	@Schemes
+//	@Description	transfer device to other user
+//	@Tags			device
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.TransferDeviceWithMacReq		true	"user device information"
+//
+//	@Success		200		{object}	mysql.UserDevice
+//	@Router			/device/transferDeviceToPhoneWithMac [post]
+func transferDeviceToPhoneWithMac(c *gin.Context) {
+	apiCommonFunc(c, mdb.TransferDeviceToPhoneWithMac)
+}
+
+// confirmTransferDevice godoc
+//
+//	@Summary	confirmTransferDevice
+//	@Schemes
+//	@Description	confirmed transfer device to other user
+//	@Tags			device
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in	body	mdb.ConfirmTransferReq		true	"confirmed transfer device"
+//
+//	@Success		200		{string}	{"Confirmed successfully"}
+//	@Router			/device/confirmTransferDevice [post]
+func confirmTransferDevice(c *gin.Context) {
+	apiCommonFunc(c, mdb.ConfirmTransferedDevice)
 }
 
 /******************************************************************************
@@ -215,7 +396,7 @@ func shareDevice(c *gin.Context) {
 // @Param end_day query string false "end day, format yyyy-MM-dd"
 //
 //	@Success		200		{object}	mysql.HeartRate
-//	@Router			/v1/device/queryHeartRate [get]
+//	@Router			/device/queryHeartRate [get]
 func queryHeartRate(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -243,7 +424,7 @@ func queryHeartRate(c *gin.Context) {
 // @Param end_day query string false "end day, format yyyy-MM-dd"
 //
 //	@Success		200		{object}	mdb.StatsHeartRate
-//	@Router			/v1/device/statsHeartRateByMinute [get]
+//	@Router			/device/statsHeartRateByMinute [get]
 func statsHeartRateByMinute(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -277,7 +458,7 @@ func statsHeartRateByMinute(c *gin.Context) {
 // @Param end_day query string false "end day, format yyyy-MM-dd"
 //
 //	@Success		200		{object}	mysql.SleepReport
-//	@Router			/v1/device/querySleepReport [get]
+//	@Router			/device/querySleepReport [get]
 func querySleepReport(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -308,7 +489,7 @@ func querySleepReport(c *gin.Context) {
 //	@Param			mac	query	string		true	"device mac address"
 //
 //	@Success		200		{object}	mysql.FallCheck
-//	@Router			/v1/device/queryFallCheckStatus [get]
+//	@Router			/device/queryFallCheckStatus [get]
 func queryFallCheckStatus(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -342,7 +523,7 @@ func queryFallCheckStatus(c *gin.Context) {
 // @Param end_day query string false "end day, format yyyy-MM-dd"
 //
 //	@Success		200		{object}	mysql.FallAlarm
-//	@Router			/v1/device/queryAlarmRecord [get]
+//	@Router			/device/queryAlarmRecord [get]
 func queryAlarmRecord(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -375,7 +556,7 @@ func queryAlarmRecord(c *gin.Context) {
 // @Param end_day query string false "end day, format yyyy-MM-dd"
 //
 //	@Success		200		{object}	mysql.FallCheck
-//	@Router			/v1/device/queryFallExistRecord [get]
+//	@Router			/device/queryFallExistRecord [get]
 func queryFallExistRecord(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -405,7 +586,7 @@ func queryFallExistRecord(c *gin.Context) {
 //	@Param			device_id	query	int		true	"device id"
 //
 //	@Success		200		{object}	mysql.FallParams
-//	@Router			/v1/device/queryFallParams [get]
+//	@Router			/device/queryFallParams [get]
 func queryFallParams(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -431,11 +612,11 @@ func queryFallParams(c *gin.Context) {
 //	@Description	query fall check device install params
 //	@Tags			fall check device
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mysql.FallParams		true	"fall check device params"
 //
 //	@Success		200		{object}	mysql.FallParams
-//	@Router			/v1/device/insertFallParams [post]
+//	@Router			/device/insertFallParams [post]
 func insertFallParams(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -461,11 +642,11 @@ func insertFallParams(c *gin.Context) {
 //	@Description	query fall check device install params
 //	@Tags			lamp device
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.LampRealDataReq		true	"lamp real data"
 //
 //	@Success		200		{none} {none}
-//	@Router			/v1/device/openLampRealData [post]
+//	@Router			/device/openLampRealData [post]
 func openLampRealData(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -491,7 +672,7 @@ func openLampRealData(c *gin.Context) {
 //	@Param			end_day		query	string	false	"end day"
 //
 //	@Success		200			{object} mysql.RealDataSql
-//	@Router			/v1/device/queryLampRealData [get]
+//	@Router			/device/queryLampRealData [get]
 func queryLampRealData(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -517,7 +698,7 @@ func queryLampRealData(c *gin.Context) {
 //	@Param			end_day		query	string	false	"end day"
 //
 //	@Success		200			{object} mysql.LampReportStatus
-//	@Router			/v1/device/queryLampReportStatus [get]
+//	@Router			/device/queryLampReportStatus [get]
 func queryLampReportStatus(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryLampReportStatus)
 }
@@ -535,7 +716,7 @@ func queryLampReportStatus(c *gin.Context) {
 //	@Param			end_day		query	string	false	"end day"
 //
 //	@Success		200			{object}	mysql.EventReportSql
-//	@Router			/v1/device/queryLampEvent [get]
+//	@Router			/device/queryLampEvent [get]
 func queryLampEvent(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -555,11 +736,11 @@ func queryLampEvent(c *gin.Context) {
 //	@Description	control lamp status
 //	@Tags			lamp device
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.ControlLampReq	true	"control lamp"
 //
 // @Success	200	{none}	{none}
-// @Router		/v1/device/controlLamp [post]
+// @Router		/device/controlLamp [post]
 func controlLamp(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -583,7 +764,7 @@ func controlLamp(c *gin.Context) {
 //	@Param			mac			query	string	true	"mac address"
 //
 //	@Success		200			{object}	mysql.LampControlSql
-//	@Router			/v1/device/queryLampControl [get]
+//	@Router			/device/queryLampControl [get]
 func queryLampControl(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -603,11 +784,11 @@ func queryLampControl(c *gin.Context) {
 //	@Description	create study room
 //	@Tags			room
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.CreateStudyRoomReq	true	"room information"
 //
 //	@Success		200	{object}	mysql.StudyRoom
-//	@Router			/v1/device/createStudyRoom [post]
+//	@Router			/device/createStudyRoom [post]
 func createStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -627,11 +808,11 @@ func createStudyRoom(c *gin.Context) {
 //	@Description	修改自习室信息
 //	@Tags			room
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in	body	mdb.ModifyStudyRoomReq	true	"room information"
 //
 //	@Success		200	 {string}	{"修改成功"}
-//	@Router			/v1/device/modifyStudyRoom [post]
+//	@Router			/device/modifyStudyRoom [post]
 func modifyStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -652,11 +833,11 @@ func modifyStudyRoom(c *gin.Context) {
 //	@Description	release study room
 //	@Tags			room
 //	@Produce		json
-//
+//	@Param			token	query	string		false	"token"
 //	@Param			in		body	mdb.ReleaseStudyRoomReq		true	"release room"
 //
 //	@Success		200			{string}	{"release study room success"}
-//	@Router			/v1/device/releaseStudyRoom [post]
+//	@Router			/device/releaseStudyRoom [post]
 func releaseStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -680,7 +861,7 @@ func releaseStudyRoom(c *gin.Context) {
 //	@Param			user_id	query	int		true	"user id in study room"
 //
 //	@Success		200			{object}	mysql.StudyRoom
-//	@Router			/v1/device/queryStudyRoom [get]
+//	@Router			/device/queryStudyRoom [get]
 func queryStudyRoom(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryStudyRoom)
 }
@@ -696,7 +877,7 @@ func queryStudyRoom(c *gin.Context) {
 //	@Param			user_id	query	int		true	"user id"
 //
 //	@Success		200			{object} mysql.StudyRoomUserDetail
-//	@Router			/v1/device/queryInviteStudyRoom [get]
+//	@Router			/device/queryInviteStudyRoom [get]
 func queryInviteStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -720,7 +901,7 @@ func queryInviteStudyRoom(c *gin.Context) {
 //	@Param			room_id	query	int		true	"room id"
 //
 //	@Success		200	{object}	mysql.StudyRoomRanking
-//	@Router			/v1/device/queryRankingByStudyRoom [get]
+//	@Router			/device/queryRankingByStudyRoom [get]
 func queryRankingByStudyRoom(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -747,7 +928,7 @@ func queryRankingByStudyRoom(c *gin.Context) {
 // @Param			end_time	query	string	true	"end time"
 //
 //	@Success		200			{int}	{int}
-//	@Router			/v1/device/statsLampFlowData [get]
+//	@Router			/device/statsLampFlowData [get]
 func statsLampFlowData(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -775,7 +956,7 @@ func statsLampFlowData(c *gin.Context) {
 // @Param end_day query string false "end day, format yyyy-MM-dd"
 //
 //	@Success		200	{object}	mdb.QueryDateListResp
-//	@Router			/v1/device/queryDateListInReport [get]
+//	@Router			/device/queryDateListInReport [get]
 func queryDateListInReport(c *gin.Context) {
 	exception.TryEx{
 		Try: func() {
@@ -787,4 +968,36 @@ func queryDateListInReport(c *gin.Context) {
 		},
 	}.Run()
 
+}
+
+// queryDeviceOverview godoc
+//
+//	@Summary	queryDeviceOverview
+//	@Schemes
+//	@Description	查询设备的概览数据
+//	@Tags			device
+//	@Produce		json
+//
+//	@Param			mac	query	string		true	"mac address"
+//
+//	@Success		200	{object}	mysql.DeviceOverview
+//	@Router			/device/queryDeviceOverview [get]
+func queryDeviceOverview(c *gin.Context) {
+	apiCommonFunc(c, mdb.QueryDeviceOverview)
+}
+
+// updateDeviceOverview godoc
+//
+//	@Summary	updateDeviceOverview
+//	@Schemes
+//	@Description	更新设备概况
+//	@Tags			device
+//	@Produce		json
+//	@Param			token	query	string		false	"token"
+//	@Param			in		body	mdb.DeviceOverviewReq		true	"概况数据"
+//
+//	@Success		200	{object}	mysql.DeviceOverview
+//	@Router			/device/updateDeviceOverview [post]
+func updateDeviceOverview(c *gin.Context) {
+	apiCommonFunc(c, mdb.UpdateDeviceOverview)
 }

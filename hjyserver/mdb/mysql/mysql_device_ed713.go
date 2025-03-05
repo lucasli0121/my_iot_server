@@ -144,7 +144,7 @@ func handleTimeMqttMsg(mac string, payload []byte) {
  * return {*}
 ********************************************************************************/
 func handleHeartBeatMqttMsg(mac string, payload []byte) {
-	SetDeviceOnline(mac, 1)
+	SetDeviceOnline(mac, 1, 0)
 
 }
 
@@ -204,13 +204,6 @@ func handleRealDataMqttMsg(mac string, payload []byte) {
 	realDataSql.MoveState = totalMoveState / heartLen
 	realDataSql.BodyStatus = totalBodyStatus / heartLen
 	realDataSql.BodyPosition = totalBodyPosition / heartLen
-	taskPool.Put(&gopool.Task{
-		Params: []interface{}{realDataSql},
-		Do: func(params ...interface{}) {
-			var obj = params[0].(*Ed713RealDataMysql)
-			obj.Insert()
-		},
-	})
 
 	heartObj := &HeartRate{
 		ID:           0,
@@ -236,7 +229,17 @@ func handleRealDataMqttMsg(mac string, payload []byte) {
 	if heartObj.ActiveStatus == 3 && heartObj.PersonStatus == 3 {
 		heartObj.StagesStatus = 3
 	}
-	mq.PublishData(common.MakeHeartRateTopic(mac), heartObj)
+	if CheckDiffBetweenTwoSleepDeviceRecords(Ed713Type, mac, heartObj) {
+		// mq.PublishData("ed713/realdata/test", heartObj)
+		mq.PublishData(common.MakeHeartRateTopic(mac), heartObj)
+		taskPool.Put(&gopool.Task{
+			Params: []interface{}{realDataSql},
+			Do: func(params ...interface{}) {
+				var obj = params[0].(*Ed713RealDataMysql)
+				obj.Insert()
+			},
+		})
+	}
 }
 
 // swagger:model Ed713RealDataMysql

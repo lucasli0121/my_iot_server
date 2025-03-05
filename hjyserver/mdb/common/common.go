@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-08-29 20:20:29
  * LastEditors: liguoqiang
- * LastEditTime: 2024-06-11 14:19:17
+ * LastEditTime: 2025-01-08 16:40:41
  * Description:
 ********************************************************************************/
 
@@ -14,13 +14,18 @@ import (
 	"hjyserver/cfg"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // define tables name
 const (
 	DeviceTbl             = "device_tbl"
+	DeviceOverviewTbl     = "device_overview_tbl"
 	UserTbl               = "user_tbl"
 	UserDeviceRelationTbl = "user_device_relation_tbl"
+	UserShareDeviceTbl    = "user_share_device_tbl"
+	UserTransferDeviceTbl = "user_transfer_device_tbl"
 	UserGroupTbl          = "user_group_tbl"
 	FriendsTbl            = "friends_tbl"
 	FallAlarmTbl          = "fall_alarm_tbl"
@@ -50,6 +55,12 @@ const (
 	ImproveType        = 8
 )
 
+// 设备确认标志
+const (
+	DeviceUnConfirmFlag = 0
+	DeviceConfirmFlag   = 1
+)
+
 // define device flag, normal device or share device
 const (
 	NormalDeviceFlag = 0
@@ -74,6 +85,16 @@ const (
 	EmailHasReg    = -33
 	PhoneNotMatch  = -34
 	EmailNotMatch  = -35
+	JsonError      = -36
+	CodeError      = -37
+	AppIdError     = -38
+	PhoneError     = -39
+	WxError        = -40
+	TokenError     = -41
+	TypeError      = -42
+	DeviceOffLine  = -43
+	SameUser       = -44
+	AlreadyBind    = -45
 )
 
 // define all MQ topies prefix
@@ -84,10 +105,14 @@ const FALL_ALARM_DATA_TOPIC_PREFIX string = "fall_alarm/real_data"
 const HL77_DATA_TOPIC_PREFIX string = "hl77/real_data"
 const HL77_USER_ENTER_ROOM_TOPIC string = "hl77/user_enter_room"
 const HL77_CONTROL_STATUS_TOPIC string = "hl77/control_status"
-const DEVICE_HEART_BEAT_TOPIC string = "device/heart_beat"
 const ADD_FRIEND_NOTIFY string = "add_friend/notify"
-const SHARE_DEVICE_NOTIFY string = "share_device/notify"
-const DEVICE_NOTIFY_TOPIC string = "device/notify"
+const SHARE_DEVICE_NOTIFY string = "hjy-dev/share_device/notify"
+const SHARE_DEVICE_REMOVE_NOTIFY string = "hjy-dev/share_device/remove_notify"
+const SHARE_DEVICE_CONFIRM string = "hjy-dev/share_device/confirm"
+const TRANSFER_DEVICE_CONFIRM string = "hjy-dev/transfer_device/confirm"
+const TRANSFER_CONFIRM_FINISHED string = "hjy-dev/transfer_device/confirm_finished"
+const DEVICE_HEART_BEAT_TOPIC string = "hjy-dev/device/heart_beat"
+const DEVICE_NOTIFY_TOPIC string = "hjy-dev/device/notify"
 
 // const DEVICE_ONLINE_TOPIC string = "device/online"
 
@@ -179,6 +204,9 @@ func SecondsToTimeStr(seconds int64) string {
 func StrToTime(tmStr string) (time.Time, error) {
 	return time.ParseInLocation(cfg.TmFmtStr, tmStr, time.Local)
 }
+func StrToDate(tmStr string) (time.Time, error) {
+	return time.ParseInLocation(cfg.DateFmtStr, tmStr, time.Local)
+}
 
 /******************************************************************************
  * function: FixPlusInPhoneString
@@ -226,7 +254,22 @@ func MakeAddFriendNotifyTopic(userId int64) string {
 }
 
 func MakeShareDeviceNotifyTopic(userId int64) string {
-	return SHARE_DEVICE_NOTIFY //+ "/" + fmt.Sprintf("%d", userId)
+	return SHARE_DEVICE_NOTIFY + "/" + fmt.Sprintf("%d", userId)
+}
+
+func MakeShareDeviceRemoveNotifyTopic(userId int64) string {
+	return SHARE_DEVICE_REMOVE_NOTIFY + "/" + fmt.Sprintf("%d", userId)
+}
+
+func MakeShareDeviceConfirmTopic(userId int64) string {
+	return SHARE_DEVICE_CONFIRM + "/" + fmt.Sprintf("%d", userId)
+}
+
+func MakeTransferDeviceConfirmTopic(userId int64) string {
+	return TRANSFER_DEVICE_CONFIRM + "/" + fmt.Sprintf("%d", userId)
+}
+func MakeTransferConfirmedFinishedTopic(userId int64) string {
+	return TRANSFER_CONFIRM_FINISHED + "/" + fmt.Sprintf("%d", userId)
 }
 
 func MakeDeviceNotifyTopic(mac string) string {
@@ -401,4 +444,26 @@ func GetNotifyStatusDesc(phone string, notifyType int, status int) string {
 		// 其他通知
 	}
 	return desc
+}
+
+func GenerateUUID() string {
+	return uuid.New().String()
+}
+
+func GenerateTimeRandom() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano())
+}
+
+/******************************************************************************
+ * function: IsOneDayApart
+ * description: 判断是否是同一天，如果是同一天返回false，否则返回true
+ * param {*} t1
+ * param {time.Time} t2
+ * return {*}
+********************************************************************************/
+func IsOneDayApart(t1, t2 time.Time) bool {
+	if t1.Year() == t2.Year() && t1.YearDay() == t2.YearDay() {
+		return false
+	}
+	return true
 }
