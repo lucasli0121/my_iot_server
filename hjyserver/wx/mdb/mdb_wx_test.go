@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2024-07-31 14:58:54
  * LastEditors: liguoqiang
- * LastEditTime: 2024-08-31 11:04:28
+ * LastEditTime: 2025-03-08 16:54:14
  * Description:
 ********************************************************************************/
 package mdbwx
@@ -123,7 +123,7 @@ func TestSendReportCard(t *testing.T) {
 	defer redis.CloseRedis()
 	mysql.Open()
 	defer mysql.Close()
-	wxtools.SendCustomerReportMsgToOfficalAccount(1, "test", "f09e9e1f42ca", "2024-08-24")
+	wxtools.SendCustomerReportMsgToOfficalAccount(1, "test", "f09e9e1f42ca", "2024-08-24", "2024-08-24")
 }
 
 func TestDecriptSessionToJson(t *testing.T) {

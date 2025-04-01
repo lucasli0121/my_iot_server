@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-09-06 17:50:12
  * LastEditors: liguoqiang
- * LastEditTime: 2025-01-07 23:28:14
+ * LastEditTime: 2025-03-09 00:01:26
  * Description:
 ********************************************************************************/
 package mdb
@@ -101,6 +101,10 @@ func InsertDevice(c *gin.Context) (int, interface{}) {
 		} else if body.Type == mysql.H03Type {
 			if cfg.This.Svr.EnableH03 {
 				mysql.SubscribeH03MqttTopic(body.Mac)
+			}
+		} else if body.Type == mysql.T1Type {
+			if cfg.This.Svr.EnableT1 {
+				mysql.SubscribeT1MqttTopic(body.Mac)
 			}
 		}
 		userDevice := mysql.NewUserDeviceRelation()

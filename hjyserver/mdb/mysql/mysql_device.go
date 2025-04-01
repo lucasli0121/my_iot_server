@@ -37,6 +37,7 @@ const (
 	X1Type        = "x1_type"
 	X1sType       = "x1s_type"
 	H03Type       = "H03pro"
+	T1Type        = "T1_type"
 )
 
 func GetDeviceTypeByName(name string) string {

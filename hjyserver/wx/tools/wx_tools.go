@@ -397,6 +397,40 @@ func SendH03DeviceOnlineMsgToOfficalAccount(userId int64, nickName string, mac s
 }
 
 /******************************************************************************
+ * function: SendT1DeviceOnlineMsgToOfficalAccount
+ * description: 发送T1设备上线消息到公众号
+ * param {int64} userId
+ * param {string} nickName
+ * param {string} mac
+ * param {string} msg
+ * param {string} tm
+ * return {*}
+********************************************************************************/
+func SendT1DeviceOnlineMsgToOfficalAccount(userId int64, nickName string, mac string, msg string, tm string) (int, string) {
+	miniList := make([]mysqlwx.WxMiniProgram, 0)
+	mysqlwx.QueryWxMiniProgramByUserId(userId, &miniList)
+	if len(miniList) == 0 {
+		return common.NoData, "can not find mini program user in datebase"
+	}
+	// 小程序unionId
+	unionId := miniList[0].UnionId
+	// 查询公众号的openId
+	officalList := make([]mysqlwx.WxOfficalAccount, 0)
+	mysqlwx.QueryWxOfficalAccountSubscribeByUnionId(unionId, &officalList)
+	if len(officalList) == 0 {
+		return common.NoData, "can not find offical account user in datebase"
+	}
+	openId := officalList[0].FromOpenId
+	// 发送模板消息
+	data := map[string]interface{}{
+		"thing16": map[string]interface{}{"value": nickName},
+		"thing10": map[string]interface{}{"value": msg},
+		"time4":   map[string]interface{}{"value": tm},
+	}
+	return SendTempMessageToOfficalAccount(openId, cfg.This.Wx.DeviceOnlineOfficalTemplateId, "", data)
+}
+
+/******************************************************************************
  * function: SendH03DeviceStatusWarningMsgToOfficalAccount
  * description: 发送H03设备状态告警消息到公众号
  * param {int64} userId
@@ -407,6 +441,40 @@ func SendH03DeviceOnlineMsgToOfficalAccount(userId int64, nickName string, mac s
  * return {*}
 ********************************************************************************/
 func SendH03DeviceStatusWarningMsgToOfficalAccount(userId int64, nickName string, mac string, msg string, tm string) (int, string) {
+	miniList := make([]mysqlwx.WxMiniProgram, 0)
+	mysqlwx.QueryWxMiniProgramByUserId(userId, &miniList)
+	if len(miniList) == 0 {
+		return common.NoData, "can not find mini program user in datebase"
+	}
+	// 小程序unionId
+	unionId := miniList[0].UnionId
+	// 查询公众号的openId
+	officalList := make([]mysqlwx.WxOfficalAccount, 0)
+	mysqlwx.QueryWxOfficalAccountSubscribeByUnionId(unionId, &officalList)
+	if len(officalList) == 0 {
+		return common.NoData, "can not find offical account user in datebase"
+	}
+	openId := officalList[0].FromOpenId
+	// 发送模板消息
+	data := map[string]interface{}{
+		"thing10": map[string]interface{}{"value": nickName},
+		"thing2":  map[string]interface{}{"value": msg},
+		"time4":   map[string]interface{}{"value": tm},
+	}
+	return SendTempMessageToOfficalAccount(openId, cfg.This.Wx.DeviceStatusOfficalTemplateId, "", data)
+}
+
+/******************************************************************************
+ * function: SendT1DeviceStatusWarningMsgToOfficalAccount
+ * description: 发送T1设备状态告警消息到公众号
+ * param {int64} userId
+ * param {string} nickName
+ * param {string} mac
+ * param {string} msg
+ * param {string} tm
+ * return {*}
+********************************************************************************/
+func SendT1DeviceStatusWarningMsgToOfficalAccount(userId int64, nickName string, mac string, msg string, tm string) (int, string) {
 	miniList := make([]mysqlwx.WxMiniProgram, 0)
 	mysqlwx.QueryWxMiniProgramByUserId(userId, &miniList)
 	if len(miniList) == 0 {

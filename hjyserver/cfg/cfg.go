@@ -2,7 +2,7 @@
  * Author: liguoqiang
  * Date: 2023-08-29 20:20:28
  * LastEditors: liguoqiang
- * LastEditTime: 2024-12-03 11:53:52
+ * LastEditTime: 2025-03-08 23:55:59
  * Description:
 ********************************************************************************/
 /*
@@ -55,6 +55,7 @@ type SvrCfg struct {
 	EnableEd713 bool   `yaml:"enable_ed713"`
 	EnableHl77  bool   `yaml:"enable_hl77"`
 	EnableH03   bool   `yaml:"enable_h03"`
+	EnableT1    bool   `yaml:"enable_t1"`
 	EnableWx    bool   `yaml:"enable_wx"`
 }
 type DbCfg struct {

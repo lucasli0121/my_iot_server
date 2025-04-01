@@ -792,6 +792,350 @@ definitions:
       low_physical:
         type: integer
     type: object
+  mdb.T1CurDayFocusStatus:
+    properties:
+      deep_study_time:
+        description: 学习状态时长 深度学习时长 单位分钟
+        type: integer
+      low_study_time:
+        description: 学习状态时长, 低度时长 单位分钟
+        type: integer
+      mac:
+        description: 设备mac地址
+        type: string
+      mid_study_time:
+        description: 学习状态时长, 中度时长 单位分钟
+        type: integer
+      total_time:
+        description: 当天学习的总时间，单位分钟
+        type: integer
+    type: object
+  mdb.T1CurrentDayStudyTimeDetail:
+    properties:
+      end_time:
+        type: string
+      start_time:
+        type: string
+      study_time_len:
+        description: 学习时长，单位分钟
+        type: number
+    type: object
+  mdb.T1RebootReq:
+    properties:
+      delay_tm:
+        type: integer
+      mac:
+        type: string
+    type: object
+  mdb.T1ReportDetail:
+    properties:
+      start_time:
+        description: 状态开始时间
+        type: string
+      status:
+        description: 状态 0:无人 1:低度 2:深度 3:离开 4:中度
+        type: integer
+    type: object
+  mdb.T1ReportItem:
+    properties:
+      detail_list:
+        description: 状态详情列表
+        items:
+          $ref: '#/definitions/mdb.T1ReportDetail'
+        type: array
+      end_time:
+        description: 学习结束时间
+        type: string
+      focus:
+        description: 专注度
+        type: integer
+      learning_continuity:
+        description: 学习效率
+        type: integer
+      posture:
+        description: 坐姿管理
+        type: integer
+      score:
+        description: 学习评分
+        type: integer
+      start_time:
+        description: 学习开始时间
+        type: string
+      study_eff:
+        description: 学习时长
+        type: integer
+    type: object
+  mdb.T1StudyReportResp:
+    properties:
+      avg_focus:
+        description: 平均专注度
+        type: integer
+      avg_learning:
+        description: 平均学习效率
+        type: integer
+      avg_posture:
+        description: 平均坐姿管理
+        type: integer
+      avg_score:
+        description: 学习评分（平均值）
+        type: integer
+      avg_study_eff:
+        description: 平均学习时长
+        type: integer
+      beat_users:
+        description: 打败用户数
+        type: integer
+      mac:
+        type: string
+      report_list:
+        description: 学习记录列表
+        items:
+          $ref: '#/definitions/mdb.T1ReportItem'
+        type: array
+      total_time:
+        description: 总学习时间
+        type: integer
+    type: object
+  mdb.T1SwitchSettingReq:
+    properties:
+      concentration_high_notify_switch:
+        description: 专注度高通知开关 0:关闭 1:开启
+        type: integer
+      concentration_low_notify_switch:
+        description: 专注度低通知开关 0:关闭 1:开启
+        type: integer
+      day_report_push_set_time:
+        description: |-
+          required: true
+          日报告推送设定时间 格式: 00:00:00
+        type: string
+      day_report_switch:
+        description: |-
+          required: true
+          日报告开关 0:关闭 1:开启
+        type: integer
+      every_time_report_switch:
+        description: |-
+          required: true
+          次报告开关 0:关闭 1:开启
+        type: integer
+      leave_notify_switch:
+        description: 反复离开通知开关 0:关闭 1:开启
+        type: integer
+      mac:
+        type: string
+      posture_notify_switch:
+        description: 坐姿提醒通知开关 0:关闭 1:开启
+        type: integer
+      seat_notify_switch:
+        description: 落座通知开关 0:关闭 1:开启
+        type: integer
+      study_timeout_notify_switch:
+        description: 学习超时通知开关 0:关闭 1:开启
+        type: integer
+      temp_id_list:
+        description: |-
+          required: false
+          小程序订阅消息模板ID，后台返回给小程序端
+        items:
+          type: string
+        type: array
+    type: object
+  mdb.T1VersionResp:
+    properties:
+      coreVersion:
+        type: string
+      create_time:
+        type: string
+      deviceType:
+        type: string
+      hardwareVersion:
+        type: string
+      id:
+        type: integer
+      is_update:
+        type: boolean
+      mac:
+        type: string
+      softwareVersion:
+        type: string
+    type: object
+  mdb.T1WeekConcation:
+    properties:
+      con_time:
+        description: 时间
+        type: string
+      concentration:
+        description: 专注度
+        type: number
+    type: object
+  mdb.T1WeekFlowState:
+    properties:
+      deep_concentration:
+        description: 深度占比
+        type: number
+      deep_study_time:
+        description: 深度时间，单位分
+        type: number
+      flow_time:
+        description: 时间
+        type: string
+      light_concentration:
+        description: 轻度占比
+        type: number
+      light_study_time:
+        description: 轻度时间，单位分
+        type: number
+      mid_concentration:
+        description: 中度占比
+        type: number
+      mid_study_time:
+        description: 中度时间，单位分
+        type: number
+      total_study_time:
+        type: number
+    type: object
+  mdb.T1WeekReportResp:
+    properties:
+      avg_concentration:
+        description: |-
+          required: true
+          一周平均专注度分数
+        type: number
+      avg_day_study_time:
+        description: |-
+          required: true
+          平均每天学习时长,单位分钟
+        type: number
+      avg_study_evaluation:
+        description: |-
+          required: true
+          平均学习评分
+        type: number
+      bronze_award_nums:
+        description: |-
+          required: true
+          铜奖数量
+        type: integer
+      create_time:
+        description: |-
+          required: true
+          创建时间
+        type: string
+      gold_award_nums:
+        description: |-
+          required: true
+          金奖数量
+        type: integer
+      gold_award_week_day:
+        description: |-
+          required: true
+          周几奖励金奖
+        type: integer
+      id:
+        description: |-
+          required: true
+          ID
+        type: integer
+      last_end_report_time:
+        description: |-
+          required: true
+          最近一次学习报告结束时间
+        type: string
+      mac:
+        description: |-
+          required: true
+          mac地址
+        type: string
+      max_concentration:
+        description: |-
+          required: true
+          最高专注度分数
+        type: number
+      max_concentration_week_day:
+        description: |-
+          required: true
+          周几最高专注度
+        type: integer
+      max_study_evaluation:
+        description: |-
+          required: true
+          最大学习评分
+        type: number
+      max_study_evaluation_week_day:
+        description: |-
+          required: true
+          最大学习评分周几
+        type: integer
+      max_study_time:
+        description: |-
+          required: true
+          最长学习时长,单位分钟
+        type: number
+      max_study_time_week_day:
+        description: |-
+          required: true
+          最长学习时长周几
+        type: integer
+      report_week:
+        description: |-
+          required: true
+          报告周数
+        type: integer
+      report_year:
+        description: |-
+          required: true
+          报告年份
+        type: integer
+      sliver_award_nums:
+        description: |-
+          required: true
+          银奖数量
+        type: integer
+      study_day_nums:
+        description: |-
+          required: true
+          一周学习天数
+        type: integer
+      than_last_concentration:
+        description: |-
+          required: true
+          比上周最高专注度
+        type: number
+      than_last_max_study_time:
+        description: |-
+          required: true
+          比上周最长学习时长
+        type: number
+      than_last_study_day_nums:
+        description: |-
+          required: true
+          比上周学习天数
+        type: integer
+      than_last_study_time:
+        description: |-
+          required: true
+          比上周学习时长,单位分钟
+        type: number
+      total_concentration:
+        description: |-
+          required: true
+          总专注度分数
+        type: number
+      total_study_time:
+        description: |-
+          required: true
+          总学习时长,单位分钟
+        type: number
+      week_concation:
+        items:
+          $ref: '#/definitions/mdb.T1WeekConcation'
+        type: array
+      week_flow_state:
+        items:
+          $ref: '#/definitions/mdb.T1WeekFlowState'
+        type: array
+    type: object
   mdb.TransferDeviceWithMacReq:
     properties:
       from_user_id:
@@ -1624,6 +1968,261 @@ definitions:
       user_phone:
         type: string
     type: object
+  mysql.T1AttrData:
+    properties:
+      alarm_mode:
+        description: 闹钟模式
+        type: integer
+      alarm_time:
+        description: 闹钟时间
+        type: string
+      alarm_vol:
+        description: 闹钟音量
+        type: integer
+      bl_brightness:
+        description: 屏幕亮度值
+        type: integer
+      bl_delay:
+        description: 自动关屏幕延时时间
+        type: integer
+      bl_mode:
+        description: 屏幕模式
+        type: integer
+      body_angle:
+        description: 身体角度
+        type: integer
+      body_distance:
+        description: 身体距离
+        type: integer
+      body_movement:
+        description: 身体活跃度
+        type: integer
+      create_time:
+        description: 创建时间
+        type: string
+      deep_study_time:
+        description: 学习状态时长 深度学习时长 单位分钟
+        type: integer
+      flow_state:
+        description: |-
+          心流状态
+          0-离开; 1\2\3-浅(活动); 4\5\6-中(学习); 7\8\9-深(心流); 10-异常
+        type: integer
+      focus_status:
+        description: |-
+          required: true
+          学习状态,1: 轻度专注，2: 中度专注，3: 深度专注
+        type: integer
+      gesture_mode:
+        description: 手势模式
+        type: integer
+      heart_rate:
+        description: 心率
+        type: integer
+      hourly_chime:
+        description: 整点报时
+        type: integer
+      id:
+        type: integer
+      low_study_time:
+        description: 学习状态时长 轻度学习时长 单位分钟
+        type: integer
+      mac:
+        description: 设备mac地址
+        type: string
+      mid_study_time:
+        description: 学习状态时长 中度学习时长 单位分钟
+        type: integer
+      nl_brightness:
+        description: 灯光亮度值
+        type: integer
+      nl_mode:
+        description: 灯光功能
+        type: integer
+      position_interval:
+        description: 坐姿位置间隔
+        type: integer
+      respiratory:
+        description: 呼吸频率
+        type: integer
+      use_light_study_time:
+        description: 使用灯学习时长 单位分钟
+        type: integer
+    type: object
+  mysql.T1Event:
+    properties:
+      activity_freq:
+        description: |-
+          required: true
+          0:无人 1:频繁活动 2:轻微活动
+        type: integer
+      alarm_rang:
+        description: 闹钟响铃
+        type: integer
+      body_status:
+        description: |-
+          required: true
+          有人，无人
+        type: integer
+      create_time:
+        type: string
+      id:
+        type: integer
+      mac:
+        description: |-
+          required: true
+          mac 号
+        type: string
+      posture_state:
+        description: |-
+          required: true
+          0:无人 1:站立 2:端坐 3:趴伏
+        type: integer
+      warning_event:
+        description: |-
+          required: true
+          1:落座;2:专注度分数低; 3:专注度分数高 4:学习时长超时 5:反复离开 6:坐姿太偏
+        type: integer
+    type: object
+  mysql.T1ReportSwitchSetting:
+    properties:
+      concentration_high_notify_switch:
+        description: 专注度高通知开关 0:关闭 1:开启
+        type: integer
+      concentration_low_notify_switch:
+        description: 专注度低通知开关 0:关闭 1:开启
+        type: integer
+      day_report_latest_time:
+        description: 最近日报告推送时间
+        type: string
+      day_report_push_set_time:
+        description: |-
+          required: true
+          日报告推送设定时间 格式: 00:00:00
+        type: string
+      day_report_switch:
+        description: |-
+          required: true
+          日报告开关 0:关闭 1:开启
+        type: integer
+      every_report_latest_time:
+        description: 最近次报告推送时间
+        type: string
+      every_time_report_switch:
+        description: |-
+          required: true
+          次报告开关 0:关闭 1:开启
+        type: integer
+      id:
+        type: integer
+      leave_notify_switch:
+        description: 反复离开通知开关 0:关闭 1:开启
+        type: integer
+      mac:
+        type: string
+      posture_notify_switch:
+        description: 坐姿提醒通知开关 0:关闭 1:开启
+        type: integer
+      seat_notify_switch:
+        description: 落座通知开关 0:关闭 1:开启
+        type: integer
+      study_timeout_notify_switch:
+        description: 学习超时通知开关 0:关闭 1:开启
+        type: integer
+    type: object
+  mysql.T1Setting:
+    properties:
+      set_alarm_mode:
+        description: |-
+          设置闹钟模式
+          0:关闭 1:强力 2:渐强 3:轻柔 4:立停
+        type: integer
+      set_alarm_time:
+        description: |-
+          设置闹钟时间
+          格式： [hh,ss], hh:小时，ss:分钟
+          如[13,30]代表13:30
+        items:
+          type: integer
+        type: array
+      set_alarm_vol:
+        description: 设置闹钟音量
+        type: integer
+      set_bl_brightness:
+        description: 设置屏幕亮度
+        type: integer
+      set_bl_delay:
+        description: 设置关闭屏幕延时时间
+        type: integer
+      set_bl_mode:
+        description: |-
+          设置屏幕模式
+          0:自动 1:常亮
+        type: integer
+      set_gesture_mode:
+        description: |-
+          设置手势模式
+          0:关闭 1:开启
+        type: integer
+      set_nl_brightness:
+        description: 设置灯光亮度
+        type: integer
+      set_nl_mode:
+        description: |-
+          required: true
+          设置灯光功能
+          0:关闭 1:开启
+        type: integer
+    type: object
+  mysql.T1WarningEventNotifyDailyStat:
+    properties:
+      id:
+        type: integer
+      mac:
+        type: string
+      notify_date:
+        type: string
+      stat_week:
+        type: integer
+      stat_year:
+        type: integer
+      warning_event:
+        description: |-
+          required: true
+          警告事件
+        type: integer
+      warning_nums:
+        description: |-
+          required: true
+          警告次数
+        type: integer
+    type: object
+  mysql.T1WarningEventNotifyWeekStat:
+    properties:
+      id:
+        type: integer
+      mac:
+        type: string
+      stat_week:
+        type: integer
+      stat_year:
+        type: integer
+      than_last_week:
+        description: |-
+          required: true
+          比上周增加次数
+        type: integer
+      warning_event:
+        description: |-
+          required: true
+          警告事件
+        type: integer
+      warning_nums:
+        description: |-
+          required: true
+          警告次数
+        type: integer
+    type: object
   mysql.User:
     properties:
       account:
@@ -1910,6 +2509,316 @@ definitions:
 info:
   contact: {}
 paths:
+  /T1/askT1Reboot:
+    post:
+      description: ask T1 device to reboot
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: reboot information
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.T1RebootReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: askT1Reboot
+      tags:
+      - T1
+  /T1/askT1SyncVersion:
+    post:
+      description: ask T1 device to sync version
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: askT1SyncVersion
+      tags:
+      - T1
+  /T1/queryT1CurDayFocusStatus:
+    get:
+      description: 查询T1当天的专注状态
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.T1CurDayFocusStatus'
+      summary: queryT1CurDayFocusStatus
+      tags:
+      - T1
+  /T1/queryT1CurrentDayStudyTimeDetail:
+    get:
+      description: 查询T1当天学习时长的详情数据
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.T1CurrentDayStudyTimeDetail'
+      summary: queryT1CurrentDayStudyTimeDetail
+      tags:
+      - T1
+  /T1/queryT1LatestAttrs:
+    get:
+      description: 查询T1属性
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.T1AttrData'
+      summary: queryT1LatestAttrs
+      tags:
+      - T1
+  /T1/queryT1LatestStudyStatus:
+    get:
+      description: 查询T1学习状态
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.T1Event'
+      summary: queryT1LatestStudyStatus
+      tags:
+      - T1
+  /T1/queryT1ReportSwitch:
+    get:
+      description: 根据mac查报告开关设置
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.T1ReportSwitchSetting'
+      summary: queryT1ReportSwitch
+      tags:
+      - T1
+  /T1/queryT1StudyReport:
+    get:
+      description: 根据日期查询T1学习报告
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: start_day
+        in: query
+        name: start_day
+        required: true
+        type: string
+      - description: end_day
+        in: query
+        name: end_day
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.T1StudyReportResp'
+      summary: queryT1StudyReport
+      tags:
+      - T1
+  /T1/queryT1Version:
+    get:
+      description: 查询T1版本
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.T1VersionResp'
+      summary: queryT1Version
+      tags:
+      - T1
+  /T1/queryT1WarningEventStatDaily:
+    get:
+      description: 根据mac以及日期查询一周七天每天的告警事件统计次数
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: 查询的日期
+        in: query
+        name: daily_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.T1WarningEventNotifyDailyStat'
+      summary: queryT1WarningEventStatDaily
+      tags:
+      - T1
+  /T1/queryT1WarningEventStatWeekly:
+    get:
+      description: 根据mac以及日期查询一周告警事件统计次数
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: 周报日期
+        in: query
+        name: week_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mysql.T1WarningEventNotifyWeekStat'
+      summary: queryT1WarningEventStatWeekly
+      tags:
+      - T1
+  /T1/queryT1WeekReport:
+    get:
+      description: 根据mac以及日期查询周报告
+      parameters:
+      - description: device mac address
+        in: query
+        name: mac
+        required: true
+        type: string
+      - description: 周报日期
+        in: query
+        name: week_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mdb.T1WeekReportResp'
+      summary: queryT1WeekReport
+      tags:
+      - T1
+  /T1/setT1Param:
+    post:
+      description: set T1 control params
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: params settting
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mysql.T1Setting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: setT1Param
+      tags:
+      - T1
+  /T1/setT1ReportSwitch:
+    post:
+      description: set T1 report setting
+      parameters:
+      - description: token
+        in: query
+        name: token
+        type: string
+      - description: params settting
+        in: body
+        name: in
+        required: true
+        schema:
+          $ref: '#/definitions/mdb.T1SwitchSettingReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: none
+      summary: setT1ReportSwitch
+      tags:
+      - T1
   /device/askEd713RealData:
     post:
       description: ask Ed713 device to send real data

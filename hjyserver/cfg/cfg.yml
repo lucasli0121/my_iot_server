@@ -12,6 +12,7 @@ server:
   enable_ed713: false
   enable_hl77: false
   enable_h03: true
+  enable_t1: true
   enable_wx: true
 database:
   #url: mongodb://dening-tech.net:27017

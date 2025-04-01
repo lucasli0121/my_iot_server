@@ -210,7 +210,7 @@ func checkDeviceOnline() {
 	// 	return
 	// }
 	tm := time.Now().Add(-6 * time.Minute).Format(cfg.TmFmtStr)
-	if cfg.This.Svr.EnableH03 {
+	if cfg.This.Svr.EnableH03 || cfg.This.Svr.EnableT1 {
 		tm = time.Now().Add(-1 * time.Minute).Format(cfg.TmFmtStr)
 	}
 	filter := fmt.Sprintf("online=1 and online_time<='%s'", tm)
@@ -456,6 +456,17 @@ func subscribeDeviceTopic() {
 		}
 	}
 	results = nil
+	// subscribe t1 topic if enable t1
+	if cfg.This.Svr.EnableT1 {
+		filter = fmt.Sprintf("type='%s'", T1Type)
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				SubscribeT1MqttTopic(v.Mac)
+			}
+		}
+	}
+	results = nil
 	// subscribe x1s topic if enable x1s
 	if cfg.This.Svr.EnableX1s {
 		SubscribeX1sWildcardTopic()
@@ -483,6 +494,19 @@ func UnsubscribeDeviceTopic(mac string) {
 		if len(results) > 0 {
 			for _, v := range results {
 				UnsubscribeH03MqttTopic(v.Mac)
+			}
+		}
+	}
+	if cfg.This.Svr.EnableT1 {
+		if mac != "" {
+			filter = fmt.Sprintf("type='%s' and mac like '%s' ", T1Type, mac)
+		} else {
+			filter = fmt.Sprintf("type='%s'", T1Type)
+		}
+		QueryDeviceByCond(filter, nil, "create_time desc", &results)
+		if len(results) > 0 {
+			for _, v := range results {
+				UnsubscribeT1MqttTopic(v.Mac)
 			}
 		}
 	}

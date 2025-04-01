@@ -109,6 +109,18 @@ func StartWeb() {
 			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
 		}
 	}
+	// 初始化T1接口
+	t1Ports, t1Gets := InitT1Actions()
+	for k, v := range t1Gets {
+		verApi.GET(k, tollbooth_gin.LimitHandler(limt), v)
+	}
+	for k, v := range t1Ports {
+		if cfg.This.Svr.ApiVersion == "v1" {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), v)
+		} else {
+			verApi.POST(k, tollbooth_gin.LimitHandler(limt), AuthorizeToken, v)
+		}
+	}
 	// 初始化X1s接口
 	x1sPorts, x1sGets := InitX1sActions()
 	for k, v := range x1sGets {
