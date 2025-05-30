@@ -534,8 +534,31 @@ func UnsubscribeDeviceTopic(mac string) {
 * pageNo==1时返回总页数
 ********************************************************************/
 func QueryPage(table string, page *common.PageDao, filter interface{}, sort interface{}, cb func(*sql.Rows)) bool {
+	// 先获取总记录数，计算总页数
 	totalPages := int64(0)
-	sql := "select SQL_CALC_FOUND_ROWS * from " + table
+	totalCount := int64(0)
+	countSql := fmt.Sprintf("select count(*) from %s", table)
+	if filter != nil && len(filter.(string)) > 0 {
+		countSql += " where " + filter.(string)
+	}
+	row := mDb.QueryRow(countSql)
+	err := row.Scan(&totalCount)
+	if err != nil {
+		mylog.Log.Errorln(err)
+		return false
+	}
+	if page.PageSize <= 0 {
+		page.PageSize = 10
+	}
+	totalPages = int64(float32(totalCount)/float32(page.PageSize) + float32(0.9))
+	page.TotalPages = totalPages
+	// 根据页数查询数据
+	if page.PageNo <= 0 {
+		page.PageNo = 1
+	} else if page.PageNo > totalPages {
+		page.PageNo = totalPages
+	}
+	sql := "select * from " + table
 	if filter != nil && len(filter.(string)) > 0 {
 		sql += " where " + filter.(string)
 	}
@@ -552,13 +575,6 @@ func QueryPage(table string, page *common.PageDao, filter interface{}, sort inte
 	for rows.Next() {
 		cb(rows)
 	}
-	row := mDb.QueryRow("select FOUND_ROWS()")
-	totalCount := int64(0)
-	if row != nil {
-		row.Scan(&totalCount)
-	}
-	totalPages = int64(float32(totalCount)/float32(page.PageSize) + float32(0.5))
-	page.TotalPages = totalPages
 	return true
 }
 

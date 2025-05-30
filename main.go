@@ -5,13 +5,7 @@
  * LastEditTime: 2024-07-11 17:38:01
  * Description:
 ********************************************************************************/
-/*
- * @Author: liguoqiang
- * @Date: 2021-03-07 09:31:25
- * @LastEditors: liguoqiang
- * @LastEditTime: 2024-04-28 16:09:48
- * @Description: 实现后台管理的主程序
- */
+
 package main
 
 import (

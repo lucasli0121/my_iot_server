@@ -83,7 +83,7 @@ func checkDayReportTimer() {
 		// 昨天有报告则推送通知
 		beginDay := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 		endDay := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
-		status, resp := QueryH03StudyReportByMac(mac, beginDay, endDay)
+		status, resp := QueryH03StudyReportByMac(mac, beginDay, endDay, true)
 		if status == common.Success {
 			reportResp := resp.(H03StudyReportResp)
 			if len(reportResp.ReportList) > 0 {
@@ -701,10 +701,23 @@ func QueryH03StudyReport(c *gin.Context) (int, interface{}) {
 	if startDay == "" || endDay == "" {
 		return common.ParamError, "start_day or end_day required!"
 	}
-	return QueryH03StudyReportByMac(mac, startDay, endDay)
+	return QueryH03StudyReportByMac(mac, startDay, endDay, true)
 }
 
-func QueryH03StudyReportByMac(mac string, startDay string, endDay string) (int, interface{}) {
+func QueryH03StudyReportByTime(c *gin.Context) (int, interface{}) {
+	mac := c.Query("mac")
+	if mac == "" {
+		return common.ParamError, "mac required!"
+	}
+	startTime := c.Query("start_time")
+	endTime := c.Query("end_time")
+	if startTime == "" || endTime == "" {
+		return common.ParamError, "start_time or end_time required!"
+	}
+	return QueryH03StudyReportByMac(mac, startTime, endTime, false)
+}
+
+func QueryH03StudyReportByMac(mac string, startDay string, endDay string, queryDay bool) (int, interface{}) {
 	reportResp := H03StudyReportResp{
 		Mac:         mac,
 		AvgFocus:    0,
@@ -715,7 +728,13 @@ func QueryH03StudyReportByMac(mac string, startDay string, endDay string) (int, 
 		ReportList:  make([]H03ReportItem, 0),
 	}
 	reportList := make([]mysql.H03StudyReport, 0)
-	mysql.QueryH03StudyReportByDay(mac, startDay, endDay, &reportList, true)
+	if queryDay {
+		// 查询日报表
+		mysql.QueryH03StudyReportByDay(mac, startDay, endDay, &reportList, true)
+	} else {
+		// 查询时间段的日报表
+		mysql.QueryH03StudyReportByTime(mac, startDay, endDay, &reportList)
+	}
 	if len(reportList) == 0 {
 		return common.NoData, "no data"
 	}

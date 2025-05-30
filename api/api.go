@@ -257,6 +257,9 @@ func getPageDaoFromGin(c *gin.Context) *common.PageDao {
 			page = common.NewPageDao(no, size)
 		}
 	}
+	if page == nil {
+		page = common.NewPageDao(1, 10)
+	}
 	return page
 }
 

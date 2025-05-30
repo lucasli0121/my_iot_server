@@ -1,6 +1,6 @@
 server:
   host: 0.0.0.0:8083
-  out_url: https://service-mini.hylgeai.com/v2/ # https://mini-3t.hylgeai.com/v2/
+  out_url: 
   api_version: v2
   enable_tls: false
   cert_file: ./cert/server/server.crt
@@ -15,44 +15,40 @@ server:
   enable_t1: true
   enable_wx: true
 database:
-  #url: mongodb://dening-tech.net:27017
-  #url: mongodb://120.79.139.90:27017
-  #url: tcp(120.79.139.90:9306)
-  #url: tcp(120.24.76.93:9306)  # 测试服务器数据库
-  url: tcp(hylgeai.cn:33060)  # 正式服务器数据库阿里云数据库
-  username: hjy_mini_program # hjy
-  password: Hjy@1234 # hjy123
-  dbname: hjy-mini-program # hjy
+  url: 
+  username: 
+  password: 
+  dbname: 
 wx:
-  min_appId: wxe30df4dd6d3bf7c7
-  min_app_secret: aefe838da69a15f245ab0a1da3211ddd
-  public_appId: wxb44db5b8185402bd
-  public_app_secret: bcfa116a917c6f660845ea401e12faac
-  public_token: e10adc3949ba59abbe56e057f20f883e
+  min_appId: 
+  min_app_secret: 
+  public_appId: 
+  public_app_secret: 
+  public_token: 
   welcome_path: pages/welcome/welcome
   welcome_title: 欢迎来到小程序
-  welcome_media_id: mzQiXdX9nkjrN0JcN0GAp2NOIm2pVAq1oSIcbqEhXVC8FqbwfFNGleg5AJL_DZBy
+  welcome_media_id: 
   report_path: /pages/report/report
-  report_offical_template_id: R-e7KH-4NgZzKN-6wnmAFHcIBlqSeRhSoGEl4aTUAyY
-  report_offical_day_template_id: pX5ComSYj5XkYscJbHvcoO7UV2LK531WCkYiTT8B2Bg
-  report_offical_every_template_id: XfhKYudMh6OsF2XuPNQFWOr3t3ASdvhEqNLQnrqCiU0
-  device_online_offical_template_id: dM6In0dH7_becgdq4HbIetStdxfX4LhN_Jb3mPo-hnk
-  device_status_offical_template_id: 5L7vGfrQ7TX9q9RwOvikNXq7wGNMp8fap1CMI4qMWxQ
-  report_mini_template_id: Q9Bk7OSUVzJTW7wRN977XnumEzx7yunKLVMFahrAF2I
-  accessTokenUri: https://api.weixin.qq.com/cgi-bin/stable_token
+  report_offical_template_id: 
+  report_offical_day_template_id: 
+  report_offical_every_template_id: 
+  device_online_offical_template_id: 
+  device_status_offical_template_id: 
+  report_mini_template_id: 
+  accessTokenUri: 
 mq:
-  host: mqtt-cn-ot93vfkv202.mqtt.aliyuncs.com
+  host: 
   port: 1883
-  access_key: LTAI5t5y4hyGmTmjVf73g9hj
-  secret_key: 5wRKdXzIeWHBIBeYeUqLPDFlo2vbjx
-  instance_id: mqtt-cn-ot93vfkv202
-  group_id: GID_hjyserver_mqttx
-  client_id: GID_hjyserver_mqtt_client_1
-  username: Signature|LTAI5t5y4hyGmTmjVf73g9hj|mqtt-cn-ot93vfkv202
-  password: OOQhbXLFUzLKEd9jp/z4E1bbrY0=
+  access_key: 
+  secret_key: 
+  instance_id: 
+  group_id: 
+  client_id: 
+  username: 
+  password: 
 redis:
-  host: 120.24.76.93:6379
-  password: redis@123
+  host: 
+  password: 
   db: 0
   enable_tls: false
   cert_file: ../cert/redis/client.crt
@@ -60,7 +56,7 @@ redis:
   ca_file: ../cert/redis/ca.crt
 log:
   level: debug
-  file: ./log/hjyserver.log
+  file: ./log/my_iot_server.log
   maxsize: 100
   maxage: 7
   maxbackups: 10

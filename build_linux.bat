@@ -9,4 +9,4 @@ rem SET GOARM=7
 rem **********************
 SET GIN_MODE=release
 
-go build -o hjyserver_%1 main.go
+go build -o my_iot_server_%1 main.go

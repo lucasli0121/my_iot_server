@@ -26,6 +26,7 @@ func InitH03Actions() (map[string]gin.HandlerFunc, map[string]gin.HandlerFunc) {
 	getAction["/h03/queryH03LatestStudyStatus"] = queryH03LatestStudyStatus
 	getAction["/h03/queryH03CurDayFocusStatus"] = queryH03CurDayFocusStatus
 	getAction["/h03/queryH03StudyReport"] = queryH03StudyReport
+	getAction["/h03/queryH03StudyReportByTime"] = queryH03StudyReportByTime
 	getAction["/h03/queryH03ReportSwitch"] = queryH03ReportSwitch
 	getAction["/h03/queryH03CurrentDayStudyTimeDetail"] = queryH03CurrentDayStudyTimeDetail
 	getAction["/h03/queryH03WeekReport"] = queryH03WeekReport
@@ -174,6 +175,24 @@ func queryH03CurDayFocusStatus(c *gin.Context) {
 //	@Router			/h03/queryH03StudyReport [get]
 func queryH03StudyReport(c *gin.Context) {
 	apiCommonFunc(c, mdb.QueryH03StudyReport)
+}
+
+// queryH03StudyReportByTime godoc
+//
+//	@Summary	queryH03StudyReportByTime
+//	@Schemes
+//	@Description	根据日期查询H03学习报告，根据时间查询
+//	@Tags			H03
+//
+//	@Param			mac	query	string	true	"device mac address"
+//	@Param			start_time	query	string	true	"start_time"
+//	@Param			end_time	query	string	true	"end_time"
+//
+//	@Produce		json
+//	@Success		200	{object}	mdb.H03StudyReportResp
+//	@Router			/h03/queryH03StudyReportByTime [get]
+func queryH03StudyReportByTime(c *gin.Context) {
+	apiCommonFunc(c, mdb.QueryH03StudyReportByTime)
 }
 
 // queryH03CurrentDayStudyTimeDetail godoc
