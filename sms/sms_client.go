@@ -2,14 +2,7 @@
  * Author: liguoqiang
  * Date: 2024-05-24 18:25:06
  * LastEditors: liguoqiang
- * LastEditTime: 2024-05-26 18:28:18
- * Description:
-********************************************************************************/
-/******************************************************************************
- * Author: liguoqiang
- * Date: 2024-05-24 18:25:06
- * LastEditors: liguoqiang
- * LastEditTime: 2024-05-24 20:09:18
+ * LastEditTime: 2025-06-04 09:46:23
  * Description:
 ********************************************************************************/
 package sms
@@ -43,9 +36,9 @@ func createClient() (_result *dysmsapi20170525.Client, _err error) {
 	// 建议使用更安全的 STS 方式，更多鉴权访问方式请参见：https://help.aliyun.com/document_detail/378661.html。
 	config := &openapi.Config{
 		// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。
-		AccessKeyId: tea.String("LTAI5tDVBxSPFy5rsRMXcgQE"),
+		AccessKeyId: tea.String(""),
 		// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。
-		AccessKeySecret: tea.String("p0bSkgCRHJUTa8LC5AbsLFQzotxJH6"),
+		AccessKeySecret: tea.String(""),
 	}
 	// Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
 	config.Endpoint = tea.String("dysmsapi.aliyuncs.com")
@@ -74,7 +67,7 @@ func SendSms(phone string, nickName string, msg string) error {
 	// 发送短信
 	sendSmsRequest := &dysmsapi20170525.SendSmsRequest{
 		PhoneNumbers:  tea.String(phone),
-		SignName:      tea.String("深圳海吉雅健康科技"),
+		SignName:      tea.String(""),
 		TemplateCode:  tea.String(templateCoee),
 		TemplateParam: tea.String(fmt.Sprintf("{\"name\":\"%s\",\"msg\":\"%s\"}", nickName, msg)),
 	}
